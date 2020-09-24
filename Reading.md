@@ -18,6 +18,7 @@ This is a list of references that I use in my studies, the books that I have rea
 
 ### Articles
 - [Learning to Learn](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/)
+
 ---
 
 ## Reinforcement Learning
@@ -43,7 +44,7 @@ This is a list of references that I use in my studies, the books that I have rea
 - [AlphaGo](https://storage.googleapis.com/deepmind-media/alphago/AlphaGoNaturePaper.pdf)
   - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
 - [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
--
+
 ---
 
 ## Robotics
