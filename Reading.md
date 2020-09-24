@@ -129,4 +129,3 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - 21 Laws for the 21st century - Harari
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
--
