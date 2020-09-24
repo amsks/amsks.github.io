@@ -77,6 +77,10 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Eletrodynamics - Griffith](http://profesores.dcb.unam.mx/users/raulpm/teoem/griffiths.pdf)
 - [Feynmann Lectures](https://www.feynmanlectures.caltech.edu/)
 
+### Interesting Stuff
+- [TOPICS IN TOPOLOGY AND HOMOTOPY THEORY](https://sites.math.washington.edu/~warner/TTHT_Warner.pdf)
+- [Introduction to homotopy theory](https://www.uni-regensburg.de/Fakultaeten/nat_Fak_I/Bunke/topo-2.pdf)
+- [Introduction to Knot Theory](https://www.maths.ed.ac.uk/~v1ranick/papers/crowfox.pdf)
 ---
 ## LIS Research
 - [TossingBot](https://tossingbot.cs.princeton.edu/paper.pdf)
@@ -130,3 +134,4 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - 21 Laws for the 21st century - Harari
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
+-
