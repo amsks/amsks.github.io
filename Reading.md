@@ -1,4 +1,4 @@
-# My Reading List
+# Reading List
 This is a list of stuff that I have read in the past and I use for reference usually in my work.
 
 ## Books
@@ -49,24 +49,38 @@ This is a list of stuff that I have read in the past and I use for reference usu
 - [Handbook fo Monte-Carlo Methods](https://people.smp.uq.edu.au/DirkKroese/montecarlohandbook/)
 
 
-
-## Notes
+## Primers
 - [Math for Intelligent Systems](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Maths.pdf)
 - [AI Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-AI.pdf)
 - [Basic Robotics](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Robotics.pdf)
+- [Convex Optimization Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Optimization.pdf)
+- [Supervised ML Primer](https://github.com/kashefy/mi1notes)
+- [Unsupervised ML Primer](https://github.com/kashefy/mi2notes)
 
 
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)
 - A brief history of time - Hawking
 - Order of Time - Carla Rovelli
+- Tao of Physics - Fritjof Capra
 - [Godel, Escher, Bach : An Eternal Golden Braid - Hofstadter](https://www.physixfan.com/wp-content/files/GEBen.pdf)
 - Foundation Series - Asimov
 - Robot Series - Asimov
 - [The Last Question](https://templatetraining.princeton.edu/sites/training/files/the_last_question_-_issac_asimov.pdf)
 - Lord of the Rings - Tolkein
 - Harry Potter Series - Rowling
+- The Innovator's Dilemma - Christensen
+- [Life 3.0 - Max Tegmark](https://en.wikipedia.org/wiki/Life_3.0)
+    * Tegmark's concept of understanding consciousness in terms of the subjective experience of an entity while proccessing information is worth lookign into. ties up to the recent exploits in [Integrated Information Theory](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42) and other related fields. Look into GEB stuff
+- [Chess Programming Wiki](https://www.chessprogramming.org/Main_Page)
+- Industries of the Future - Alec Ross
+- Bold: Go Big, Create Wealth and impact the world - Peter Diamandis
+- Zero to One - Peter Thiel
+- How to win friends and Inflence peopel - Dale Carnegie
+- 48 Laws of Power - Robert Greene
+- QED - Fynmann
+
+---
+-
 - Tools for Conviviality - Ivan Illich
 - [Deschooling Society](https://davidtinapple.com/illich/1970_deschooling.html)
-- The Innovator's Dilemma - Christensen
--
