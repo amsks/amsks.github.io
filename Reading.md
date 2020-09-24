@@ -1,51 +1,53 @@
 # Reading List
 This is a list of references that I use in m studies and the books that I have read in the past, best recollected from memory
 
-## Books
-### Machine Learning
-
-- [Reinforcement Learning: An Introduction by Sutton and Barto](https://web.stanford.edu/class/psych209/Readings/SuttonBartoIPRLBook2ndEd.pdf)
-- [Dynamic Programming and Optimal Control by Bertsekas](https://web.mit.edu/dimitrib/www/DP2_Chapter%204_UPDATED.pdf)
+---
+## Machine Learning
+### Books
 - [Pattern Recognition and Machine Learning by Bishop](http://users.isr.ist.utl.pt/~wurmd/Livros/school/Bishop%20-%20Pattern%20Recognition%20And%20Machine%20Learning%20-%20Springer%20%202006.pdf)
 - [Deep Learning by Ian Goodfellow et. al](https://www.deeplearningbook.org/)
 - [Learning with kernels by Schölkopf & Smola](http://agbs.kyb.tuebingen.mpg.de/lwk/)
 - [Artificial Intelligence by Russel and Norvig](https://www.cin.ufpe.br/~tfl2/artificial-intelligence-modern-approach.9780131038059.25368.pdf)
 
-### Robotics
+### Primers
+- [Supervised ML Primer](https://github.com/kashefy/mi1notes)
+- [Unsupervised ML Primer](https://github.com/kashefy/mi2notes)
+- [AI Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-AI.pdf)
+- [Foundations of ML](https://bloomberg.github.io/foml/#lectures)
+
+---
+
+## Reinforcement Learning
+### Books
+- [Reinforcement Learning: An Introduction by Sutton and Barto](https://web.stanford.edu/class/psych209/Readings/SuttonBartoIPRLBook2ndEd.pdf)
+- [Dynamic Programming and Optimal Control by Bertsekas](https://web.mit.edu/dimitrib/www/DP2_Chapter%204_UPDATED.pdf)
+
+### Articles
+- [Key Terms in RL](Reinforcement_Learning/Key_Terms_in_RL.md)
+- [Key Papers in RL](https://spinningup.openai.com/en/latest/spinningup/keypapers.html#model-free-rl)
+
+### Papers
+- [Potential-Based Reward Shaping: Policy Invariance](https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf)
+- [DQN](http://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
+- [DDPG](https://arxiv.org/pdf/1509.02971.pdf)
+
+---
+
+## Robotics
+
+## Books
 - [Introduction to Robotics by Craig](http://www.mech.sharif.ir/c/document_library/get_file?uuid=5a4bb247-1430-4e46-942c-d692dead831f&groupId=14040)
 - [Probabilistic Robotics by Thurn, Burgard adn Fox](https://docs.ufpr.br/~danielsantos/ProbabilisticRobotics.pdf)
 - [Planning Algorithms by Lavelle](http://lavalle.pl/planning/)
 
-### Math and Physics
-- [Thomas calculus](https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnx3d3dpbW1vcnRhbHM5NWNvbXxneDo2MGJjOWQxNWE5NWYwZGUx)
-- [Eletrodynamics - Griffith](http://profesores.dcb.unam.mx/users/raulpm/teoem/griffiths.pdf)
-- [Feynmann Lectures](https://www.feynmanlectures.caltech.edu/)
+### Primers
+- [Basic Robotics](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Robotics.pdf)
 
+---
 
-## Papers and Articles
-
-### LIS Research
-- [TossingBot](https://tossingbot.cs.princeton.edu/paper.pdf)
-- [LeTs Drive](https://arxiv.org/abs/1905.12197)
-- [PoseRBPF](https://arxiv.org/abs/1905.09304)
-- [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
-
-### Machine Learning
-- [Foundations of ML](https://bloomberg.github.io/foml/#lectures)
-
-
-### Autonomous Driving
--
-
-### Reinforcement Learning
-- [Key Terms in RL](Primers/Key_Terms_in_RL.md)
-- [Potential-Based Reward Shaping: Policy Invariance](https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf)
-- [DQN](http://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
-- [DDPG](https://arxiv.org/pdf/1509.02971.pdf)
-- [Key Papers in RL](https://spinningup.openai.com/en/latest/spinningup/keypapers.html#model-free-rl)
-
-
-### Math Reivew
+## Math and Physics
+### Primers
+- [Math for Intelligent Systems](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Maths.pdf)
 - [Review of Probability Theory](http://cs229.stanford.edu/section/cs229-prob.pdf)
 - [Convex Optimization Overview 1](http://cs229.stanford.edu/section/cs229-cvxopt.pdf)
 - [Convex Optimization Overview 2](http://cs229.stanford.edu/section/cs229-cvxopt2.pdf)
@@ -55,17 +57,21 @@ This is a list of references that I use in m studies and the books that I have r
 - [Gaussian Processes](http://cs229.stanford.edu/section/cs229-gaussian_processes.pdf)
 - [Handbook fo Monte-Carlo Methods](https://people.smp.uq.edu.au/DirkKroese/montecarlohandbook/)
 - [Handbook of Geometry](https://vlecomte.github.io/cp-geo.pdf)
-
-
-## Primers
-- [Math for Intelligent Systems](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Maths.pdf)
-- [AI Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-AI.pdf)
-- [Basic Robotics](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Robotics.pdf)
 - [Convex Optimization Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Optimization.pdf)
-- [Supervised ML Primer](https://github.com/kashefy/mi1notes)
-- [Unsupervised ML Primer](https://github.com/kashefy/mi2notes)
 
+### Books
+- [Thomas calculus](https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnx3d3dpbW1vcnRhbHM5NWNvbXxneDo2MGJjOWQxNWE5NWYwZGUx)
+- [Eletrodynamics - Griffith](http://profesores.dcb.unam.mx/users/raulpm/teoem/griffiths.pdf)
+- [Feynmann Lectures](https://www.feynmanlectures.caltech.edu/)
 
+---
+## LIS Research
+- [TossingBot](https://tossingbot.cs.princeton.edu/paper.pdf)
+- [LeTs Drive](https://arxiv.org/abs/1905.12197)
+- [PoseRBPF](https://arxiv.org/abs/1905.09304)
+- [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
+
+---
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)
 - A brief history of time - Hawking

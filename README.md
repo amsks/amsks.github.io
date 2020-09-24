@@ -5,7 +5,7 @@
 - [Resume](CV/main.pdf)
 - [Linkedin](https://www.linkedin.com/in/amsks/)
 - [Medium](https://medium.com/@adityak735)
-- [reading list](Reading.md)
+- [Reading list](Reading.md)
 - [Stuff I have written](Writings.md)
 
 ## Introduction
