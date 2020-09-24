@@ -1,5 +1,5 @@
 # Reading List
-This is a list of references that I use in m studies and the books that I have read in the past, best recollected from memory
+This is a list of references that I use in my studies, the books that I have read in the past, and stuff that I found interesting.
 
 ---
 ## Machine Learning
@@ -14,7 +14,10 @@ This is a list of references that I use in m studies and the books that I have r
 - [Unsupervised ML Primer](https://github.com/kashefy/mi2notes)
 - [AI Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-AI.pdf)
 - [Foundations of ML](https://bloomberg.github.io/foml/#lectures)
+- [Collection of DL Resources](http://www.jeremydjacksonphd.com/category/deep-learning/)
 
+### Articles
+- [Learning to Learn](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/)
 ---
 
 ## Reinforcement Learning
@@ -30,11 +33,20 @@ This is a list of references that I use in m studies and the books that I have r
 - [Potential-Based Reward Shaping: Policy Invariance](https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/NgHaradaRussell-shaping-ICML1999.pdf)
 - [DQN](http://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf)
 - [DDPG](https://arxiv.org/pdf/1509.02971.pdf)
-
+- [Async DL : A2C/A3C](https://arxiv.org/pdf/1602.01783.pdf)
+- [Proximal Policy Optimization](https://arxiv.org/pdf/1707.06347.pdf)
+- [Trust Region Policy Optimization](https://arxiv.org/pdf/1502.05477.pdf)
+- [Hindsight Experience Replay](https://arxiv.org/pdf/1707.01495.pdf)
+- [Rainbow](https://arxiv.org/pdf/1710.02298.pdf)
+- [Feudal Networks](https://arxiv.org/pdf/1703.01161.pdf)
+- [Learning to learn by gradient descent](https://arxiv.org/pdf/1606.04474.pdf)
+- [AlphaGo](https://storage.googleapis.com/deepmind-media/alphago/AlphaGoNaturePaper.pdf)
+  - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
+- [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
+-
 ---
 
 ## Robotics
-
 ## Books
 - [Introduction to Robotics by Craig](http://www.mech.sharif.ir/c/document_library/get_file?uuid=5a4bb247-1430-4e46-942c-d692dead831f&groupId=14040)
 - [Probabilistic Robotics by Thurn, Burgard adn Fox](https://docs.ufpr.br/~danielsantos/ProbabilisticRobotics.pdf)
@@ -111,9 +123,10 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
     * "Many students, especially those who are poor, intuitively know what the schools do for them. They school them to confuse process and substance. Once these become blurred, a new logic is assumed: the more treatment there is, the better are the results; or, escalation leads to success. The pupil is thereby “schooled” to confuse teaching with learning, grade advancement with education, a diploma with competence, and fluency with the ability to say something new. His imagination is “schooled” to accept service in place of value. Medical treatment is mistaken for health care, social work for the improvement of community life, police protection for safety, military poise for national security, the rat race for productive work. Health, learning, dignity, independence, and creative endeavor are defined as little more than the performance of the institutions which claim to serve these ends, and their improvement is made to depend on allocating more resources to the management of hospitals, schools, and other agencies in question. In these essays, I will show that the institutionalization of values leads inevitably to physical pollution, social polarization, and psychological impotence: three dimensions in a process of global degradation and modernized misery."
 
 - Trust Me, I am lying - Ryan Holiday
-- Krishna Trilogy( I am Krishna )m - Deep Trivedi
+- Krishna Trilogy(I am Krishna) - Deep Trivedi
 - Homo Sapiens - Harari
 - Homo Deus - Harari
 - 21 Laws for the 21st century - Harari
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
+-
