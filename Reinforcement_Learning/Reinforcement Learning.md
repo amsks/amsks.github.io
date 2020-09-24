@@ -11,4 +11,4 @@ Now, the way I define observations is thorugh formalizing it as a **state** in w
 ![image](Pics/agent-env.svg)
 
 To charecterize this agent, following components are deinfed:
-- **Policy**: It characterizes the behaviour of the agent i.e how it should navigate around the this world that it is observing. 
+- **Policy**($$e=mc^2$$): It characterizes the behaviour of the agent i.e how it should navigate around the this world that it is observing. 
