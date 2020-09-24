@@ -1,8 +1,7 @@
 # Reading List
-This is a list of stuff that I have read in the past and I use for reference usually in my work.
+This is a list of references that I use in m studies and the books that I have read in the past, best recollected from memory
 
 ## Books
-
 ### Machine Learning
 
 - [Reinforcement Learning: An Introduction by Sutton and Barto](https://web.stanford.edu/class/psych209/Readings/SuttonBartoIPRLBook2ndEd.pdf)
@@ -79,8 +78,5 @@ This is a list of stuff that I have read in the past and I use for reference usu
 - How to win friends and Inflence peopel - Dale Carnegie
 - 48 Laws of Power - Robert Greene
 - QED - Fynmann
-
----
--
 - Tools for Conviviality - Ivan Illich
 - [Deschooling Society](https://davidtinapple.com/illich/1970_deschooling.html)
