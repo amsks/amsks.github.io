@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Reinforcement Learning | amsks.github.io</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Reinforcement Learning" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/Reinforcement_Learning/Reinforcement%20Learning.html" />
+<meta property="og:url" content="http://localhost:4000/Reinforcement_Learning/Reinforcement%20Learning.html" />
+<meta property="og:site_name" content="amsks.github.io" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/Reinforcement_Learning/Reinforcement%20Learning.html","headline":"Reinforcement Learning","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=5a74aa8e2109aa03a9ef8917c5291ca5b9cc4b17">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
+        
+        
+
+        <p></p>
+
+        
+        <p class="view"><a href="https://github.com/amsks/amsks.github.io">View the Project on GitHub <small>amsks/amsks.github.io</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="reinforcement-learning">Reinforcement Learning</h1>
+
+<p>This is a concept flow for the major topics in RL, as understod from various sources listed in the <a href="Reading.md">reading list</a></p>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>The way I like to think about reinforcement learning is by imagining myself as a ring-master who has to train an animal. I call this animal an <strong>agent</strong>. My language of communication with this animal is through numbers, encoded in processes that I create for it to understand and interact with the world around it. The way this agent interacts with the world around it is through <strong>actions</strong> and the way it understands the world is through <strong>observations</strong>. Now, my task is to define these actions and observations, and train this agent to achieve a certain task by creating a closed-loop control of feedback for the actions it takes. This feedback is the <strong>reward</strong> that agent recieves for each of its actions.</p>
+
+<p>Now, the way I define observations is thorugh formalizing it as a <strong>state</strong> in which this agent exists, or can exist. This state can either be the same as the observation, in case the agent is able to see everything about its environment, for example, in an extreme case imagine if you were able to see all the atoms that constitute your surroundings, or the state can be defined in terms of <strong>beliefs</strong> that the might have based on its observation.</p>
+
+<p><img src="/Reinforcement_Learning/Pics/agent-env.svg" alt="image" /></p>
+
+<p>To charecterize this agent, following components are deinfed:</p>
+<ul>
+  <li><strong>Policy</strong>($e=mc^2$): It characterizes the behaviour of the agent i.e how it should navigate around the this world that it is observing.</li>
+</ul>
+
+<p>Now let’s consider two sets, $A, B$</p>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/amsks">amsks</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

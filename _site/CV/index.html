@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>AltaCV, yet another LaTeX CV/Résumé class | amsks.github.io</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="AltaCV, yet another LaTeX CV/Résumé class" />
+<meta property="og:locale" content="en_US" />
+<link rel="canonical" href="http://localhost:4000/CV/" />
+<meta property="og:url" content="http://localhost:4000/CV/" />
+<meta property="og:site_name" content="amsks.github.io" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/CV/","headline":"AltaCV, yet another LaTeX CV/Résumé class","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=5a74aa8e2109aa03a9ef8917c5291ca5b9cc4b17">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
+        
+        
+
+        <p></p>
+
+        
+        <p class="view"><a href="https://github.com/amsks/amsks.github.io">View the Project on GitHub <small>amsks/amsks.github.io</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="altacv-yet-another-latex-cvrésumé-class">AltaCV, yet another LaTeX CV/Résumé class</h1>
+
+<p>v1.3.2 (17 May 2020), by LianTze Lim (liantze@gmail.com)</p>
+
+<p><em>Sample file with new paracol layout added on 2 February 2020</em></p>
+
+<p>(Thanks to <a href="https://github.com/nurh">Nur</a> for the name.)</p>
+
+<p>It all started with this:</p>
+
+<p><a href="https://twitter.com/Leonduck/status/764281546408923136"><img src="tweet-that-started-this.png" width="500px" /></a></p>
+
+<p>Leonardo was talking about a <a href="http://www.businessinsider.my/a-sample-resume-for-marissa-mayer-2016-7/">résumé of Marissa Mayer that Business Insider put together</a> using <a href="https://enhancv.com">enhancv.com</a>.
+I <em>knew</em> I had to do something about it. And so AltaCV was born.</p>
+
+<h2 id="samples">Samples</h2>
+
+<p>This is how the re-created résumé looks like (<a href="https://www.overleaf.com/latex/examples/recreating-business-insiders-cv-of-marissa-mayer-using-altacv/gtqfpbwncfvp">view/open on Overleaf</a>):</p>
+
+<p><img src="mmayer.png" alt="Marissa Mayer's résumé, re-created with AltaCV" width="600px" /></p>
+
+<p>Though if you’re creating your own CV/résumé, you’d probably prefer using the basic template (<a href="https://www.overleaf.com/latex/templates/altacv-template/trgqjpwnmtgv">view/open on Overleaf</a>):</p>
+
+<p><img src="sample.png" alt="sample barebones AltaCV template" width="600px" /></p>
+
+<h2 id="requirements-and-compilation">Requirements and Compilation</h2>
+
+<ul>
+  <li>pdflatex + biber + pdflatex</li>
+  <li>AltaCV uses <a href="http://www.ctan.org/pkg/fontawesome"><code class="language-plaintext highlighter-rouge">fontawesome</code></a> and <a href="http://www.ctan.org/pkg/academicons"><code class="language-plaintext highlighter-rouge">academicons</code></a>; they’re included in both TeX Live 2016 and MikTeX 2.9.</li>
+  <li>Loading <code class="language-plaintext highlighter-rouge">academicons</code> is optional: enable it by adding the <code class="language-plaintext highlighter-rouge">academicons</code> option to <code class="language-plaintext highlighter-rouge">\documentclass</code>.</li>
+  <li>Use the <code class="language-plaintext highlighter-rouge">normalphoto</code> option to get normal (i.e. non-circular) photos.</li>
+  <li>As of v1.2 you can add multiple photos on the left or right: <code class="language-plaintext highlighter-rouge">\photoL{2cm}{logo1}</code> and <code class="language-plaintext highlighter-rouge">\photoR{2.5cm}{logo2,photo}</code>. (<code class="language-plaintext highlighter-rouge">\photo</code> will work like <code class="language-plaintext highlighter-rouge">\photoR</code>.) Separate your image filenames with commas <em>without</em> spaces.</li>
+  <li>Use the <code class="language-plaintext highlighter-rouge">ragged2d</code> option to activate hyphenations while keeping text left-justified; line endings will thus be less jagged and more aesthetically pleasing.</li>
+  <li>Can now be compiled with pdflatex, XeLaTeX and LuaLaTeX!</li>
+  <li>However if you’re using <code class="language-plaintext highlighter-rouge">academicons</code>, you <em>must</em> use either XeLaTeX or LuaLaTeX. If the doc then compiles but the icons don’t show up in the output PDF, try compiling with LuaLaTeX instead.</li>
+  <li>The samples here use the <a href="http://www.latofonts.com/lato-free-fonts/">Lato</a> font. Feel free to use a different typeface package instead—often a different typeface will change the entire CV’s feel.</li>
+</ul>
+
+<h2 id="example-files">Example Files</h2>
+
+<h3 id="sampletex"><code class="language-plaintext highlighter-rouge">sample.tex</code></h3>
+
+<p>(You may prefer to use <code class="language-plaintext highlighter-rouge">sample-alt.tex</code> instead; please read both sections before proceeding.)</p>
+
+<p>This is the original sample template file. The right sidebar is actually a <em>marginpar</em>, so it doesn’t support footnote and cannot automatically break across pages if it’s too long. You would need to split your right sidebar contents into separate files e.g. <code class="language-plaintext highlighter-rouge">p1sidebar.tex</code> and <code class="language-plaintext highlighter-rouge">p2sidebar.tex</code>, and insert them as the optional argument of the <code class="language-plaintext highlighter-rouge">\cvsection{...}</code> that you want to align them with:</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">\cvsection</span><span class="na">[p1sidebar]</span><span class="p">{</span>Experience<span class="p">}</span>
+...
+... END OF FIRST PAGE OF YOUR CV ...
+<span class="k">\cvsection</span><span class="na">[page2sidebar]</span><span class="p">{</span>Publications<span class="p">}</span>
+...
+</code></pre></div></div>
+
+<p>This assumes that the next page’s main column would start immediately with a <code class="language-plaintext highlighter-rouge">\cvsection</code>, so that the top of your right sidebar contents also appear at the top of the page. Now if the <em>next</em> page doesn’t start with a <code class="language-plaintext highlighter-rouge">\cvsection</code> but you’d still like to add a sidebar, then use this command on the <em>current</em> page to add it. The optional argument lets you pull up the sidebar a bit so that it looks aligned with the top of the main column:</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">\addnextpagesidebar</span><span class="na">[-1ex]</span><span class="p">{</span>page3sidebar<span class="p">}</span>
+</code></pre></div></div>
+
+<p>If you want to change the left and right columns’ widths, you’ll need to tinker with the <code class="language-plaintext highlighter-rouge">right</code> (distance from paper’s right edge until the main column’s right edge) and <code class="language-plaintext highlighter-rouge">marginparwidth</code> (width of the right sidebar) options in the <code class="language-plaintext highlighter-rouge">\geometry</code> line. For example, to make the right sidebar wider by 2cm, you could use</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">%% original was right=9cm, marginparwidth=6.8cm</span>
+<span class="k">\geometry</span><span class="p">{</span>left=1cm,right=11cm,marginparwidth=8.8cm,marginparsep=1.2cm,top=1cm,bottom=1cm<span class="p">}</span>
+</code></pre></div></div>
+<p>as well as doing a bit of arithmetic when you’re making the header to get it full-width, i.e. reducing the sidebar by 2cm and extending the main column by 2cm.</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">\begin{adjustwidth}</span><span class="p">{}{</span>-10cm<span class="p">}</span>  <span class="c">%% original was -8cm</span>
+<span class="k">\makecvheader</span>
+<span class="nt">\end{adjustwidth}</span>
+</code></pre></div></div>
+
+<h3 id="sample-alttex-added-2-february-2020"><code class="language-plaintext highlighter-rouge">sample-alt.tex</code> [ADDED 2 FEBRUARY 2020]</h3>
+<p>Many users have overlooked the optional argument of <code class="language-plaintext highlighter-rouge">\cvsection</code> to insert the right sidebar contents, and often confused that the right sidebar doesn’t automatically break across pages. This new layout uses the <code class="language-plaintext highlighter-rouge">paracol</code> package for typesetting the left and right columns that <em>can</em> break across pages. It also makes changing the column widths easier:</p>
+
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">%% Set the left/right column width ratio to 6:4.</span>
+<span class="k">\columnratio</span><span class="p">{</span>0.6<span class="p">}</span>
+
+<span class="c">% Start a 2-column paracol. Both the left and right columns will automatically</span>
+<span class="c">% break across pages if things get too long.</span>
+<span class="nt">\begin{paracol}</span><span class="p">{</span>2<span class="p">}</span>
+<span class="k">\cvsection</span><span class="p">{</span>Experience<span class="p">}</span>
+...
+... END OF LEFT COLUMN CONTENTS ...
+
+<span class="c">% Now switch to the right column.</span>
+<span class="k">\switchcolumn</span>
+<span class="k">\cvsection</span><span class="p">{</span>Education<span class="p">}</span>
+...
+...END OF RIGHT COLUMN CONTENTS ...
+<span class="nt">\end{paracol}</span>
+</code></pre></div></div>
+<p>You can also use <code class="language-plaintext highlighter-rouge">\swithcolumn*</code> for “synchronising” the columns, as well as other commands from the <code class="language-plaintext highlighter-rouge">paracol</code> package. See the <a href="http://texdoc.net/pkg/paracol"><code class="language-plaintext highlighter-rouge">paracol</code> package documentation</a> for further details.</p>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/amsks">amsks</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>
