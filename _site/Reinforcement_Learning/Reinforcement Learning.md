@@ -13,5 +13,3 @@ Now, the way I define observations is thorugh formalizing it as a **state** in w
 
 To charecterize this agent, following components are deinfed:
 - **Policy**($e=mc^2$): It characterizes the behaviour of the agent i.e how it should navigate around the this world that it is observing.
-
-Now let's consider two sets, $A, B$
