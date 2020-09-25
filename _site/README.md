@@ -32,10 +32,10 @@ I am a Master student in the [EIT Digital Master's course in Autonomous systems]
   - JAVA
 
 * **RL Software**
-  - OPenAI Gym
+  - OpenAI Gym
   - PyBullet
   - PhysX
-    - RAI
+  - RAI
 
 * **Deep Learning**
   - Pytorch
