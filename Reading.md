@@ -135,3 +135,5 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - 21 Laws for the 21st century - Harari
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
+- Levathian - Hobbs
+  - One of the classic ideas that come out of this with Game Theory as a reference would be a dicounting factor for teh future, or the 'shadow of the future', which would help in evaluating cooperation for the future. So, in probabilistic games, maybe Nash Equilibria can be shaped by tampering with this shadow of the future
