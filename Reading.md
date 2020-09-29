@@ -48,9 +48,10 @@ This is a list of references that I use in my studies, the books that I have rea
 ---
 
 ## Robotics
-## Books
-- [Introduction to Robotics by Craig](http://www.mech.sharif.ir/c/document_library/get_file?uuid=5a4bb247-1430-4e46-942c-d692dead831f&groupId=14040)
-- [Probabilistic Robotics by Thurn, Burgard adn Fox](https://docs.ufpr.br/~danielsantos/ProbabilisticRobotics.pdf)
+### Books
+- [Introduction to Robotics by Craig](shorturl.at/hjpOQ)
+<!-- http://www.mech.sharif.ir/c/document_library/get_file?uuid=5a4bb247-1430-4e46-942c-d692dead831f&groupId=14040 -->
+- [Probabilistic Robotics by Thurn, Burgard and Fox](shorturl.at/copBL)
 - [Planning Algorithms by Lavelle](http://lavalle.pl/planning/)
 
 ### Primers
@@ -90,6 +91,11 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
 
 ---
+
+## Mobiity Modelling
+- [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
+- [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
+---
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)
 - A brief history of time - Hawking
@@ -103,13 +109,13 @@ This is a list of references that I use in my studies, the books that I have rea
 - Harry Potter Series - Rowling
 - The Innovator's Dilemma - Christensen
 - [Life 3.0 - Max Tegmark](https://en.wikipedia.org/wiki/Life_3.0)
-    * Tegmark's concept of understanding consciousness in terms of the subjective experience of an entity while proccessing information is worth lookign into. ties up to the recent exploits in [Integrated Information Theory](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42) and other related fields. Look into GEB stuff
-    * An opposing viewpoint to IIT : [The Problem with Phi: A Critique of
+    - Tegmark's concept of understanding consciousness in terms of the subjective experience of an entity while proccessing information is worth lookign into. ties up to the recent exploits in [Integrated Information Theory](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42) and other related fields. Look into GEB stuff
+    - An opposing viewpoint to IIT : [The Problem with Phi: A Critique of
 Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/file?id=10.1371/journal.pcbi.1004286&type=printable)
 - [Consciousness: here, there and everywhere?](https://royalsocietypublishing.org/doi/full/10.1098/rstb.2014.0167)
 - [The Society of Mind - Minsky](https://www.youtube.com/playlist?list=PLUl4u3cNGP61E-vNcDV0w5xpsIBYNJDkU)
 - [Matter, Mind and Models - Marvin Minsky](https://web.media.mit.edu/~minsky/papers/MatterMindModels.html)
-    * When intelligent machines are constructed, we should not be surprised to find them as confused and as stubborn as are men in their convictions about mind-matter, consciousness, free will, and the like. For all such questions are pointed at explaining the complicated interactions between parts of the self-model. A man's or a machine's strength of conviction about such things tells us nothing about the man or about the machine except what it tells us about his model of himself.
+    - When intelligent machines are constructed, we should not be surprised to find them as confused and as stubborn as are men in their convictions about mind-matter, consciousness, free will, and the like. For all such questions are pointed at explaining the complicated interactions between parts of the self-model. A man's or a machine's strength of conviction about such things tells us nothing about the man or about the machine except what it tells us about his model of himself.
 - [There Is No Such Thing as Conscious Thought](https://www.scientificamerican.com/article/there-is-no-such-thing-as-conscious-thought/)
 - [The Problem of Self-Referential Reasoning in Self-Improving AI: An Interview with Ramana Kumar, Part 2](https://futureoflife.org/2019/03/21/the-problem-of-self-referential-reasoning-in-self-improving-ai-an-interview-with-ramana-kumar-part-2/?cn-reloaded=1&cn-reloaded=1)
 - [The mind of an anthill](https://www.knowablemagazine.org/article/living-world/2018/mind-anthill)

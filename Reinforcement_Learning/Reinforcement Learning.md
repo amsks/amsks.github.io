@@ -1,6 +1,5 @@
 # Reinforcement Learning
 
-
 This is a concept flow for the major topics in RL, as understod from various sources listed in the [reading list](../Reading.md)
 
 ## Introduction

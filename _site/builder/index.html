@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Builder | amsks.github.io</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Builder" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Code and contents of my website" />
+<meta property="og:description" content="Code and contents of my website" />
+<link rel="canonical" href="http://localhost:4000/builder/" />
+<meta property="og:url" content="http://localhost:4000/builder/" />
+<meta property="og:site_name" content="amsks.github.io" />
+<script type="application/ld+json">
+{"@type":"WebPage","url":"http://localhost:4000/builder/","headline":"Builder","description":"Code and contents of my website","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=fa4cbddcccc9906a6e8261e579a03740cd6db205">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
+        
+        
+
+        <p>Code and contents of my website</p>
+
+        
+        <p class="view"><a href="https://github.com/amsks/amsks.github.io">View the Project on GitHub <small>amsks/amsks.github.io</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="builder">Builder</h1>
+
+<ul>
+  <li>Builds HTML from the markdown in the blog.</li>
+  <li>Splits large markdown file into multiple HTML files.</li>
+  <li>TODO: RSS feed.</li>
+  <li>TODO: Latex to ASCII.</li>
+  <li>
+    <p>we create source highlihting using
+<a href="https://www.gnu.org/software/src-highlite/"><code class="language-plaintext highlighter-rouge">source-highlight</code></a>.</p>
+  </li>
+  <li><a href="http://hutchinson.belmont.ma.us/tth/">TTH: the TEX to HTML translator</a></li>
+  <li>
+    <p><a href="http://hevea.inria.fr/">Hevea</a> is used to deal with latex.</p>
+  </li>
+  <li>https://www.cprogramming.com/tutorial/unicode.html</li>
+  <li>key-value database: <a href="https://github.com/adamierymenko/kissdb"><code class="language-plaintext highlighter-rouge">kissdb</code></a></li>
+  <li><a href="https://unpoly.com/up.protocol">Unpoly</a> for fast page prefetching and 
+navigation inside a static site.</li>
+  <li><a href="https://github.com/jeremycw/httpserver.h"><code class="language-plaintext highlighter-rouge">httpserver.h</code></a> for a minimal HTTP server to run <code class="language-plaintext highlighter-rouge">libCURL</code> on.</li>
+  <li><a href="https://curl.haxx.se/libcurl/c/"><code class="language-plaintext highlighter-rouge">libCURL</code> API</a> to check that all links exist.</li>
+  <li><a href="https://crank.js.org/">crankJS</a>: Lightweight React replacement if I ever need it.</li>
+  <li><a href="https://ace.c9.io/#nav=embedding">Ace editor</a> for a lightweight text editor inside the browser.</li>
+</ul>
+
+<p>How to check if horizontal scrollbar exists:</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="p">((</span><span class="nb">window</span><span class="p">.</span><span class="nx">innerHeight</span> <span class="o">-</span> <span class="nb">document</span><span class="p">.</span><span class="nx">documentElement</span><span class="p">.</span><span class="nx">clientHeight</span><span class="p">)</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">H-scrollbar active</span><span class="dl">'</span><span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="features">Features</h1>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />error for <code class="language-plaintext highlighter-rouge">_ _</code>,  <code class="language-plaintext highlighter-rouge">* *</code>, <code class="language-plaintext highlighter-rouge">__ __</code>, <code class="language-plaintext highlighter-rouge">** **</code> that span multiple lines.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />error for inline code blocks that span multiple lines.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />error for incorrectly written LaTeX.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />error for incorrectly formatted lists.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" checked="checked" />generate links for headers as github does.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />figure out which DOM element causes window to overflow horizontally.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />RSS feed.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Broken link warnings.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Checkboxes.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Link generation for repeats: eg. “#a\n#a” should have links <code class="language-plaintext highlighter-rouge">a-1</code> and <code class="language-plaintext highlighter-rouge">a-2</code>.</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />MathML</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://twtxt.readthedocs.io/en/latest/">twtxt</a></li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" /><a href="https://duktape.org/">Duktape</a> for JS interpretation for KaTeX?</li>
+</ul>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/amsks">amsks</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

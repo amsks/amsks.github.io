@@ -1,0 +1,3 @@
+/home/mclovin/git/amsks.github.io/builder/CMakeFiles/rebuild_cache.dir
+/home/mclovin/git/amsks.github.io/builder/CMakeFiles/builder.dir
+/home/mclovin/git/amsks.github.io/builder/CMakeFiles/edit_cache.dir
