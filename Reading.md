@@ -1,8 +1,6 @@
 # Reading List
 This is a list of references that I use in my studies, the books that I have read in the past, and stuff that I found interesting.
 
----
-
 ## Machine Learning
 ### Books
 - [Pattern Recognition and Machine Learning by Bishop](http://users.isr.ist.utl.pt/~wurmd/Livros/school/Bishop%20-%20Pattern%20Recognition%20And%20Machine%20Learning%20-%20Springer%20%202006.pdf)
@@ -20,7 +18,6 @@ This is a list of references that I use in my studies, the books that I have rea
 ### Articles
 - [Learning to Learn](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/)
 
----
 
 ## Reinforcement Learning
 ### Books
@@ -46,7 +43,6 @@ This is a list of references that I use in my studies, the books that I have rea
   - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
 - [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
 
----
 
 ## Robotics
 ### Books
@@ -57,7 +53,6 @@ This is a list of references that I use in my studies, the books that I have rea
 ### Primers
 - [Basic Robotics](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Robotics.pdf)
 
----
 
 ## Math and Physics
 ### Primers
@@ -83,7 +78,6 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Introduction to homotopy theory](https://www.uni-regensburg.de/Fakultaeten/nat_Fak_I/Bunke/topo-2.pdf)
 - [Introduction to Knot Theory](https://www.maths.ed.ac.uk/~v1ranick/papers/crowfox.pdf)
 
----
 
 ## LIS Research
 - [TossingBot](https://tossingbot.cs.princeton.edu/paper.pdf)
@@ -91,13 +85,11 @@ This is a list of references that I use in my studies, the books that I have rea
 - [PoseRBPF](https://arxiv.org/abs/1905.09304)
 - [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
 
----
 
 ## Mobiity Modelling
 - [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
 - [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
 
----
 
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)

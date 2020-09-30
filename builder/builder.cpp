@@ -1192,7 +1192,7 @@ const char html_preamble[] =
 // "    crossorigin='anonymous'"
 // "    onload='on_katex_load();'></script>"
 // ===End KateX===
-"<title> Cogito Ergo Sum </title>"
+"<title> Aditya Mohan </title>"
 "<style>"
 "@font-face {font-family: 'Blog Mono'; src: url('/static/iosevka-fixed-extended.ttf');}"
 "@font-face {font-family: 'Blog Text'; src: url('/static/Exo2-Regular.ttf');}"

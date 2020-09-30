@@ -12,40 +12,25 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Code and contents of my website" />
 <meta property="og:description" content="Code and contents of my website" />
-<link rel="canonical" href="http://localhost:4000/Reinforcement_Learning/Key_Terms_in_RL.html" />
-<meta property="og:url" content="http://localhost:4000/Reinforcement_Learning/Key_Terms_in_RL.html" />
+<link rel="canonical" href="http://localhost:4000/Key_Terms_in_RL.html" />
+<meta property="og:url" content="http://localhost:4000/Key_Terms_in_RL.html" />
 <meta property="og:site_name" content="amsks.github.io" />
 <script type="application/ld+json">
-{"@type":"WebPage","url":"http://localhost:4000/Reinforcement_Learning/Key_Terms_in_RL.html","headline":"Explanations of Key Terms used in Reinforcement Learning Vocabulary","description":"Code and contents of my website","@context":"https://schema.org"}</script>
+{"@type":"WebPage","headline":"Explanations of Key Terms used in Reinforcement Learning Vocabulary","url":"http://localhost:4000/Key_Terms_in_RL.html","description":"Code and contents of my website","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 
-    <link rel="stylesheet" href="/assets/css/style.css?v=fa4cbddcccc9906a6e8261e579a03740cd6db205">
-    <!--[if lt IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" href="/assets/css/style.css?v=49d7106fd6431d159b733ca7af3ac899470643bd">
   </head>
   <body>
-    <div class="wrapper">
-      <header>
-        <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
-        
-        
-
-        <p>Code and contents of my website</p>
-
-        
-        <p class="view"><a href="https://github.com/amsks/amsks.github.io">View the Project on GitHub <small>amsks/amsks.github.io</small></a></p>
-        
-
-        
-
-        
-      </header>
-      <section>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
+      
 
       <h1 id="explanations-of-key-terms-used-in-reinforcement-learning-vocabulary">Explanations of Key Terms used in Reinforcement Learning Vocabulary</h1>
 
 <h2 id="mdp">MDP</h2>
+<p>A <strong>Markov Decision Process (MDP)</strong> is a way to model decision making in discrete, stochastic and/or sequential processes. The key here is the markov property, which basically states that the probability of enbtering a certain state, when conditioned upon the previous state is same as the probability of entering that state when conditioned on all the history of states. The significance here is that if we had state A and state B and A precedes B, then we can assume that all the states that preceded B in an episode can be  ignored, and A can just be conditioned on B because of the way that B is linked to all previous states. So, we don’t really need to look at all the history since the sequence of transitions makes sure that there would be a particular way to reach B, and thus, A. If we assume this about the environment, then we can create a map of transitions between states as our model of the environment and then use that to assign rewards for reaching a state. This is a markov reward process.</p>
 
 <h2 id="markov-chain-monte-carlo">Markov Chain Monte-Carlo</h2>
 
@@ -97,15 +82,10 @@
 <h2 id="zero-shot-one-shot-few-shot">Zero-Shot, One-Shot, Few-shot</h2>
 
 
-      </section>
-      <footer>
-        
-        <p>This project is maintained by <a href="https://github.com/amsks">amsks</a></p>
-        
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
+      
     </div>
-    <script src="/assets/js/scale.fix.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
     
   </body>
 </html>
