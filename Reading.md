@@ -2,6 +2,7 @@
 This is a list of references that I use in my studies, the books that I have read in the past, and stuff that I found interesting.
 
 ---
+
 ## Machine Learning
 ### Books
 - [Pattern Recognition and Machine Learning by Bishop](http://users.isr.ist.utl.pt/~wurmd/Livros/school/Bishop%20-%20Pattern%20Recognition%20And%20Machine%20Learning%20-%20Springer%20%202006.pdf)
@@ -50,7 +51,6 @@ This is a list of references that I use in my studies, the books that I have rea
 ## Robotics
 ### Books
 - [Introduction to Robotics by Craig](shorturl.at/hjpOQ)
-<!-- http://www.mech.sharif.ir/c/document_library/get_file?uuid=5a4bb247-1430-4e46-942c-d692dead831f&groupId=14040 -->
 - [Probabilistic Robotics by Thurn, Burgard and Fox](shorturl.at/copBL)
 - [Planning Algorithms by Lavelle](http://lavalle.pl/planning/)
 
@@ -84,6 +84,7 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Introduction to Knot Theory](https://www.maths.ed.ac.uk/~v1ranick/papers/crowfox.pdf)
 
 ---
+
 ## LIS Research
 - [TossingBot](https://tossingbot.cs.princeton.edu/paper.pdf)
 - [LeTs Drive](https://arxiv.org/abs/1905.12197)
@@ -95,7 +96,9 @@ This is a list of references that I use in my studies, the books that I have rea
 ## Mobiity Modelling
 - [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
 - [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
+
 ---
+
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)
 - A brief history of time - Hawking
@@ -132,7 +135,7 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - QED - Fynmann
 - Tools for Conviviality - Ivan Illich
 - [Deschooling Society](https://davidtinapple.com/illich/1970_deschooling.html)
-    * Many students, especially those who are poor, intuitively know what the schools do for them. They school them to confuse process and substance. Once these become blurred, a new logic is assumed: the more treatment there is, the better are the results; or, escalation leads to success. The pupil is thereby “schooled” to confuse teaching with learning, grade advancement with education, a diploma with competence, and fluency with the ability to say something new. His imagination is “schooled” to accept service in place of value. Medical treatment is mistaken for health care, social work for the improvement of community life, police protection for safety, military poise for national security, the rat race for productive work. Health, learning, dignity, independence, and creative endeavor are defined as little more than the performance of the institutions which claim to serve these ends, and their improvement is made to depend on allocating more resources to the management of hospitals, schools, and other agencies in question. In these essays, I will show that the institutionalization of values leads inevitably to physical pollution, social polarization, and psychological impotence: three dimensions in a process of global degradation and modernized misery.
+    - Many students, especially those who are poor, intuitively know what the schools do for them. They school them to confuse process and substance. Once these become blurred, a new logic is assumed: the more treatment there is, the better are the results; or, escalation leads to success. The pupil is thereby “schooled” to confuse teaching with learning, grade advancement with education, a diploma with competence, and fluency with the ability to say something new. His imagination is “schooled” to accept service in place of value. Medical treatment is mistaken for health care, social work for the improvement of community life, police protection for safety, military poise for national security, the rat race for productive work. Health, learning, dignity, independence, and creative endeavor are defined as little more than the performance of the institutions which claim to serve these ends, and their improvement is made to depend on allocating more resources to the management of hospitals, schools, and other agencies in question. In these essays, I will show that the institutionalization of values leads inevitably to physical pollution, social polarization, and psychological impotence: three dimensions in a process of global degradation and modernized misery.
 
 - Trust Me, I am lying - Ryan Holiday
 - Krishna Trilogy(I am Krishna) - Deep Trivedi
@@ -142,4 +145,4 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
 - Levathian - Hobbs
-  * One of the classic ideas that come out of this with Game Theory as a reference would be a dicounting factor for teh future, or the 'shadow of the future', which would help in evaluating cooperation for the future. So, in probabilistic games, maybe Nash Equilibria can be shaped by tampering with this shadow of the future.
+    - One of the classic ideas that come out of this with Game Theory as a reference would be a dicounting factor for teh future, or the 'shadow of the future', which would help in evaluating cooperation for the future. So, in probabilistic games, maybe Nash Equilibria can be shaped by tampering with this shadow of the future.
