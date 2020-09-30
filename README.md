@@ -2,8 +2,9 @@
 
 - Reach me: <a href='mailto:adityak735@gmail.com'> `adityak735@gmail.com` </a>
 - [Github](http://github.com/amsks)
+- [Linkedin](https://www.linkedin.com/in/amsks/)
 - [Resume](CV/main.pdf)
-- [Reading list](Reading.md)
+- [Reading list](reading-list.html)
 
 # About Me
 I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/), working towards a specialization at the intersection of Robotics and Reinforcement Learning. I have previously worked in various fields in hardware and software, and on projects that range from cognitive radios to RTOS stacks, and now I aim to combine them and become a researcher in the field of Robotics and AI. I'm always up for collaborating on interesting projects.
