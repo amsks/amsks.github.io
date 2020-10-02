@@ -25,7 +25,7 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Dynamic Programming and Optimal Control by Bertsekas](https://web.mit.edu/dimitrib/www/DP2_Chapter%204_UPDATED.pdf)
 
 ### Articles
-- [Key Terms in RL](Reinforcement_Learning/Key_Terms_in_RL.md)
+- [Key Terms in RL](Key_Terms_in_RL.md)
 - [Key Papers in RL](https://spinningup.openai.com/en/latest/spinningup/keypapers.html#model-free-rl)
 
 ### Papers
@@ -43,6 +43,10 @@ This is a list of references that I use in my studies, the books that I have rea
   - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
 - [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
 
+### Esosteric Stuff
+- [RL-CycleGAN](https://openaccess.thecvf.com/content_CVPR_2020/papers/Rao_RL-CycleGAN_Reinforcement_Learning_Aware_Simulation-to-Real_CVPR_2020_paper.pdf)
+- [RL-BCI Thesis](https://www.ias.informatik.tu-darmstadt.de/uploads/Main/Abschlussarbeiten/Sharma_MscThesis_2017.pdf)
+- [EEG Reward Shaping](https://arxiv.org/pdf/2006.16498.pdf)
 
 ## Robotics
 ### Books
@@ -89,7 +93,7 @@ This is a list of references that I use in my studies, the books that I have rea
 ## Mobiity Modelling
 - [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
 - [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
-
+- [Lecture Resources](https://drive.google.com/drive/folders/1EnK0oB_0Eh1bqtIqWbzrL-he4cmQlmpo)
 
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)

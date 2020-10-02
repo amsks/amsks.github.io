@@ -40,12 +40,201 @@ I am a Master student in the [EIT Digital Master's course in Autonomous systems]
   - Keras
   - Tensorflow
 
+#### Stuff I have Written
 
-##### Reinforcement Learning
-# Introduction to Reinforcement learning
+# Clouds: Introduction to Cloud Technologies
+The best way to look at the development of the cloud is to look at the lifecycle for major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring the water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rate basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
+
+<img width=500 height=200 src="static/Clouds/general-cycle.png">
+
+If we look at IT from the lens of this cycle, then the innovation phase would be the phase where new kinds of products and services were introduced into the market, the product phase would be when companies maintained these on a growing user base, and the service phase would be when companies started addressing the growing demand and user-base by trying to achieve economies of scale through the cloud.
+
+## Defining Cloud Computing
+Cloud Computing can be defined in the following three ways:
+1. It is the delivery of computing as a service rather than a product
+2. It is a method to offer shared resources, software, and information to computers and other devices
+3. It is a metered service over the network
+
+### IT as a Service
+There are 3 primary ways in which IT as a service can be offered:
+1. **Software-as-a-Service (SaaS) :** These are applications running on a browser
+2. **Platform-as-a-Service (Paas) :** These are software platforms made available to developers through APIs, to build applications
+3. **Infrastructure-as-a-Service (Iaas) :** These are basic computing resources like CPU, Memory, Disk, etc. made  available to users in the form of Virtual Machine Instances
+
+Some other models that are also possible are **Hardware-as-a-Service (Haas)** where users can get access to barebones hardware machines, do whatever they want with them (E.g clusters), and **X-as-a-service (Xaas)** which might extend to Backend, Desktop, etc.
+
+### Cloud Infrastructure
+Servers are computers that provide to user machines - the client - and the main idea behind these is that they can be designed for reliability and to service a high number of requests. Dual socket servers are the fundamental building blocks of cloud infrastructure. Organizations usually require many physical servers, like a web server or database server, to provide various services. These servers are grouped, organized, and placed into racks. For standardization, 1 Rack Unit (RU) is defined as 4.45 cm.
+
+<img width=500 height=200 src="static/Clouds/RU.png">
+
+A data center is a facility that is used to house a large number of servers. It needs to provide Air-Conditioning to cool the servers, Power supply to all the servers and needs to implement monitoring, network, and security mechanisms for these servers. Now the companies all have the option of privately owned data centers, but these are certain problems associated with this:
+- These are expensive to set-up with a high CAPEX for real-estate, servers, and peripherals
+- They have high OPEX in energy and administration costs
+- It is difficult to grow or shrink applications. If the company initially budgets a small number of servers, and then there a demand surge, sometimes even overnight for companies like FaceApp, they would have to expand the area abruptly, which is very difficult. Now, let us say they are able to expand the area and resource pool, they would not be able to shrink these if they demand tapers off. These things are simply not possible for smaller companies, as much as they are for bigger companies like Dropbox
+- Servers can also suffer from the problem of low utilization. This can be caused by uneven usage of applications, where one application might be exhausting one resource while leaving the others stranded-off. Another reason for this is sudden demand spikes, which taper off even more suddenly
+
+Thus, the idea behind cloud infrastructure is to alleviate this problem by separating the server infrastructure from the end-users. The servers can be grouped into a large resource pool and then access can be given to applications based on their demand and the pricing can be set-up based on the usage of this resource pool. Hence, the applications don't need to worry about the usage statistics as far as to look into load balancing. Moreover, the sudden demand spikes and shrinks can be easily adjusted by changing the user requests. However, to offer such a service two requirements need to be met:
+- Means for rapidly and dynamically satisfying application's fluctuating resource need. This is provided by **Virtualization**
+- Means for servers to Quickly and reliable access shared and persistent data. This is done by programming models and distributed file/storage/database systems
+
+This resource pool can also be defined based on its location:
+- **Single-Site Cloud :** This would be the collection of hardware and software that the vendors use to offer computing resources and services to users.
+- **Geographically Distributed Cloud :** This is a resource pool that is spread across multiple locations and has a composition of different structures and services
+
+### Cloud Hardware and Software stack
+The full stack for clouds has 9 components, as shown in the figure below:
+
+<img width=200 height=300 src="static/Clouds/cloud-stack.png">
+
+- **Applcations :** These are applications like Web-apps or Scientific Coputation Jobs etc.
+- **Data :** These are the database systems like Old SQL (Oracle, SQLServer), No SQL (MongoDB, Cassandra), and  New SQL (TimesTen, Impala, Hekaton) systems
+- **Runtime Environment :** These are runtime platforms like Hadoop, Spark, etc. to support cloud programming models.
+- **Middleware :** These are platforms for Resource Management, Monitoring, Provisioning, Identity Management, and Security.
+- **Operating Systems :** These are operating systems like Linux used on a personal machine, but they can also be packed with libraries and software for quick deployment. For example, Amazon Machine Images (AMI) contain OS as well as required software packages as a “snapshot” for instant deployment
+- **Virtualization :** This layer is the key enabler of the cloud services. It creates a mapping between the lower hardware layers and the upper applications and OS layers and contributes towards multi latency. For example, the Amazon EC2 is based on the Xen virtualization platform, and Microsoft Azure is based on HyperV
+
+The stuff below virtualization has already been discussed. However, one thing that can now b understood is how does this stack help in differentiating between the offered services. As shown in the figure below, in the case of Saas the user has only access to the applications offered by the cloud. In the case of Paas, the user manages the application and Data layer of the stack. In the case of Iaas, the user has access to all the layers above the virtualization layer, so that they can build their own application on the offered resources.
+
+<img width=800 height=300 src="static/Clouds/stack-resources.png">
+
+### Types of Cloud
+There are three basic types of clouds:
+1. **Public (external) Cloud :** This is a resource pool that serves as an open market for on-demand computing and IT resources. However, the availability, reliability, security, trust, and SLAs can have limitations.
+2. **Private (Internal) Cloud :** This is the same set of services of cloud, but devoted to the functions of a large enterprise with the budget of large-scale IT
+3. **Hybrid Cloud :** This is the best of both worlds. The private cloud is extended by connecting it to other public cloud vendors to make use of their available cloud services. So, a company can use their private cloud, and when the resources surge they can also extend usage to the public cloud, of course paying pro-rata
+
+### Applications Enabled by the Cloud
+The applications that can be enabled by the cloud are of 4 types
+1. **High-Growth Applications :** This the same case as FaceAPP that was discussed previously. Imagine a startup that is growing. They would need a dynamic resource usage mechanism, that as discussed previously, is comfortably offered by the cloud. The risk of not setting up a distributed resource management method is losing on customer experience. This was the case with Friendster(2001), that had a similar offering as Facebook but could not keep up with the user growth.
+2. **Aperiodic Applications :** These are applications that face sudden demand peaks and need a way to handle this. The cloud enables them comfortably, and again the risk is user experience. For example, Flipkart offered the 'Big-Billion Day' sale in a similar manner to Amazon's Prime Day, but initially, they could not handle the load and the customer experience was ruined. However, they did fix it over time
+3. **On-off Applications :** These are one-off applications that for which extending private resources makes no sense. for example, scientific simulations requiring 1000s of computers
+4. **Periodic Applications :** These are applications that will have a periodic demand surge, like stock market analysis tools or HFT tools, and thus, dynamic, flexible infrastructure can reduce costs, improve performance
+
+### Advantages Offered by Cloud Computing
+1. Pay-as-you-go economic model
+2. Simplified IT Management
+3. Quick adn Effortless scalability
+4. Flexible options
+5. Improved Resource Utilization
+6. Decrease in Carbon Footpriint
+
+
+
+
+# MobMod: Random Mobility
+As with any analysis, the basics start from idealized scenarios. In terms of modeling, this would be random mobility. The historical viewpoint on this comes from Brownian Motion, which is the model of the movement of particles suspended in a liquid or gas caused by collisions with molecules of the surrounding medium. The two most basic models of random mobility are:
+- **Random Walk :** For every new interval $t$, each node randomly and uniformly chooses its new direction $\theta(t)$ from $(0, 2\pi]$. The new speed follows a uniform distribution or a Guassian distribution from $[0, V_{max}]$. Therefore, during time interval t, the node moves with the velocity vector $(v(t)cos(\theta(t)),v(t)sin(\theta(t)))$. If the node moves according to the above rules and reaches the boundary of simulation field, the leaving node is bounced back to the simulation field with the angle of $\pi - \theta(t)$ or $\theta(t)$, respectively. This effect is called border effect.
+- **Random Waypoint :** As the simulation starts, each mobile node randomly selects one location in the simulation field as the destination, which can be bounded $[-X^{max},+X^{max}],[-Y^{max},+Y^{max}]$. It then travels towards this destination with constant velocity chosen uniformly and randomly from $[0,V_{max}]$. The velocity and direction of a node are chosen independently of other nodes, and the direction is also sampled uniformly and randomly from $[0,2\pi]$. Upon reaching the destination, the node stops for a duration defined by the ‘pause time’ parameter. If $T_{pause} =0$, this leads to continuous mobility.
+
+
+<img width=300 height=200 src="static/MobMod/rwm-rwp.png">
+
+#### Limitations of the Random Waypoint and Walk models
+These models are not able to capture a lot of realistic scenarios, the major ones listed as follows:
+1. **Temporal Dependency of Velocity :** In these models the velocity of the mobile node is a memoryless random process since the values at each epoch are independent of the previous one. Thus, sudden mobility behaviors are possible in these models, including sharp turns, sudden acceleration, or sudden stop. However, in real situations, these values change smoothly
+2. **Spatial Dependency of Velocity :** in these models, each node moves independently of all the other nodes. However, in real scenarios, like battlefield communication or museum touring, these values may be correlated in different ways, which is not taken into account in these models
+3. **Geographic Restriction of Movement :** In these models the mobile nodes are allowed to move freely without any restrictions, but this might not be the case in real life scenarios, like driving for instance, where the agents are contained in their movement by the roads, obstacles, etc.
+
+## More Realistic Models
+#### Manhattan Model
+This model addresses the drawback of Geographic restriction on movement. The general idea is that initially, the nodes are placed randomly on the edges of the graph. Then for each node, a destination is randomly chosen and the node moves towards this destination through the shortest path along the edges. Upon arrival, the node pauses for T time and again chooses a new destination for the next movement. This procedure is repeated until the end of the simulation. In the Manhattan Model, these edges are in the form of a grid. Thus, this is just an extension of the Random Waypoint idea, but with added constraints on movement
+
+<img width=300 height=200 src="static/MobMod/Mahattan-model.png">
+
+#### Reference-point Group Mobility Model (RPGM)
+
+This model addresses the drawback of spatial dependency of the velocity in the random models. Nodes are categorized into groups. Each group has a center, which is either a logical center or a group leader node. For the sake of simplicity, we assume that the center is the group leader. Thus, each group is composed of one leader and many members. The movement of the group leader determines the mobility behavior of the entire group. The movement of group leader at time t can be represented by motion vector $V^{t}_{group}$. The motion vector can be randomly chosen or carefully designed based on certain predefined paths. Each member of this group deviates from this general motion vector to some degree, for example, each mobile node could be randomly placed in the neighborhood of the leader. The velocity of each member can be expressed as $V^{t}_{group} + R_i$, where the second term is the deviation of each member, indexed by i, from the group leader's velocity.
+
+<img width=300 height=200 src="static/MobMod/Ref-pt-model.png">
+
+#### Gauss-Markov Model
+This model addresses the correlation of velocities. In this model, the velocity of mobile node is assumed to be correlated over time and modeled as a Gauss-Markov stochastic process:
+$$
+\begin{aligned}
+R(t) = \bar{\alpha}.R(t-1) + (1-\bar{\alpha}).R + \sqrt{1 -  \bar{\alpha}^2 }.\bar{X}_{t-1}\\
+
+& R(t) \rightarrow speed/direction\\
+&\bar{X} \text{\textasciitilde} I.I.D Gaussian (0, \sigma)\\
+&\bar{\alpha} = e^{-\beta} \text{\textasciitilde} [0,1]\\
+&\bar{\alpha} = 0 \rightarrow Brownian Motion \\
+&\bar{\alpha} = 1 \rightarrow Linear Motion \\
+\end{aligned}
+$$
+
+Based on these equations, we observe that the velocity mobile node at time slot $t$ is dependent on the velocity-time slot $t-1$. Therefore, the Gauss-Markov model is a temporally dependent mobility model where the degree of dependency is determined by the memory level parameter $\bar{\alpha}$, a parameter to reflect the randomness of the Gauss-Markov process. By tuning this parameter, this model is capable of duplicating different kinds of mobility behaviors lying on the spectrum of Linear and Brownian motion.
+
+#### Smooth Motion Model
+Another mobility model considering the temporal dependency of velocity over various time slots is the Smooth Random Mobility Model. Here, instead of the sharp turns and accelerations as proposed in the Random Waypoint Model, these values are changed smoothly. It is observed that mobile nodes in real life tend to move at certain preferred speeds, rather than at speeds purely
+uniformly distributed in the range. Therefore, in Smooth Random
+Mobility model, the speed within the set of preferred speed values has a high probability, while a uniform distribution is assumed on the remaining part of the entire interval
+$$
+V^{pref} = Random(V_1, V_2, .... , V_n)
+$$
+The frequency of speed change is assumed to be a Poisson process. Upon an event of speed change, a new target speed is chosen according to the probability distribution function of speed above and the speed of the mobile node is changed
+incrementally from the current speed to the targeted new speed
+by acceleration or deceleration a(t). The probability distribution function of acceleration or deceleration a(t) is uniformly distributed among $[0, a_{max}]$ and $[a_{min} ,0]$, respectively. The new speed depends on the previous speed:
+$$
+V_t = V_{t-1} + a(t)(V_t - V_{t-1})
+$$
+
+A similar approach is followed for the direction update with angular accelerations
+
+## Problem of Unsteady Values
+One of the most important factors that play a role in the analysis of the various parameters associated with these networks is the stability of values. In the evolution of network states, there is usually an initial phase where the process variables change over time, and this phase is called a **Transient Phase**. During this transient phase, analyzing these variables is not possible as any value that they predict for the system is not a good indicator. As this phase passes, these values start to stabilize and as they stop varying over time units on an average, a **Steady State** is reached. This is the point at which a feasible network analysis starts becoming possible. in case the network transitions into something else over time, another steady state is reached after an intermediate transient state. The problem comes when these transient states start lasting longer or start happening more frequently since then stable analysis of the system becomes increasingly difficult. Thus, one of the major areas of research had been in figuring out a way to effectively predict these steady-state values and use them in analyzing the models. The seminal work on this was done by J-Y Le Boudec at EPFL, where the team developed a method called **Palm Calculus** and used it to predict the steady-state distributions of all major random mobility models.
+
+# MobMod: Introduction to Mobility Modelling
+The fundamental abstraction that is needed to understand inter-connected phenomena is a way to describe the different relationships between the various participating entities. For example, imagine a scenario where a disaster management Mobile Ad-hoc network of drones is deployed to triangulate sensitive points, the key to successful execution lies in how these various drones interact and share knowledge. Thus, the **Network** that is shared between these drones - or, **Nodes** - would have a certain way of establishing communication and its performance can be analyzed in terms of various performance parameters. One central aspect of analyzing this network would be the simulating how these nodes might move and what kind of impact that might have on the network. It is exactly for this kind of analysis and understanding that we create **Mobility Models**: They allow mimicking the behavior of mobile nodes when network performance is simulated. The simulation results are strongly correlated with the mobility model.
+
+#### Case of Connected Cars
+The way this analysis fits into the driving scenario is in terms of modeling the uncertainty in the traffic scenario. In the case of autonomous driving, the limitation for an individual agent is more from the side of the sensors. Usually, we would use cameras and Radars to work stuff out, but Radars can only see around 10m. So, how would this agent work in a highly uncertain scenario? Imagine a car driving on an Indian road in a 2-tier city, with pedestrians walking on all sides and multiple vehicles going in all directions.
+
+<img width=600 height=400 src="static/MobMod/Indian-road.png">
+
+One way to approach this solution would be to shift a bit of the load from the individual agent to the network. This could be done if the cars are connected through a network based on 4G/5G. Thus, in this case, we could view the cars as nodes communicating with each other and moving in some way. For each car, the regular functions - movement, mapping, obstacle detection, and avoidance, etc. - would be performed on the edge of this network while the co-ordinating function would be performed on the network. Thus, the issue of modeling the Mobility becomes important in this case. Modeling of the traffic flow, especially in the case of more uncertain scenarios, becomes extremely important.
+
+#### Need for Modelling
+1. The performance evaluation of such a large-scale network is bounded by simulation: Raw analytical analysis is too complex while conducting experiments is too expensive
+2. Real-world traces are hard to find, either because they do not exist or are not publicly available (E.g City-Data).
+3. Trivial representations of mobility might bias the simulation results. The available races might not represent real-world situations very effectively, and might have a lot of residual effects that might render them useful to represent only specific conditions, and thus, not generalizable.
+
+#### The safe and sustainable mobility conundrum
+Now if we were to go about this modeling, one of the central issues that would come up is that of optimality. The optimization here would be in terms of maximizing the usage of the road capacity and the driver and pedestrian safety. To better understand this, imagine we implement a model where a car is made to drive slow to increase safety. Now, this is fine for the individual driver, since the car always maintains a safe distance from the car in front of it. However, two problems come-up here:
+1. If the safe distance is too large, then a pedestrian might walk-in between leading to the car to halt
+2. The speed of the car is slow and so, the general traffic speed is also slow. This might create problems on traffic bottlenecks, like a 7 lane highway leading to a 2 lane road, etc.
+
+If we use the same policy on high-volume traffic conditions, then slow speeds nad sudden halts can easily lead to shockwave propagation and Ghost Jams. Let us formalize this by looking at traffic in terms of flow
+
+$$
+Flow = Density . Speed
+$$
+
+Thus, looking at this model we can see some safe directions to analyze this situation would be by controlling this flow through either reducing the speed or maybe keeping it and reducing the flow through density control. But more importantly, if we were to model the mobility by simulating this condition, we could develop interesting ways of cooperative navigation.
+
+#### Vehicular Models
+To analyze this network, we start looking at vehicles as nodes. Thus, the traffic becomes a MANET and our methods of simulation enable us to better understand this network.
+
+<img width=1000 height=400 src="static/MobMod/car-node.png">
+
+The impact of mobility is even more pronounced in the case of vehicular networks. The three factors that differentiate these networks from other networks are:
+1. The speed of each node is not bounded in small intervals, and is not smooth. It is highly variable
+2. The movement is far from random. Thus, we cannot directly sample from standard distributions in realistic scenarios
+3. The nodes do not move independently, and in  fact, have strong reciprocal dependencies
+
+Consequently, the abstractions that this network viewpoint offers can be on three levels:
+1. Vehicular Traffic Model: Abstraction of the large scale trajectories employed by the vehicles
+2. Vehicular Flow Model: Abstractions of the physical inter-dependencies
+3. Vehicular Driver Model: Abstractions of the actions of individual nodes, like breaks, turns, etc.
+
+# RL: Markov Processes
+These are random processes indexed by time and are used to model systems that have limited memory of the past. The fundamental intuition behind Markov processes is the property that the future is independent of the past, given the present. In a general scenario, we might say that to determine the state of an agent at any time instant, we only have to condition it on a limited number of previous states, and not the whole history of its states or actions. The size of this window determines the order of the Markov process.
+
+To better explain this, one primary point that needs to be addressed is that the complexity of a Markov process greatly depends on whether the time axis is discrete or topological. When this space is discrete, then the Markov process is a Markov Chain. A basic level understanding of how these processes play out in the domain of reinforcement learning is very clear when analyzing these chains. Moreover, the starting point of analysis can be further simplified by limiting the order of Markov Processes to first-order. This means that at any time instant, the agent only needs to see its previous state to determine its current state, or its current state to determine its future state. This is called the **Markov Property :** $\Rho(S_{t+1}|S_t) = \Rho(S_{t+1}|S_1, ..., S_t) )$
+
+# RL: Introduction to Reinforcement learning
 The way I like to think about Reinforcement learning is by imagining myself as a ring-master who has to train a certain creature. One of the reasons why I like this visualization is because RL has historical roots in trial and error and the psychology of animal learning. So, let's say I want to train this creature to perform some tricks around a hula-hoop, one of the ways I might go about this is by creating a scheme where the creature would be punished for not jumping through the hoop. As the training goes on, the punishment guides it to go to places where it does not receive punishment, and over time, it learns to jump through the hoop.
 
-A similar thing happens in RL. The thing that I need to train is called an **agent**. My language of communication with this agent is through numbers, encoded in processes that I create for it to understand and interact with the world around it. The way this agent interacts with the world around it is through **Actions (A)** and the way it understands the world is through **Observations (O)**. Now, my task is to define these actions and observations and train this agent to achieve a certain task by creating a closed-loop control of feedback for the actions it takes. This feedback is the **reward (R)** that agent receives for each of its actions. So, the key is to devise a method to guide the agent in such a way that it 'learns' to reach the goal by selecting actions with the highest **Expected Rewards (G)**, updating these values by observing the environment after taking that action. Thus, the agent first takes random actions and updates its reward values, and slowly, it starts to favor actions with higher rewards, which eventually lead to the goal.
+A similar thing happens in RL. The thing that I need to train is called an **Agent**. My language of communication with this agent is through numbers, encoded in processes that I create for it to understand and interact with the world around it. The way this agent interacts with the world around it is through **Actions (A)** and the way it understands the world is through **Observations (O)**. Now, my task is to define these actions and observations and train this agent to achieve a certain task by creating a closed-loop control of feedback for the actions it takes. This feedback is the **reward (R)** that agent receives for each of its actions. So, the key is to devise a method to guide the agent in such a way that it 'learns' to reach the goal by selecting actions with the highest **Expected Rewards (G)**, updating these values by observing the environment after taking that action. Thus, the agent first takes random actions and updates its reward values, and slowly, it starts to favor actions with higher rewards, which eventually lead to the goal.
 
 <img width=800 height=500 src="static/Reinforcement Learning/agent-env.svg">
 
