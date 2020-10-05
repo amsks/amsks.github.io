@@ -428,3 +428,68 @@ pip install h5py
 ```
 pip install keras
 ```
+
+#### Setting up Jekyll for local website
+- First check if ruby and gem are already installed on your system
+
+```
+ruby -v
+gem -v 
+```
+
+- if no, then install ruby
+
+```
+sudo apt-get install ruby-full
+```
+
+- Install other dependencies
+
+```
+build-essential zlib1g-dev
+```
+
+- Configure gem installation related stuff in the bashrc
+
+```
+echo '# Install Ruby Gems to ~/gems' >> ~/.bashrc
+echo 'export GEM_HOME="$HOME/gems"' >> ~/.bashrc
+echo 'export PATH="$HOME/gems/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+- Install jeyll and bundler
+
+```
+gem install jekyll bundler
+```
+
+- Clone the github pages repo and navigate to it. Then make an orphan branch
+
+```
+git checkout --orphan gh-pages
+```
+
+- To create a new Jekyll site, use the jekyll new command, replacing VERSION with the current dependency version for Jekyll
+
+```
+bundle exec jekyll VERSION new .
+```
+
+- Update the gemfile with the sources
+
+```
+gem "github-pages", "~> VERSION", group: :jekyll_plugins
+```
+
+- Check if any other related dependencies are missing
+
+```
+bundle install
+```
+
+- Run the localhost:4000 website
+
+```
+bundle exec jekyll serve
+```

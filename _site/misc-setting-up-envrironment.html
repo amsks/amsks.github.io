@@ -107,4 +107,38 @@ pip install h5py
 <ul><li><span class='centered'> Install keras</li></ul>
 <pre><code>pip install keras
 </code></pre>
-</container></body></html>
+<h4><a id=setting-up-jekyll-for-local-website href='#setting-up-jekyll-for-local-website'> § </a><span class='centered'> Setting up Jekyll for local website</h4>
+<ul><li><span class='centered'> First check if ruby and gem are already installed on your system</li></ul>
+<pre><code>ruby -v
+gem -v 
+</code></pre>
+<ul><li><span class='centered'> if no, then install ruby</li></ul>
+<pre><code>sudo apt-get install ruby-full
+</code></pre>
+<ul><li><span class='centered'> Install other dependencies</li></ul>
+<pre><code>build-essential zlib1g-dev
+</code></pre>
+<ul><li><span class='centered'> Configure gem installation related stuff in the bashrc</li></ul>
+<pre><code>echo '# Install Ruby Gems to ~/gems' >> ~/.bashrc
+echo 'export GEM_HOME="$HOME/gems"' >> ~/.bashrc
+echo 'export PATH="$HOME/gems/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+</code></pre>
+<ul><li><span class='centered'> Install jeyll and bundler</li></ul>
+<pre><code>gem install jekyll bundler
+</code></pre>
+<ul><li><span class='centered'> Clone the github pages repo and navigate to it. Then make an orphan branch</li></ul>
+<pre><code>git checkout --orphan gh-pages
+</code></pre>
+<ul><li><span class='centered'> To create a new Jekyll site, use the jekyll new command, replacing VERSION with the current dependency version for Jekyll</li></ul>
+<pre><code>bundle exec jekyll VERSION new .
+</code></pre>
+<ul><li><span class='centered'> Update the gemfile with the sources</li></ul>
+<pre><code>gem "github-pages", "~> VERSION", group: :jekyll_plugins
+</code></pre>
+<ul><li><span class='centered'> Check if any other related dependencies are missing</li></ul>
+<pre><code>bundle install
+</code></pre>
+<ul><li><span class='centered'> Run the localhost:4000 website</li></ul>
+<pre><code>bundle exec jekyll serve
+</code></pre></container></body></html>
