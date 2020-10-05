@@ -265,3 +265,166 @@ Finally, certain paradigms are common in RL which recurs regularly and thus, it 
 - **Learning and Planning :** In learning the rules of the game are unknown and are learned by putting the agent in the environment. For example, I remember some people once told me how some coaches teach the basics of swimming by asking the learner to directly jump into the semi-deep water and try to move their hands and legs in a way so that they can float. Irrespective of whether this actually happens or not, if someone learned this way I could think of it as a decent enough analogy. Planning, on the other hand, is driven by a model of the rules that need to be followed, which can be used by the agent to perform a look-ahead search on the actions that it can take.
 - **Exploration and Exploitation :** This is the central choice the agent needs to make every time it takes an action. At any step, it has certain information about the world and it can go on exploiting it to eventually reach a goal (maybe), but the problem is it might not know about the most optimal way to reach this goal if it just acts on the information it already has. Thus, to discover better ways of doing things, the agent can also decide to forego the path it 'knows' will get it the best reward according to its current knowledge and take a random action to see what kind of reward it gets. Thus, in doing so the agent might end up exploring other ways of solving a problem that it might not have known, which might lead to higher rewards than the path it already knows. Personally, the most tangible way I can visualize it is by thinking of a tree of decisions, and then imagining that the agent knows one way to reach the leaf nodes with the maximum reward. However, there might exist another portion of the tree that has higher rewards, but the agent might not ever go to if it greedily acts on its current rewards.
 - **Prediction and Control :** Prediction is just finding a path to the goal, while control is optimizing this path to the goal. Most of the algorithms in RL can be distinguished based on this.
+
+# Misc: Setting up Envrironment
+
+#### Installing VS Code 
+
+- Install the .deb link from 
+
+```
+https://code.visualstudio.com/Download
+```
+- Navigate to the Downloads folder
+
+```
+cd ~/Downloads
+```
+- Install using dpkg 
+
+```
+sudo dpkg -i Name_of_file
+```
+
+#### Installing Sublime Text
+
+- Open Terminal and install the key
+
+```
+wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+```
+
+- Add the apt repository
+
+```
+echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+```
+
+- Finally, check updates and install sublime-text via apt
+
+```
+sudo apt update
+
+sudo apt install sublime-text
+```
+
+#### Installing CUDA
+
+- Remove all NVIDIA traces in the system
+
+```
+sudo rm /etc/apt/sources.list.d/cuda*
+sudo apt remove --autoremove nvidia-cuda-toolkit
+sudo apt remove --autoremove nvidia-*
+```
+
+- Setup the correct CUDA PPA on the system
+
+```
+sudo apt update
+sudo add-apt-repository ppa:graphics-drivers
+
+sudo apt-key adv --fetch-keys  http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+
+sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
+
+sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list'
+```
+
+- Install CUDA 10.1 packages
+
+```
+sudo apt update
+sudo apt install cuda-10-1
+sudo apt install libcudnn7
+```
+
+- To specify PATH to CUDA in ‘.profile’ file, open it :
+
+```
+sudo gedit ~/.profile
+```
+
+- Then add this to the end of the file
+
+```
+# set PATH for cuda 10.1 installation
+if [ -d "/usr/local/cuda-10.1/bin/" ]; then
+    export PATH=/usr/local/cuda-10.1/bin${PATH:+:${PATH}}
+    export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+fi
+```
+
+- Restart and check the versions for the installation. For CUDA, NVIDIA and libcudnn
+
+```
+nvcc  – version
+
+nvidia-smi
+
+/sbin/ldconfig -N -v $(sed ‘s/:/ /’ <<< $LD_LIBRARY_PATH) 2>/dev/null | grep libcudnn
+```
+
+#### Setting up Virtual Environment for DL
+
+- Install virtual env using apt
+
+```
+sudo apt update
+
+sudo apt install virtualenv
+```
+
+- Install virtualenvwrapper
+
+```
+sudo apt install virtualenvwrapper
+```
+
+- Check the installation paths ( Should be in /usr/bin/ )
+
+```
+which virtualenv
+
+which virtualenvwrapper
+```
+
+- Create the new environment for keras and tensorflow
+
+```
+mkvirtualenv keras_tf -p python3
+```
+
+- Check if the global commands work
+
+```
+workon keras_tf 
+
+deactivate
+```
+
+- Install and Check tf
+
+```
+pip install --upgrade tensorflow
+
+python
+>>> import tensorflow as tf
+>>> tf.__version__
+
+```
+
+- Install Keras related dependencies
+
+```
+pip install numpy scipy
+pip install scikit-learn
+pip install pillow
+pip install h5py
+```
+
+- Install keras
+
+```
+pip install keras
+```

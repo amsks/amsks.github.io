@@ -1,0 +1,110 @@
+<!DOCTYPE html><meta charset='UTF-8'><html><head><link rel='stylesheet' href='katex/katex.min.css'    integrity='sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X'    crossorigin='anonymous'><!-- The loading of KaTeX is deferred to speed up page rendering --><link rel='stylesheet' href='prism/prism.css'><title> Cogito Ergo Sum </title><style>@font-face {font-family: 'Blog Mono'; src: url('/static/iosevka-fixed-extended.ttf');}@font-face {font-family: 'Blog Text'; src: url('/static/Exo2-Regular.ttf');}html { font-size: 100%; }html,body { text-size-adjust: none; -webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; } body { background-color: #FFFFFF; color: #000000;  font-family: 'Blog Text', sans-serif; font-size: 18px; line-height: 1.4em;  max-width: 100%; overflow-x: hidden; }
+img { display:block; }.container { overflow-x: auto; overflow-y: hidden;  max-width:100%; }@media (max-width: 480px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (max-width: 1024px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (min-width: 1024px) { .container { margin-left: 25%; margin-right: 20%; } }.image { }
+a:hover { color: #1a73e8; text-decoration: underline;  }
+a { color: #1a73e8; text-decoration: none; }
+a:visited { color: #1a73e8; text-decoration: none; }
+a:active { color: #1a73e8; text-decoration: none; }
+
+blockquote { margin-left: 0px; margin-right: 0px; } pre, .latexblock, blockquote { border-left-color:#BBB;  border-left-style: solid;      border-left-width: 1px; }pre, blockquote { padding-left: 10px; }
+pre { font-family: 'Blog Mono', monospace; font-size: 90%;  }pre {  overflow-x: auto; }.latexblock, blockquote, pre { margin-top: 10px; margin-bottom: 10px; padding-bottom: 5px; padding-top: 5px; background-color: #FFFFFF; }.latexblock { line-height: 1em }
+pre, kbd, samp, tt{ font-family:'Blog Mono',monospace; }ul, ol { list-style-position: inside; padding-left: 0; }</style></head><body><div class='container'><h2><a id=misc-setting-up-envrironment href='#misc-setting-up-envrironment'> § </a><span class='centered'> Misc: Setting up Envrironment</h2>
+<h4><a id=installing-vs-code href='#installing-vs-code'> § </a><span class='centered'> Installing VS Code </h4>
+<ul><li><span class='centered'> Install the .deb link from </li></ul>
+<pre><code>https://code.visualstudio.com/Download
+</code></pre>
+<ul><li><span class='centered'> Navigate to the Downloads folder</li></ul>
+<pre><code>cd ~/Downloads
+</code></pre>
+<ul><li><span class='centered'> Install using dpkg </li></ul>
+<pre><code>sudo dpkg -i Name_of_file
+</code></pre>
+<h4><a id=installing-sublime-text href='#installing-sublime-text'> § </a><span class='centered'> Installing Sublime Text</h4>
+<ul><li><span class='centered'> Open Terminal and install the key</li></ul>
+<pre><code>wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | sudo apt-key add -
+</code></pre>
+<ul><li><span class='centered'> Add the apt repository</li></ul>
+<pre><code>echo "deb https://download.sublimetext.com/ apt/stable/" | sudo tee /etc/apt/sources.list.d/sublime-text.list
+</code></pre>
+<ul><li><span class='centered'> Finally, check updates and install sublime-text via apt</li></ul>
+<pre><code>sudo apt update
+
+sudo apt install sublime-text
+</code></pre>
+<h4><a id=installing-cuda href='#installing-cuda'> § </a><span class='centered'> Installing CUDA</h4>
+<ul><li><span class='centered'> Remove all NVIDIA traces in the system</li></ul>
+<pre><code>sudo rm /etc/apt/sources.list.d/cuda*
+sudo apt remove --autoremove nvidia-cuda-toolkit
+sudo apt remove --autoremove nvidia-*
+</code></pre>
+<ul><li><span class='centered'> Setup the correct CUDA PPA on the system</li></ul>
+<pre><code>sudo apt update
+sudo add-apt-repository ppa:graphics-drivers
+
+sudo apt-key adv --fetch-keys  http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub
+
+sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
+
+sudo bash -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64 /" > /etc/apt/sources.list.d/cuda_learn.list'
+</code></pre>
+<ul><li><span class='centered'> Install CUDA 10.1 packages</li></ul>
+<pre><code>sudo apt update
+sudo apt install cuda-10-1
+sudo apt install libcudnn7
+</code></pre>
+<ul><li><span class='centered'> To specify PATH to CUDA in ‘.profile’ file, open it :</li></ul>
+<pre><code>sudo gedit ~/.profile
+</code></pre>
+<ul><li><span class='centered'> Then add this to the end of the file</li></ul>
+<pre><code># set PATH for cuda 10.1 installation
+if [ -d "/usr/local/cuda-10.1/bin/" ]; then
+    export PATH=/usr/local/cuda-10.1/bin${PATH:+:${PATH}}
+    export LD_LIBRARY_PATH=/usr/local/cuda-10.1/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}
+fi
+</code></pre>
+<ul><li><span class='centered'> Restart and check the versions for the installation. For CUDA, NVIDIA and libcudnn</li></ul>
+<pre><code>nvcc  – version
+
+nvidia-smi
+
+/sbin/ldconfig -N -v $(sed ‘s/:/ /’ <<< $LD_LIBRARY_PATH) 2>/dev/null | grep libcudnn
+</code></pre>
+<h4><a id=setting-up-virtual-environment-for-dl href='#setting-up-virtual-environment-for-dl'> § </a><span class='centered'> Setting up Virtual Environment for DL</h4>
+<ul><li><span class='centered'> Install virtual env using apt</li></ul>
+<pre><code>sudo apt update
+
+sudo apt install virtualenv
+</code></pre>
+<ul><li><span class='centered'> Install virtualenvwrapper</li></ul>
+<pre><code>sudo apt install virtualenvwrapper
+</code></pre>
+<ul><li><span class='centered'> Check the installation paths ( Should be in /usr/bin/ )</li></ul>
+<pre><code>which virtualenv
+
+which virtualenvwrapper
+</code></pre>
+<ul><li><span class='centered'> Create the new environment for keras and tensorflow</li></ul>
+<pre><code>mkvirtualenv keras_tf -p python3
+</code></pre>
+<ul><li><span class='centered'> Check if the global commands work</li></ul>
+<pre><code>workon keras_tf 
+
+deactivate
+</code></pre>
+<ul><li><span class='centered'> Install and Check tf</li></ul>
+<pre><code>pip install --upgrade tensorflow
+
+python
+>>> import tensorflow as tf
+>>> tf.__version__
+
+</code></pre>
+<ul><li><span class='centered'> Install Keras related dependencies</li></ul>
+<pre><code>pip install numpy scipy
+pip install scikit-learn
+pip install pillow
+pip install h5py
+</code></pre>
+<ul><li><span class='centered'> Install keras</li></ul>
+<pre><code>pip install keras
+</code></pre>
+</container></body></html>
