@@ -42,6 +42,7 @@ This is a list of references that I use in my studies, the books that I have rea
 - [AlphaGo](https://storage.googleapis.com/deepmind-media/alphago/AlphaGoNaturePaper.pdf)
   - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
 - [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
+- [OpenAI : MADDPG](https://arxiv.org/pdf/1706.02275.pdf)
 
 ### Esosteric Stuff
 - [RL-CycleGAN](https://openaccess.thecvf.com/content_CVPR_2020/papers/Rao_RL-CycleGAN_Reinforcement_Learning_Aware_Simulation-to-Real_CVPR_2020_paper.pdf)
