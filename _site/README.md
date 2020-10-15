@@ -1,3 +1,8 @@
+<h2>
+<img style="float:left;display:inline-block;padding-right: 16px" src="./static/zettelkasten.png" width="32px">
+Zettelkasten
+</h2>
+
 ### Aditya Mohan
 
 - Reach me: <a href='mailto:adityak735@gmail.com'> `adityak735@gmail.com` </a>
@@ -40,7 +45,7 @@ I am a Master student in the [EIT Digital Master's course in Autonomous systems]
   - Keras
   - Tensorflow
 
-#### Stuff I have Written
+#### Notes
 
 # Clouds: Introduction to Cloud Technologies
 The best way to look at the development of the cloud is to look at the lifecycle for major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring the water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rate basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
@@ -122,6 +127,9 @@ The applications that can be enabled by the cloud are of 4 types
 # Mob: Vehicular Flow Modelling
 
 # MobMod: Palm Calculus
+Palm calculus is a way to reconsile differences in metrics that arise from sampling differences. To simply explain this, the rudimentary example is that of a cyclist going through the
+
+
 
 # MobMod: Random Mobility
 As with any analysis, the basics start from idealized scenarios. In terms of modeling, this would be random mobility. The historical viewpoint on this comes from Brownian Motion, which is the model of the movement of particles suspended in a liquid or gas caused by collisions with molecules of the surrounding medium. The two most basic models of random mobility are:
@@ -226,6 +234,11 @@ Consequently, the abstractions that this network viewpoint offers can be on thre
 1. Vehicular Traffic Model: Abstraction of the large scale trajectories employed by the vehicles
 2. Vehicular Flow Model: Abstractions of the physical inter-dependencies
 3. Vehicular Driver Model: Abstractions of the actions of individual nodes, like breaks, turns, etc.
+
+# MALIS: Introdution to Machine Learning 
+
+
+
 
 # RL: Markov Processes
 These are random processes indexed by time and are used to model systems that have limited memory of the past. The fundamental intuition behind Markov processes is the property that the future is independent of the past, given the present. In a general scenario, we might say that to determine the state of an agent at any time instant, we only have to condition it on a limited number of previous states, and not the whole history of its states or actions. The size of this window determines the order of the Markov process.
