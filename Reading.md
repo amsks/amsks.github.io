@@ -120,6 +120,10 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - [The Problem of Self-Referential Reasoning in Self-Improving AI: An Interview with Ramana Kumar, Part 2](https://futureoflife.org/2019/03/21/the-problem-of-self-referential-reasoning-in-self-improving-ai-an-interview-with-ramana-kumar-part-2/?cn-reloaded=1&cn-reloaded=1)
 - [The mind of an anthill](https://www.knowablemagazine.org/article/living-world/2018/mind-anthill)
 - [Ascribing Consciousness to Artificial Intelligence](https://arxiv.org/ftp/arxiv/papers/1504/1504.05696.pdf)
+- [Donald hoffman, Evolutionary Argument against reality](https://www.quantamagazine.org/he-evolutionary-argument-against-reality-20160421/)
+```
+Evolution has shaped us with perceptions that allow us to survive. But part of that involves hiding from us the stuff we don’t need to know. And that’s pretty much all of reality, whatever reality might be. We arefitting to the models that allow us to survive. So, a person who sees the reality for what it is, is actually not going to be efficient at surviving. In an ideal scenario, my curve for seeing thebenifit in a resource would be linear, and so more resource means more health. However, in reality it might be gaussian, in which case, I equate scarcity and excess as equally dangerous. Hence, I attune myself to react to the right sweet-spot of the resource, and this habit would be magnified by evolution to make me have a mental model that magnified that sweet-spot. Hence, I would actually react to a model that is  increasingly away from reality.
+```
 - [Chess Programming Wiki](https://www.chessprogramming.org/Main_Page)
 - Industries of the Future - Alec Ross
 - Bold: Go Big, Create Wealth and impact the world - Peter Diamandis
