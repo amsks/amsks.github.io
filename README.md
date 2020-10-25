@@ -23,29 +23,20 @@ I am a Master student in the [EIT Digital Master's course in Autonomous systems]
 
 #### Technologies
 
-- **Robotics**
-  - ROS
-  - MORSE
-  - FlexBE
-
-- **Programming**
-  - C++
-  - Embedded C
-  - Python
-  - JAVA
-
-- **RL Software**
-  - OpenAI Gym
-  - PyBullet
-  - PhysX
-  - RAI
-
-- **Deep Learning**
-  - Pytorch
-  - Keras
-  - Tensorflow
+- **Robotics :** ROS, MORSE, FlexBE
+- **Programming :** C++, Embedded C, Python, JAVA
+- **RL Software :** OpenAI Gym, PyBullet, PhysX, RAI
+- **Deep Learning :** Pytorch, Keras, Tensorflow
 
 #### Notes
+
+# Clouds: Fundamentals of Cloud Computing
+
+## Cloudonomics: Quantative Analysis of cloud
+In 2012, Joe weinman came up with the economic theory to estimate the business value of cloud computing, calling it Cloudonomics. The two major 
+
+
+
 
 # Clouds: Introduction to Cloud Technologies
 The best way to look at the development of the cloud is to look at the lifecycle for major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring the water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rate basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
@@ -124,7 +115,7 @@ The applications that can be enabled by the cloud are of 4 types
 5. Improved Resource Utilization
 6. Decrease in Carbon Footpriint
 
-# Mob: Vehicular Flow Modelling
+# MobMod: Vehicular Flow Modelling
 
 # MobMod: Palm Calculus
 Palm calculus is a way to reconsile differences in metrics that arise from sampling differences. To simply explain this, the rudimentary example is that of a cyclist going through the
