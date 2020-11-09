@@ -1,20 +1,18 @@
-<h2>
-<img style="float:left;display:inline-block;padding-right: 16px" src="./static/zettelkasten.png" width="32px">
-Zettelkasten
-</h2>
+## Aditya Mohan
 
-### Aditya Mohan
+<img style="float:left;display:inline-block;padding-right: 16px" src="./static/meinfoto.jpg" width="100px">
 
 - Reach me: <a href='mailto:adityak735@gmail.com'> `adityak735@gmail.com` </a>
 - [Github](http://github.com/amsks)
 - [Linkedin](https://www.linkedin.com/in/amsks/)
-- [Resume](CV/main.pdf)
+- [Curriculum Vitae](CV/CV_Aditya_Mohan.pdf)
 - [Reading list](reading-list.html)
 
-### About Me
-I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/), working towards a specialization at the intersection of Robotics and Reinforcement Learning. I have previously worked in various fields in hardware and software, and on projects that range from cognitive radios to RTOS stacks, and now I aim to combine them and become a researcher in the field of Robotics and AI. I'm always up for collaborating on interesting projects.
 
-**Fun Fact :** I am a musician - multiinstrumentalist and singer - and can sing in around 8 languages so far. Checkout some of my song covers on my [instagram page](https://www.instagram.com/melodic.musings/)
+### About Me
+- I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/), working towards a specialization at the intersection of Robotics and Reinforcement Learning. I have previously worked in various fields in hardware and software, and on projects that range from cognitive radios to RTOS stacks, and now I aim to combine them and become a researcher in the field of Robotics and AI. I'm always up for collaborating on interesting projects.
+
+- **Fun Fact :** I am a musician - multiinstrumentalist and singer - and can sing in around 8 languages so far. Checkout some of my song covers on my [instagram page](https://www.instagram.com/melodic.musings/)
 
 #### Education
 - [EURECOM](http://www.eurecom.fr/en)
@@ -28,7 +26,7 @@ I am a Master student in the [EIT Digital Master's course in Autonomous systems]
 - **RL Software :** OpenAI Gym, PyBullet, PhysX, RAI
 - **Deep Learning :** Pytorch, Keras, Tensorflow
 
-#### Notes
+#### Zettelkasten
 
 # Clouds: Fundamentals of Cloud Computing
 
@@ -229,6 +227,287 @@ Consequently, the abstractions that this network viewpoint offers can be on thre
 # MALIS: Introdution to Machine Learning 
 
 
+
+# RL: Model-Free Control
+
+While prediction is all about estimating the value function in an environment for which the underlying MDP is not known, Model-Free control deals with otimizing this value function.
+
+
+
+
+# RL: Model-Free Prediction
+One of the problems with DP is that it assumes a full knowledge of the MDP, and consequently, the environment. While this holds true for a lot of applications, it might not hold true for all cases. In fact, the upper limit does turn out to be the ability to be accurate about the underlying MDP. Thus, if we don't know the true MDP behind a process, the next best thing would be to try to approximate them. One of the ways to go about this is **Model-Free RL**. 
+
+## Monte-Carlo Methods
+The first that comes to my mind when someone speaks fo approximation is Monte-carlo methods. The core idea behind the monte-carlo approach, which has its root in gambling, is to use probaility to approximate quantities. suppose we have to approximate the area of a circle relative to a rectangle inside which it is inscribed (This is a classic exmaple and an easy experiment too), the experiment-based approach would be to make a board and randomly throw some balls on it. In a true random throw, let's call the creation of a spot on the board as a simulation ( experiment, whatever!), after each simulation, record the number of sots inside the circular area and he total number of spots including the circular area and the the recangluar area. A ratio of these two quantities would give us an estimate of the relative area of the circle and the rectangle. Now as we conduct more such experiments, this estimate would actually get better since the underlying probability of a spot appearing inside the circle is proportional to the amount of area that the circle occupies inside the rectangle. Thus, in the infinity limit, we could get the exact value of this ratio. 
+
+### Applying MC idea to RL
+Another way to put the monte-carlo approach would be to say that Monte-Carlo methods only require experience. In the case of RL, this would translate to sample sequences of states, actions, and rewards from actual or simulated interaction with an environment. An experiment in this sense would be a full rollout of an episode which will create a sequence of states and reqards. when multiple such experiments are conducted, we get better approximations of our MDP. To be specific, our goal here would be to learn $v_{\pi}$ from episodes of experience under policy $\pi$. The value function is the expectation fo reward
+
+$$
+v_{\pi}(s) = E_{\pi}[G_t | S_t = s]
+$$
+
+So, all we have to do is estimate this expectation using the empirical mean of the returns for the experiments. 
+
+### First-Visit MC Evaluation
+To evaluate state s, at the first time-step t at which s is visited: 
+1. Increment counter $N(s) \gets  N(s) + 1$
+2. Increment total return $S(s) \gets S(s) + 1 $
+3. Estimate value by the mean return $V(s) = S(s)/N(s) $
+
+As we repreat more experiments and update the values at the  first visit, convergence to optimal values $V(s) \to  v_{\pi}$
+as $N(s) \to \infin$
+
+### Every-Visit MC Evaluation
+This is same as first visit evaluation, excep  we update at every visit: 
+1. $N(s) \gets  N(s) + 1$
+2. $S(s) \gets S9(s) + 1 $
+3. $V(s) = S(s)/N(s) $
+
+
+### Incremental MC updates
+The empirical mea can be expressed as an incremental update as follows: 
+
+$$
+{\mu}_k = \frac{1}{k} \displaystyle\sum_{j=1}^n x_j = \frac{1}{k} (x_k + \displaystyle\sum_{j=1}^{k-1} x_j) = \frac{1}{k} (x_k + (k-1)\mu_{k-1})
+$$
+
+Thus, for the state updates, we can follow a similar pattern and for each state $S_t$ and return $G_t$ express it as: 
+1. $N(S_t) \gets N(S_t) + 1$
+2. $V(S_t) = V(S_t) + \frac{1}{N(S_t)}(G_t - V(S_t))$
+
+An another useful way would be to track a running mean: 
+
+$$
+V(S_t) \gets V(S_t) + \alpha (G_t - V(S_t)
+$$
+
+
+
+## Temporal-Difference (TD) Learning
+The MC method of learning needs an episode to terminate in order to work its way backward. In TD, the idea is work the way forwrad by replacing the remainder of the states with an estimate. This is one method that is considered central adn novel to RL (According to Sutton adn Barto). Like MC methods, TD methods can learn directly from raw experience and like DP, TD methods update estimates based in part on other learned estimates, without waiting for a final outcome, something which is called Bootstrapping - updating a guess towards aguess (I know!).
+
+### Concept of Target and Error
+If we look at the previous equation of Incremental MC, the general form that can be extrapolated is 
+
+$$
+V(S_t) \gets V(S_t) + \alpha (T - V(S_t)
+$$
+
+Here, the quantity $T$ is called the **Target** and the quantity $T - V(S_t)$ is called the **error**. Now, in the MC version, the target is the return $G_t$, means the MC method has to wait for this return to be propagated backwards to then see the error if its current value function from this return, and improve. This is where TD methods show their magic; At time t+1 they immediately form a target and make a useful update using the observed reward and the current estimate of the value function. The simplest TD method, TD(0), thus has the following form 
+
+$$
+V(S_t) \gets V(S_t) + \alpha (R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
+$$
+
+This is why bootstrapping is a guess of guess, since the TD method bases its update in part on an existing estimate. 
+
+## Comparing TD, MC and DP
+Another way to look these algorithms would be through the bellman optimality equation:
+
+$$
+v_{\pi}(s) = E [ R_{t+1} + \gamma v_{\pi}(S_{t+1})| S_t = s]
+$$
+
+The MC method is an estimate because it does not have a model of the environment and thus, needs to sample in order to get an estimate of the mean. The DP method is an estimate because it does not know the future values of states and thus, uses the current state value estimate in its place. The TD method is an estimate because it does both of these things. Hence, it is combination of both. However, unlike DP, MC and TD do not require a model of the environment. Moreover, the online nature of these algorithms is something that allows them to work with samples of backups, whereas DP requires full backup.TD and MC can be differentiated in the nature of the samples that they work with: TD requires shallow backups since it is inherently online in nature, while MC requires deep backups due to the  nature of its search. Another way to look at the inherent difference is to realize that DP inherently dies a breadth first search, while MC does a depth first search. TD(0) only looks one step ahead and forms a guess. David silver summarizes the differences on the following spectrum, which I find really helpful: 
+
+<img width=600 height=500 src="static/Reinforcement Learning/TD-MC-DP.png">
+
+## Extending TD to n-steps 
+
+The next natural step for something like TD, would be to extend it to further steps. For this, we generalize the target and define the it as follows:
+
+$$
+G^{(n)}_t = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+ n} + \gamma^n V(S_{t+n})
+$$
+
+And so the equation again follows the same format:
+
+$$
+V(S_t) \gets V(S_t) + \alpha (G^{(n)}_t - V(S_t)
+$$
+
+One interesting thing to note here is that if n is increased all the way till the terminal state, then we essentially get the same equation as MC methods! 
+
+### Averaging over n returns 
+To get the best out of all n's, one improvement could be to avergae teh returns over certain number of states. For example, we could combine 2-step and 4-step returns and take teh average :
+
+$$
+G_avg = \frac{1}{2} [ G^{(2)} + G^{(4)} ]
+$$
+
+This has been shown to work  better in many cases, but only incrementally.
+
+### $\lambda$-Return
+
+This is a method to combine the returns from all the n-steps:
+
+$$
+G^{(\lambda)}_t = (1 - \lambda ) \displaystyle\sum_{n=1}^{\infin} \lambda^{n-1} G^{(n)}_t
+
+$$
+
+And ths, is als called **Forward-view TD($\lambda$)**
+
+### Backward View 
+
+To understand the backward view, we need a way to see how we are going to judge the causal relationships between events and outcomes (Returns). There are two heuristics:
+1. **Frequency Heuristic :** Assign credit to the most frequent states
+2. **Recency Heuristic :** Assign credit to the most recent states.
+
+The way we keep track of how each states fares on these two heuristic is through **Eligibility Traces** :
+
+$$
+E_t(s) = \gamma \lambda E_{t-1}(s) + \bold{1}(S_t = s)
+$$
+
+These traces accumulate as the frequency increases, and are higher for more recent states. If the frequency drops, they also drop. This is evident in the figure below:
+
+<img width=300 height=100 src="static/Reinforcement Learning/ET.png">
+
+So, all we need to do it scale the TD-error $\delta_t$ according to the trace function:
+
+$$
+V(S) \gets  V(S) + \alpha \delta_t E_t(s)
+$$
+
+Thus, when $\lambda = 0$, we get TD(0) and when $\lambda = 1$, the credit is deferred to the end of the episode nand we get MC
+
+
+
+# RL: Planning and Dynamic Programming
+
+Dynamic programming (DP) is a method that solves a problem by breaking it down into sub-problems and then solving each sub-problem individually, and then combining them into a solution. A godo example is the standard fibonacci sequence calculation problem, where traditionally the way to solve ti would be through recursion
+
+```cpp
+int fib(int x)
+{
+    if (x < 2)
+        return 1;
+
+    return fib(x-1) + fib(x-2);
+}
+
+```
+However, the way DP would go about this would be to cache the variables after teh first call, so that the same call is not made again, making the program more efficient:
+
+```cpp
+int fib(int x)
+{
+    static vector<int> cache(N, -1);
+
+    int& result = cache[x];
+
+    if (result == -1)
+    {
+        if (x < 2)
+            result = 1;
+        else
+            result = fib(x-1) + fib(x-2);
+    }
+
+    return result;
+}
+
+```
+
+The 2 characteristics that a problems need to have fo DP to solve it are: 
+1. **Optimal Substructure :** Any problem has optimal substructure property if its overall optimal solution can be constructed from the optimal solutions of its subproblems i.e the property $Fib(n) = Fib(n-1) + Fib(n-2)$ in fibonacci numbers
+2. **Over-lapping Sub-problems :** The problem involves sub-problems which need to be solved recursively many tiimes
+
+Now, in teh case of an MDP, we have already seen that these properties are fulfilled: 
+1. The Bellman equation gives a recursive relation that satisfies the overlap requirement
+2. The valu function is able to store and re-use the solutions from each state-visit, and thus, the we can exploit it as an optimal substructure
+
+Hence, DP can be used for making solutions to MDPs more tractable, and thus, is a good tool to solve the planning problem in an MDP. The plannign problem, as discussed before, is of two types: 
+1. **Predicton Problem :** **How do we evaluate a policy ?** or, Using the MDP tuple as an input, the output is a value function $V_{\pi}$ and/or a policy $\pi$
+2. **Control Problem :** **How do we optimie the policy ?** Using the MDP tuple as an input, the output is a an optimal value function $V_{*}$ and/or a policy $\pi_{*}$ 
+
+## Iterative Policy Evaluation
+
+The most basic way is to iteratively apply the bellman equation, using hte old values to calculate a new estimate, and then using this new estimate to calculate new values. IN the bellman equation for the state-value function 
+
+$$
+v_{\pi}(s) = \sum_{\substack{a \in A}} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s) ]
+$$
+
+As long as either $\gamma < 1$ or eventual termination is guaranteed from all states under the policy $\pi$, the uniqueness of the value function is guaranteed. Thus, we can consider a sequence of approximation functions $v_0, v_1, v_2, ...$ each mapping states to Real numbers, start with an arbitrary estimate of $v_0$, and obstain successive approximations using bellman equation, as follows: 
+
+$$
+v_{k+1}(s) = \sum_{\substack{a \in A}} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{k} (s') ]
+$$
+
+The sequence $v_k$ can be shown to converge as $ k \rightarrow \infin $
+
+the process, is basically a propogation towards the root of the decision tree from the roots.
+
+<img width=300 height=200 src="static/Reinforcement Learning/It-pol-eval.png">
+
+This update operation is applied to each state in the MDP at each step, and so, is called **Full-Backup**, ad so in a computer program we would have two cache arrays - one for $v_k(s)$ and one for $v_{k+1}(s)$
+
+## Policy Improvement
+Once we have a policy, the next question is do we follow this policy or shift to a new improved policy ? one way to answer this problem is to take an action that this policy does not suggest and then evluate the smae policy after that action. If the returns are higher than the we can say that taking that action is better than following the current policy. The way we evaluate the action is throught the action value function: 
+
+$$
+q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s')
+$$
+
+If this value is greater than the value function of a state S, then that means that it is better to select this action than follow the policy $\pi$, and by extension, it would mean that anytime we encounter state S, we would like to take this action. So, let's call the schema of taking action a everytime we encounter s as a new policy ${\pi}'$, and so, we can now say 
+
+$$
+q_{\pi}(s,{\pi}'(s)) \geqslant v_{\pi}(s)
+$$
+
+
+This implies that the policy ${\pi}'$ must be at-least as good as the policy $\pi$
+
+$$
+v_{{\pi}'} \geqslant v_{\pi}
+$$
+
+Thus, if we extend this idea to multiple possible actions at any state s,  the net incentive is to go full greedy on it and select best out of all those possible actions: 
+
+$$
+{\pi}'(s) = \argmax_a q_{\pi}(s,a)
+$$
+
+The greedy policy, thus, takes the action that looks best in the short term i.e after one step of lookahead. The point at which the new policy stops becoming better than the old one, is the conveergence point, and we can conclude that optimality has been reached. This idea also applies in the general case of stochastic policies, with the addition tha in the case of multiple actions with the maximum value, a portion of the stochastic probabiltiy can be given to each.
+
+## Policy Iteration
+
+Following the greedy policy improvement process, we can bstain a sequency of policies: 
+
+$$
+{\pi}_0 \rightarrow v_{\pi_0} \rightarrow {\pi_1} \rightarrow v_{\pi_1} .... \rightarrow {\pi}_* \rightarrow v_{{\pi}_*}
+$$
+
+Since a finite MDP has a finite number of policies, this process must converge at some point to an optimal value. This process is called **Policy Iteration**. The algorithm, thus, follows the process: 
+1. **Evaluate** the policy using the Bellman equation
+2. **Improve** the policy using greedy policy improvement.
+
+A natural question that comes up at this point is that do we actually need to follow this optimiztaion procedure till the end ? It does sound like a lot of work, and in fact, as  seen in the Gridworld example (Sutton and Barto), the workably optimal policy is actually reached much before the final iteration step, where basically teh final three steps actualy are redundant. Thus, we can include stopping conditions to tackle this: 
+1. $\epsilon$-convergence
+2. Stop after k iteratiokns
+3. Value Iteration
+
+
+## Value Iteration
+
+in this algorithm, the evaluation is truncated to one sweep, or one backup of each state. to understand this, the first step is to understand something called the **Principle of Optimality**. The basic idea is that an optimal policy can be subdivided into two parts:
+- An optimal first action $A_*$
+- An optimal policy from the successor state S'
+
+So, if we know the the solution to $v_*(s')$ for all s' succeeding a state, s , then the solution can be found with just a one-step lookahead
+
+$$
+v_*(s) \gets \max_{a \isin A} R^a_s + \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{*} (s')
+$$
+
+The intuition is to start from teh final reward and work your way backward. There is no explicit update of policy, only values. This also opens up the possibility that the intermediate values might not correspond to any policies, and so interpreting anything midway will have some residue in addition to the greedy policy.  In practice, we stop once the value function changes by only a small amount in a sweep. A  summary of synchronous methods for DP is given by David Silverman:
+
+
+<img width=500 height=150 src="static/Reinforcement Learning/sync_DP_summary.png">
 
 
 # RL: Markov Processes
@@ -601,7 +880,7 @@ g++ -L/home/users/a/amsks1996/git/ceres-solver/build/lib -L/home/users/a/amsks19
 /beegfs/home/cluster/python/3.6.8/bin:/cluster/comp/binutils/2.29/bin:/cluster/comp/gcc/7.2.0/bin:/home/users/a/amsks1996/usr/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/home/users/a/amsks1996/.local/bin:/home/users/a/amsks1996/bin:/cluster/cuda/cuda-9.2.88//bin/:/cluster/cuda/cuda-9.2.88//open64/bin/:/cluster/cuda/cuda-9.2.88//nvvm/:/cluster/cuda/cuda-9.2.88//samples/bin/x86_64/linux/release/:/home/users/a/amsks1996/usr/include
 ```
 
-### LInking step error
+### Linking step error
 
 AAA -lceres -lglog -lcholmod -llapack -lblas -lpthread  $(HOME)/usr/lib/libspqr.so $(HOME)/usr/lib/libtbbmalloc.so $(HOME)/usr/lib/libtbb.so $(HOME)/usr/lib/libcholmod.so $(HOME)/usr/lib/libccolamd.so $(HOME)/usr/lib/libcamd.so $(HOME)/usr/lib/libcolamd.so $(HOME)/usr/lib/libamd.so $(HOME)/usr/lib/liblapack.so $(HOME)/usr/lib/libf77blas.so $(HOME)/usr/lib/libatlas.so $(HOME)/usr/lib/libsuitesparseconfig.so $(HOME)/usr/lib/librt.so $(HOME)/usr/lib/libcxsparse.so $(HOME)/usr/lib/liblapack.so $(HOME)/usr/lib/libf77blas.so $(HOME)/usr/lib/libatlas.so $(HOME)/usr/lib/libsuitesparseconfig.so $(HOME)/usr/lib/librt.so $(HOME)/usr/lib/libcxsparse.so $(HOME)/usr/lib/libgflags.so.2.2.1 -lpthread $(HOME)/usr/lib/libglog.so -lceres -lglog -cholmod ld: final link failed: Nonrepresentable section on output
 

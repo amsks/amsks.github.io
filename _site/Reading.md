@@ -109,9 +109,12 @@ This is a list of references that I use in my studies, the books that I have rea
 - Harry Potter Series - Rowling
 - The Innovator's Dilemma - Christensen
 - [Life 3.0 - Max Tegmark](https://en.wikipedia.org/wiki/Life_3.0)
-    - Tegmark's concept of understanding consciousness in terms of the subjective experience of an entity while proccessing information is worth lookign into. ties up to the recent exploits in [Integrated Information Theory](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42) and other related fields. Look into GEB stuff
-    - An opposing viewpoint to IIT : [The Problem with Phi: A Critique of
+
+> Tegmark's concept of understanding consciousness in terms of the subjective experience of an entity while proccessing information is worth lookign into. ties up to the recent exploits in [Integrated Information Theory](https://bmcneurosci.biomedcentral.com/articles/10.1186/1471-2202-5-42) and other related fields. Look into GEB stuff
+
+> **An opposing viewpoint to IIT :** [The Problem with Phi: A Critique of
 Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/file?id=10.1371/journal.pcbi.1004286&type=printable)
+
 - [Consciousness: here, there and everywhere?](https://royalsocietypublishing.org/doi/full/10.1098/rstb.2014.0167)
 - [The Society of Mind - Minsky](https://www.youtube.com/playlist?list=PLUl4u3cNGP61E-vNcDV0w5xpsIBYNJDkU)
 - [Matter, Mind and Models - Marvin Minsky](https://web.media.mit.edu/~minsky/papers/MatterMindModels.html)
@@ -121,9 +124,9 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - [The mind of an anthill](https://www.knowablemagazine.org/article/living-world/2018/mind-anthill)
 - [Ascribing Consciousness to Artificial Intelligence](https://arxiv.org/ftp/arxiv/papers/1504/1504.05696.pdf)
 - [Donald hoffman, Evolutionary Argument against reality](https://www.quantamagazine.org/he-evolutionary-argument-against-reality-20160421/)
-```
-Evolution has shaped us with perceptions that allow us to survive. But part of that involves hiding from us the stuff we don’t need to know. And that’s pretty much all of reality, whatever reality might be. We arefitting to the models that allow us to survive. So, a person who sees the reality for what it is, is actually not going to be efficient at surviving. In an ideal scenario, my curve for seeing thebenifit in a resource would be linear, and so more resource means more health. However, in reality it might be gaussian, in which case, I equate scarcity and excess as equally dangerous. Hence, I attune myself to react to the right sweet-spot of the resource, and this habit would be magnified by evolution to make me have a mental model that magnified that sweet-spot. Hence, I would actually react to a model that is  increasingly away from reality.
-```
+
+> Evolution has shaped us with perceptions that allow us to survive. But part of that involves hiding from us the stuff we don’t need to know. And that’s pretty much all of reality, whatever reality might be. We arefitting to the models that allow us to survive. So, a person who sees the reality for what it is, is actually not going to be efficient at surviving. In an ideal scenario, my curve for seeing thebenifit in a resource would be linear, and so more resource means more health. However, in reality it might be gaussian, in which case, I equate scarcity and excess as equally dangerous. Hence, I attune myself to react to the right sweet-spot of the resource, and this habit would be magnified by evolution to make me have a mental model that magnified that sweet-spot. Hence, I would actually react to a model that is  increasingly away from reality.
+
 - [Chess Programming Wiki](https://www.chessprogramming.org/Main_Page)
 - Industries of the Future - Alec Ross
 - Bold: Go Big, Create Wealth and impact the world - Peter Diamandis
@@ -136,7 +139,8 @@ Evolution has shaped us with perceptions that allow us to survive. But part of t
 - QED - Fynmann
 - Tools for Conviviality - Ivan Illich
 - [Deschooling Society](https://davidtinapple.com/illich/1970_deschooling.html)
-    - Many students, especially those who are poor, intuitively know what the schools do for them. They school them to confuse process and substance. Once these become blurred, a new logic is assumed: the more treatment there is, the better are the results; or, escalation leads to success. The pupil is thereby “schooled” to confuse teaching with learning, grade advancement with education, a diploma with competence, and fluency with the ability to say something new. His imagination is “schooled” to accept service in place of value. Medical treatment is mistaken for health care, social work for the improvement of community life, police protection for safety, military poise for national security, the rat race for productive work. Health, learning, dignity, independence, and creative endeavor are defined as little more than the performance of the institutions which claim to serve these ends, and their improvement is made to depend on allocating more resources to the management of hospitals, schools, and other agencies in question. In these essays, I will show that the institutionalization of values leads inevitably to physical pollution, social polarization, and psychological impotence: three dimensions in a process of global degradation and modernized misery.
+
+> Many students, especially those who are poor, intuitively know what the schools do for them. They school them to confuse process and substance. Once these become blurred, a new logic is assumed: the more treatment there is, the better are the results; or, escalation leads to success. The pupil is thereby “schooled” to confuse teaching with learning, grade advancement with education, a diploma with competence, and fluency with the ability to say something new. His imagination is “schooled” to accept service in place of value. Medical treatment is mistaken for health care, social work for the improvement of community life, police protection for safety, military poise for national security, the rat race for productive work. Health, learning, dignity, independence, and creative endeavor are defined as little more than the performance of the institutions which claim to serve these ends, and their improvement is made to depend on allocating more resources to the management of hospitals, schools, and other agencies in question. In these essays, I will show that the institutionalization of values leads inevitably to physical pollution, social polarization, and psychological impotence: three dimensions in a process of global degradation and modernized misery.
 
 - Trust Me, I am lying - Ryan Holiday
 - Krishna Trilogy(I am Krishna) - Deep Trivedi
@@ -145,5 +149,10 @@ Evolution has shaped us with perceptions that allow us to survive. But part of t
 - 21 Laws for the 21st century - Harari
 - The Selfish Gene - Dawkins
 - [Thou Shall Not Commit Logical fallacies](https://yourlogicalfallacyis.com/?fbclid=IwAR0-myXMlJLUVnXhpS7LSx4neNjZqRnz4f4I7fFhbvE70TWI-qVV8egFJps)
-- Levathian - Hobbs
-    - One of the classic ideas that come out of this with Game Theory as a reference would be a dicounting factor for teh future, or the 'shadow of the future', which would help in evaluating cooperation for the future. So, in probabilistic games, maybe Nash Equilibria can be shaped by tampering with this shadow of the future.
+- Levathian by Hobbs
+
+> One of the classic ideas that come out of this with Game Theory as a reference would be a dicounting factor for the future, or the 'shadow of the future', which would help in evaluating cooperation for the future. So, in probabilistic games, maybe Nash Equilibria can be shaped by tampering with this shadow of the future.
+
+- [Who rules the world ? - Noam Chomsky](https://hadinur1969.files.wordpress.com/2017/11/noam_chomsky-who_rules_the_world.pdf)
+
+- [The Oedipus and Yayati Complex](https://www.google.com/amp/s/www.speakingtree.in/article/from-oedipus-to-yayati/m-lite)
