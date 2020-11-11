@@ -91,6 +91,9 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
 
 
+## Optimizations
+- [Convex Optimization by Boyd and Vanderberghe](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
+
 ## Mobiity Modelling
 - [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
 - [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
