@@ -43,6 +43,7 @@ This is a list of references that I use in my studies, the books that I have rea
   - [MCTS and rapid action value estimation in computer Go](https://www.ics.uci.edu/~dechter/courses/ics-295/winter-2018/papers/mcts-gelly-silver.pdf)
 - [Deep RL with double Q Learning](https://arxiv.org/pdf/1509.06461.pdf)
 - [OpenAI : MADDPG](https://arxiv.org/pdf/1706.02275.pdf)
+- [Self-Organizing Maps in DDPG](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.92.9850&rep=rep1&type=pdf)
 
 ### Esosteric Stuff
 - [RL-CycleGAN](https://openaccess.thecvf.com/content_CVPR_2020/papers/Rao_RL-CycleGAN_Reinforcement_Learning_Aware_Simulation-to-Real_CVPR_2020_paper.pdf)
@@ -92,6 +93,7 @@ This is a list of references that I use in my studies, the books that I have rea
 
 
 ## Optimizations
+- [Materials for the Course]()
 - [Convex Optimization by Boyd and Vanderberghe](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
 
 ## Mobiity Modelling
@@ -159,3 +161,7 @@ Integrated Information Theory](https://journals.plos.org/ploscompbiol/article/fi
 - [Who rules the world ? - Noam Chomsky](https://hadinur1969.files.wordpress.com/2017/11/noam_chomsky-who_rules_the_world.pdf)
 
 - [The Oedipus and Yayati Complex](https://www.google.com/amp/s/www.speakingtree.in/article/from-oedipus-to-yayati/m-lite)
+
+- [the story of Annapurna Devi](https://www.mansworldindia.com/people/annapurna-devi-the-tragedy-and-triumph-of-ravi-shankars-first-wife/)
+
+- [Hillarious Critique on Peterson](https://www.currentaffairs.org/2018/03/the-intellectual-we-deserve)
