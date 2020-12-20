@@ -26,6 +26,11 @@
 - **RL Software :** OpenAI Gym, PyBullet, PhysX, RAI
 - **Deep Learning :** Pytorch, Keras, Tensorflow
 
+
+#### Work Reports
+[Plan-Based Reward-Shaping for Goal-Focused Exploration in Reinforcement Learning](CV/LIS_Internship_Report.pdf)
+
+
 #### Zettelkasten
 
 # Optimization: Unconstrainted Optimization
