@@ -1,0 +1,124 @@
+<!DOCTYPE html><meta charset='UTF-8'><html><head><link rel='stylesheet' href='katex/katex.min.css'    integrity='sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X'    crossorigin='anonymous'><!-- The loading of KaTeX is deferred to speed up page rendering --><link rel='stylesheet' href='prism/prism.css'><title> Cogito Ergo Sum </title><style>@font-face {font-family: 'Blog Mono'; src: url('/static/iosevka-fixed-extended.ttf');}@font-face {font-family: 'Blog Text'; src: url('/static/Exo2-Regular.ttf');}html { font-size: 100%; }html,body { text-size-adjust: none; -webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; } body { background-color: #FFFFFF; color: #000000;  font-family: 'Blog Text', sans-serif; font-size: 18px; line-height: 1.4em;  max-width: 100%; overflow-x: hidden; }
+img { display:block; }.container { overflow-x: auto; overflow-y: hidden;  max-width:100%; }@media (max-width: 480px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (max-width: 1024px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (min-width: 1024px) { .container { margin-left: 25%; margin-right: 20%; } }.image { }
+a:hover { color: #1a73e8; text-decoration: underline;  }
+a { color: #1a73e8; text-decoration: none; }
+a:visited { color: #1a73e8; text-decoration: none; }
+a:active { color: #1a73e8; text-decoration: none; }
+
+blockquote { margin-left: 0px; margin-right: 0px; } pre, .latexblock, blockquote { border-left-color:#BBB;  border-left-style: solid;      border-left-width: 1px; }pre, blockquote { padding-left: 10px; }
+pre { font-family: 'Blog Mono', monospace; font-size: 90%;  }pre {  overflow-x: auto; }.latexblock, blockquote, pre { margin-top: 10px; margin-bottom: 10px; padding-bottom: 5px; padding-top: 5px; background-color: #FFFFFF; }.latexblock { line-height: 1em }
+pre, kbd, samp, tt{ font-family:'Blog Mono',monospace; }ul, ol { list-style-position: inside; padding-left: 0; }</style></head><body><div class='container'><h2><a id=clouds-parallelism-and-distributed-programming href='#clouds-parallelism-and-distributed-programming'> § </a><span class='centered'> Clouds: Parallelism and Distributed Programming</h2>
+<h3><a id=parallelism-in-cpus href='#parallelism-in-cpus'> § </a><span class='centered'> Parallelism in CPUs</h3>
+A CPU executes instructions in stages, the major stages being Fetch, Decode, Execute, Memory and Write. Paralellism in CPUs can be achieved in many ways, the most basic being through pipelining instructions, where independent instructions are executed together to improve efficiency. This is represented in the waterfall model shown below: 
+<img width=650 height=300 src="static/Clouds/waterfall.png">
+A measure of how many of the instructions in a computer program can be executed simultaneously is called <b><span class='centered'>Instruction-level parallelism</b> and a processor that executes this kind of parallelism is called a <b><span class='centered'>Superscalar Processor</b>. The problem with the above parallelization is the possibility of conflicts that increases with increase in clock cycles i.e fitting increasingly more instructions together as the pipeline stage continues. Moreover, automatic search for independendt instructions requires additional resources.
+<h4><a id=vectorization-automatic-and-explicit href='#vectorization-automatic-and-explicit'> § </a><span class='centered'> Vectorization: Automatic and Explicit</h4>
+One way to overcome the roadblocks of deeper cycles in CPUs is through exploiting parallelism in data. FOr example, if the same operation - say addition - needs to be performed on two arrays then this operation can be replaced by a single operation on the whole array. This is called <b><span class='centered'>vectorization</b>.
+<img width=350 height=300 src="static/Clouds/vectorization.png">
+Vectorization can be <b><span class='centered'>Automatic</b> when the scalar operation is automatically converted by the processor into a parallel one, and <b><span class='centered'>Explicit</b> when the user manually implements vectorization. While the obvious benifit of automatic vectorization is the ease of implementation, it does not always work. Foe example, in the following code auto vectorization will not work because for each element the addition depends on the previous element and so, the operation cannot be split into chunks.  
+<pre><code>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+=</span> a<span class="token punctuation">[</span>i<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+However, if we just replace the '-' with a '+' as shown in the code below, vectorization works since now all the processor needs to do is take a snapshot of the element that the for loop has not reached yet and add that to the current element.
+<pre><code>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+=</span> a<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+The subtraction might work if the loop is not checking the previous, but an element that is one more than the lenght of the vector
+<pre><code>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+=</span> a<span class="token punctuation">[</span>i <span class="token operator">-</span> N<span class="token punctuation">]</span> <span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+Another case in which Automatic Vecotrization does not work is when there is assumed dependence as shown below, where the code would only work if a and b are not aliased ( a == b - 1) and b > a
+<pre><code>
+<span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">+=</span> b<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+Thus, the limitations of auto vectorization are: 
+<ol><li><span class='centered'> Works on only innermost loops</li><li><span class='centered'> No Vector dependence </li><li><span class='centered'> Number of iterations must be known</li></ol>
+However, we can guide auto-vectorization by using the simd directives. An example is shown below: 
+<pre><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">pragma</span> <span class="token expression">omp declare simd </span></span>
+<span class="token keyword">double</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token keyword">double</span> x<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+<span class="token keyword">const</span> <span class="token keyword">double</span> dx <span class="token operator">=</span> a <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span>n <span class="token punctuation">;</span>
+<span class="token keyword">double</span> integral <span class="token operator">=</span> <span class="token number">0.0</span> <span class="token punctuation">;</span> 
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">pragma</span> <span class="token expression">omp simd <span class="token function">reduction</span><span class="token punctuation">(</span><span class="token operator">+</span><span class="token punctuation">,</span> integral<span class="token punctuation">)</span></span></span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">&lt;</span>n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token keyword">double</span> xip2 <span class="token operator">=</span> dx <span class="token operator">*</span> <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span>i <span class="token operator">+</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token keyword">double</span> dI <span class="token operator">=</span> <span class="token function">func</span><span class="token punctuation">(</span>xip2<span class="token punctuation">)</span> <span class="token operator">*</span> dx <span class="token punctuation">;</span> 
+    integral <span class="token operator">+=</span> dI
+<span class="token punctuation">}</span>
+</code></pre>
+The pragma directive signals the SIMD(Single Instruction Multiple Data) processor to parallelize 'func()' whilethe reduction on addition of the integreal signals that the sum needs to be calculated in reductive manner, where different  parts of the parallel sums are combined to get a result which is then finaly added to the integral variable instead of using a the integral variable everytime. 
+<h3><a id=parallelism-in-multi-core-cpus href='#parallelism-in-multi-core-cpus'> § </a><span class='centered'> Parallelism in Multi-Core CPUs</h3>
+A mutli-core CPU has multiple CPU units sharing the same  memory, as shown below:
+<img width=700 height=250 src="static/Clouds/multi-core-cpu.png">
+Thus, all the stuff explained above is happening on one vector unit. Since the memory is shared, all the CPU units have th ability to accees and modify the contents of the same memory. Thus, they don't need external communication as it is implemented implicitly. However, the relevant issue now becomes the synchronization of these processes since the code written is Multi-Threaded.
+<h4><a id=openmp href='#openmp'> § </a><span class='centered'> OpenMP</h4>
+Open Multi-Processing (OpenMP) is a framework for shared-memeory programming that allows distribution of threads across the CPU cores for parallel speedup. It can be included the cpp programs and easily used through the pragma keyword. For example, in the above reimann sum OpenMP can be applied as follows: 
+<pre><code><span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">pragma</span> <span class="token expression">omp declare simd </span></span>
+<span class="token keyword">double</span> <span class="token function">func</span><span class="token punctuation">(</span><span class="token keyword">double</span> x<span class="token punctuation">)</span><span class="token punctuation">;</span> 
+
+<span class="token keyword">const</span> <span class="token keyword">double</span> dx <span class="token operator">=</span> a <span class="token operator">/</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span>n <span class="token punctuation">;</span>
+<span class="token keyword">double</span> integral <span class="token operator">=</span> <span class="token number">0.0</span> <span class="token punctuation">;</span> 
+
+<span class="token macro property"><span class="token directive-hash">#</span><span class="token directive keyword">pragma</span> <span class="token expression">omp parallel <span class="token keyword">for</span> <span class="token function">reduction</span><span class="token punctuation">(</span><span class="token operator">+</span><span class="token operator">:</span> integral<span class="token punctuation">)</span></span></span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span> i<span class="token operator">&lt;</span>n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+    <span class="token keyword">const</span> <span class="token keyword">double</span> xip2 <span class="token operator">=</span> dx <span class="token operator">*</span> <span class="token punctuation">(</span> <span class="token punctuation">(</span><span class="token keyword">double</span><span class="token punctuation">)</span>i <span class="token operator">+</span> <span class="token number">0.5</span><span class="token punctuation">)</span> <span class="token punctuation">;</span>
+    <span class="token keyword">const</span> <span class="token keyword">double</span> dI <span class="token operator">=</span> <span class="token function">func</span><span class="token punctuation">(</span>xip2<span class="token punctuation">)</span> <span class="token operator">*</span> dx <span class="token punctuation">;</span> 
+    integral <span class="token operator">+=</span> dI
+<span class="token punctuation">}</span>
+</code></pre>
+Here, the for reduction is applied to use the reduction sum instead of a normal sum as integral is a shared variable that is incremented in each iteration. If we were to use a normal parallel on for without reduction, the performance would not speed up since the mutex between threads would prevent the loops from parallel operation as each loop would wait for one operation to complete adn release the variable. Thus, the addtion of the reduction sum allows parallelization, and the performance improves dramatically as shown inthe figure below: 
+<img width=600 height=300 src="static/Clouds/openMP.png">
+<h4><a id=adding-more-cores-mimd href='#adding-more-cores-mimd'> § </a><span class='centered'> Adding More Cores : MIMD</h4>
+The next step in the trend was to add more cores and make each core perform the same the function Thus, more number of transistors performing specialized tasks allows splitting independent work over multiple processors, for example in pixel analysis of images. This is called <b><span class='centered'>Task Parallelism</b>, and this lead to <b><span class='centered'>Multiple Instructions Multiple Data (MIMD)</b> cores. When the work being done by each core is identical, but the data is different, then is is called <b><span class='centered'>Single Program Multiple Data (SPMD)</b>, a subcategory of MIMD. The most obvious addition that can be done to SPMDs is sharing the fetch and decode parts of processing amongst multipel processes as shown below: 
+<img width=600 height=300 src="static/Clouds/simt.png">
+This is called <b><span class='centered'>Single Instruction Multiple Thread (SIMT)</b> approach.
+<h3><a id=gpus href='#gpus'> § </a><span class='centered'> GPUs</h3>
+The SIMT appraoch forms the core of the Graphical Processing Units (GPUs) where each unit does identical work. Many SIMT threads grouped together make up a GPU core. A GPU has many such cores and a hierarchy can be created as follows:
+<img width=400 height=600 src="static/Clouds/gpu-cuda.png">
+<b><span class='centered'>TODO: CUDA Kernel Docuemntation</b>
+<h3><a id=inter-node-parallelism href='#inter-node-parallelism'> § </a><span class='centered'> Inter-node parallelism </h3>
+All that has been discussed previously is specific to parallelism implemented within a node on a cluster and so, is called <b><span class='centered'>Intra-node parallelism</b>. Sine the memory is shared between the CPUs and each of them can have their one caches, synchronized using mutexes and executed in a multi-threaded manner, the previous approach is also called <b><span class='centered'>Shared-Memory Parallelism</b>. However, when we speak of computing on several nodes in a cluster, the intra-node sync vanishes since now each node has its own memory which is separate form the other nodes, and so this is called <b><span class='centered'>Inter-Node Parallelism</b>. Moreover, now the synchronization cannot happen through the shared memory approach and is implemented by passing messaged between nodes - <b><span class='centered'>Message Passing Parallelism</b> - and so, the thing that is central here is deadlock.  
+<img width=500 height=250 src="static/Clouds/msg-psng.png">
+<h4><a id=message-passing-interface-mpi href='#message-passing-interface-mpi'> § </a><span class='centered'> Message Passing Interface (MPI)</h4>
+MPI is a library standard defined by a committee of vendors, implementers, and parallel programmers that is used to create parallel programs based on message passing. It is Portable and the De-facto standard platform for the High Performance Computing (HPC) community. The 6 basic routines in MPI are : 
+<pre><code><span class="token number">1.</span> MPI_Init <span class="token operator">:</span> Initialize 
+<span class="token number">2.</span> MPI_Finalize <span class="token operator">:</span> Terminate <span class="token operator">:</span> 
+<span class="token number">3.</span> MPI_Comm_size <span class="token operator">:</span> Determines the number of processes 
+<span class="token number">4.</span> MPI_Comm_rank <span class="token operator">:</span> Determines the label of calling process
+<span class="token number">5.</span> MPI_Send <span class="token operator">:</span> Sends an unbuffered<span class="token operator">/</span>blocking message
+<span class="token number">6.</span> MPI_Recv <span class="token operator">:</span> Receives an unbuffered<span class="token operator">/</span>blocking message<span class="token punctuation">.</span>
+</code></pre>
+<b><span class='centered'>MPI Communicators</b> define the communication interface over MPI  and ar  used by the message passing functions. The prototypes of each of the above functions are shown below: 
+<pre><code><span class="token number">1.</span> <span class="token keyword">int</span> <span class="token function">MPI_Init</span><span class="token punctuation">(</span><span class="token keyword">int</span> <span class="token operator">*</span>argc<span class="token punctuation">,</span> <span class="token keyword">char</span> <span class="token operator">*</span><span class="token operator">*</span><span class="token operator">*</span>argv<span class="token punctuation">)</span>
+<span class="token number">2.</span> <span class="token keyword">int</span> <span class="token function">MPI_Finalize</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token number">3.</span> <span class="token keyword">int</span> <span class="token function">MPI_Comm_size</span><span class="token punctuation">(</span>MPI_Comm comm<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>size<span class="token punctuation">)</span>
+<span class="token number">4.</span> <span class="token keyword">int</span> <span class="token function">MPI_Comm_rank</span><span class="token punctuation">(</span>MPI_Comm comm<span class="token punctuation">,</span> <span class="token keyword">int</span> <span class="token operator">*</span>rank
+<span class="token number">5.</span> <span class="token keyword">int</span> <span class="token function">MPI_Send</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">,</span> MPI_Datatype datatype<span class="token punctuation">,</span><span class="token keyword">int</span> dest<span class="token punctuation">,</span> <span class="token keyword">int</span> tag<span class="token punctuation">,</span> MPI_Comm comm<span class="token punctuation">)</span>
+<span class="token number">6.</span> <span class="token keyword">int</span> <span class="token function">MPI_Recv</span><span class="token punctuation">(</span><span class="token keyword">void</span> <span class="token operator">*</span>buf<span class="token punctuation">,</span> <span class="token keyword">int</span> count<span class="token punctuation">,</span> MPI_Datatype datatype<span class="token punctuation">,</span> <span class="token keyword">int</span> source<span class="token punctuation">,</span> <span class="token keyword">int</span> tag<span class="token punctuation">,</span> MPI_Comm comm<span class="token punctuation">,</span> MPI_Status <span class="token operator">*</span>status<span class="token punctuation">)</span>  
+</code></pre>
+MPI also provides a Send and Recieve function that helps in avoiding deadlock through handshakes, and other functions for scattering and broadcast.
+<pre><code><span class="token number">1.</span> MPI_Sendrecv <span class="token operator">:</span> Send <span class="token operator">and</span> Recieve in one<span class="token operator">-</span>shot 
+<span class="token number">2.</span> MPI_Bcast <span class="token operator">:</span> Broadcast same data to all processes in a group
+<span class="token number">3.</span> MPI_Scatter <span class="token operator">:</span> Send different pieces of an array to different 
+                 processes through partitioning
+<span class="token number">4.</span> MPI_Gather <span class="token operator">:</span> Take elements from many processes <span class="token operator">and</span> gather them 
+                to one single process
+</code></pre>
+There are two other important functions that help in reduction sums: 
+<pre><code><span class="token number">1.</span> MPI_Reduce <span class="token operator">:</span> Takes an array of input elements on each process 
+                <span class="token operator">and</span> returns an array of output elements to the 
+                root process given a specified operation 
+<span class="token number">2.</span> MPI_Allreduce <span class="token operator">:</span> Like MPI_Reduce but distribute results to all 
+                   processes
+</code></pre>
+
+</container></body></html>

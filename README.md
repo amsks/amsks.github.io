@@ -33,17 +33,341 @@
 
 #### Zettelkasten
 
+# Meta-RL: 
+
+<!-- %%% -->
 # Optimization: Unconstrainted Optimization
 
 
+<!-- %%% -->
+# Clouds: Parallelism and Distributed Programming
+
+
+## Parallelism in CPUs
+
+A CPU executes instructions in stages, the major stages being Fetch, Decode, Execute, Memory and Write. Paralellism in CPUs can be achieved in many ways, the most basic being through pipelining instructions, where independent instructions are executed together to improve efficiency. This is represented in the waterfall model shown below: 
+
+<img width=650 height=300 src="static/Clouds/waterfall.png">
+
+A measure of how many of the instructions in a computer program can be executed simultaneously is called **Instruction-level parallelism** and a processor that executes this kind of parallelism is called a **Superscalar Processor**. The problem with the above parallelization is the possibility of conflicts that increases with increase in clock cycles i.e fitting increasingly more instructions together as the pipeline stage continues. Moreover, automatic search for independendt instructions requires additional resources.
+
+### Vectorization: Automatic and Explicit
+One way to overcome the roadblocks of deeper cycles in CPUs is through exploiting parallelism in data. FOr example, if the same operation - say addition - needs to be performed on two arrays then this operation can be replaced by a single operation on the whole array. This is called **vectorization**.
+
+<img width=350 height=300 src="static/Clouds/vectorization.png">
+
+Vectorization can be **Automatic** when the scalar operation is automatically converted by the processor into a parallel one, and **Explicit** when the user manually implements vectorization. While the obvious benifit of automatic vectorization is the ease of implementation, it does not always work. Foe example, in the following code auto vectorization will not work because for each element the addition depends on the previous element and so, the operation cannot be split into chunks.  
+
+```cpp
+
+for(int i=1; i < n; i++){
+    a[i] += a[i-1]
+}
+```
+
+However, if we just replace the '-' with a '+' as shown in the code below, vectorization works since now all the processor needs to do is take a snapshot of the element that the for loop has not reached yet and add that to the current element.
+
+```cpp
+
+for(int i=1; i < n; i++){
+    a[i] += a[i+1] ;
+}
+```
+
+The subtraction might work if the loop is not checking the previous, but an element that is one more than the lenght of the vector
+
+```cpp
+
+for(int i=1; i < n; i++){
+    a[i] += a[i - N] ;
+}
+```
+Another case in which Automatic Vecotrization does not work is when there is assumed dependence as shown below, where the code would only work if a and b are not aliased ( a == b - 1) and b > a
+
+```cpp
+
+for(int i=1; i < n; i++){
+    a[i] += b[i] ;
+}
+```
+Thus, the limitations of auto vectorization are: 
+1. Works on only innermost loops
+2. No Vector dependence 
+3. Number of iterations must be known
+
+However, we can guide auto-vectorization by using the simd directives. An example is shown below: 
+
+```cpp
+#pragma omp declare simd 
+double func(double x); 
+
+const double dx = a / (double)n ;
+double integral = 0.0 ; 
+
+#pragma omp simd reduction(+, integral)
+for (int i=0; i<n; i++){
+    const double xip2 = dx * ( (double)i + 0.5) ;
+    const double dI = func(xip2) * dx ; 
+    integral += dI
+}
+```
+The pragma directive signals the SIMD(Single Instruction Multiple Data) processor to parallelize 'func()' whilethe reduction on addition of the integreal signals that the sum needs to be calculated in reductive manner, where different  parts of the parallel sums are combined to get a result which is then finaly added to the integral variable instead of using a the integral variable everytime. 
+
+
+## Parallelism in Multi-Core CPUs
+
+A mutli-core CPU has multiple CPU units sharing the same  memory, as shown below:
+
+<img width=700 height=250 src="static/Clouds/multi-core-cpu.png">
+
+Thus, all the stuff explained above is happening on one vector unit. Since the memory is shared, all the CPU units have th ability to accees and modify the contents of the same memory. Thus, they don't need external communication as it is implemented implicitly. However, the relevant issue now becomes the synchronization of these processes since the code written is Multi-Threaded.
+
+### OpenMP
+
+Open Multi-Processing (OpenMP) is a framework for shared-memeory programming that allows distribution of threads across the CPU cores for parallel speedup. It can be included the cpp programs and easily used through the pragma keyword. For example, in the above reimann sum OpenMP can be applied as follows: 
+
+```cpp
+#pragma omp declare simd 
+double func(double x); 
+
+const double dx = a / (double)n ;
+double integral = 0.0 ; 
+
+#pragma omp parallel for reduction(+: integral)
+for (int i=0; i<n; i++){
+    const double xip2 = dx * ( (double)i + 0.5) ;
+    const double dI = func(xip2) * dx ; 
+    integral += dI
+}
+```
+Here, the for reduction is applied to use the reduction sum instead of a normal sum as integral is a shared variable that is incremented in each iteration. If we were to use a normal parallel on for without reduction, the performance would not speed up since the mutex between threads would prevent the loops from parallel operation as each loop would wait for one operation to complete adn release the variable. Thus, the addtion of the reduction sum allows parallelization, and the performance improves dramatically as shown inthe figure below: 
+
+<img width=600 height=300 src="static/Clouds/openMP.png">
+
+### Adding More Cores : MIMD
+
+The next step in the trend was to add more cores and make each core perform the same the function Thus, more number of transistors performing specialized tasks allows splitting independent work over multiple processors, for example in pixel analysis of images. This is called **Task Parallelism**, and this lead to **Multiple Instructions Multiple Data (MIMD)** cores. When the work being done by each core is identical, but the data is different, then is is called **Single Program Multiple Data (SPMD)**, a subcategory of MIMD. The most obvious addition that can be done to SPMDs is sharing the fetch and decode parts of processing amongst multipel processes as shown below: 
+
+<img width=600 height=300 src="static/Clouds/simt.png">
+
+This is called **Single Instruction Multiple Thread (SIMT)** approach.
+
+
+## GPUs
+The SIMT appraoch forms the core of the Graphical Processing Units (GPUs) where each unit does identical work. Many SIMT threads grouped together make up a GPU core. A GPU has many such cores and a hierarchy can be created as follows:
+
+<img width=400 height=600 src="static/Clouds/gpu-cuda.png">
+
+**TODO: CUDA Kernel Docuemntation**
+
+
+## Inter-node parallelism 
+
+
+All that has been discussed previously is specific to parallelism implemented within a node on a cluster and so, is called **Intra-node parallelism**. Sine the memory is shared between the CPUs and each of them can have their one caches, synchronized using mutexes and executed in a multi-threaded manner, the previous approach is also called **Shared-Memory Parallelism**. However, when we speak of computing on several nodes in a cluster, the intra-node sync vanishes since now each node has its own memory which is separate form the other nodes, and so this is called **Inter-Node Parallelism**. Moreover, now the synchronization cannot happen through the shared memory approach and is implemented by passing messaged between nodes - **Message Passing Parallelism** - and so, the thing that is central here is deadlock.  
+
+
+<img width=500 height=250 src="static/Clouds/msg-psng.png">
+
+
+### Message Passing Interface (MPI)
+
+MPI is a library standard defined by a committee of vendors, implementers, and parallel programmers that is used to create parallel programs based on message passing. It is Portable and the De-facto standard platform for the High Performance Computing (HPC) community. The 6 basic routines in MPI are : 
+
+```cpp
+1. MPI_Init : Initialize 
+2. MPI_Finalize : Terminate : 
+3. MPI_Comm_size : Determines the number of processes 
+4. MPI_Comm_rank : Determines the label of calling process
+5. MPI_Send : Sends an unbuffered/blocking message
+6. MPI_Recv : Receives an unbuffered/blocking message.
+```
+**MPI Communicators** define the communication interface over MPI  and ar  used by the message passing functions. The prototypes of each of the above functions are shown below: 
+
+```cpp
+1. int MPI_Init(int *argc, char ***argv)
+2. int MPI_Finalize()
+3. int MPI_Comm_size(MPI_Comm comm, int *size)
+4. int MPI_Comm_rank(MPI_Comm comm, int *rank
+5. int MPI_Send(void *buf, int count, MPI_Datatype datatype,int dest, int tag, MPI_Comm comm)
+6. int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)  
+```
+
+MPI also provides a Send and Recieve function that helps in avoiding deadlock through handshakes, and other functions for scattering and broadcast.
+
+```cpp
+1. MPI_Sendrecv : Send and Recieve in one-shot 
+2. MPI_Bcast : Broadcast same data to all processes in a group
+3. MPI_Scatter : Send different pieces of an array to different 
+                 processes through partitioning
+4. MPI_Gather : Take elements from many processes and gather them 
+                to one single process
+```
+There are two other important functions that help in reduction sums: 
+
+```cpp
+1. MPI_Reduce : Takes an array of input elements on each process 
+                and returns an array of output elements to the 
+                root process given a specified operation 
+2. MPI_Allreduce : Like MPI_Reduce but distribute results to all 
+                   processes
+```
+
+
+
+
+
+
+
+<!-- %%% -->
 # Clouds: Fundamentals of Cloud Computing
 
-## Cloudonomics: Quantative Analysis of cloud
-In 2012, Joe weinman came up with the economic theory to estimate the business value of cloud computing, calling it Cloudonomics. The two major 
+In 2012, Joe Weinman came up with the economic theory to estimate the business value of cloud computing, calling it Cloudonomics. The major benefits of the cloud that come out are the following: 
+1. Common Infrastructure
+2. Location Independence
+3. Online connectivity 
+4. Utility pricing 
+
+## Utility Pricing Calculation
+To understand how utility pricing allows cloud services to be advantageous, we look at the load and the related quantities as follows: 
+- **L(t) :** Load demand as a function of time, with T being the total time 
+- **P :** maximum load or peak load 
+- **A :** Average load 
+- **B :** Baseline cost i.e the cost associated with owning the infrastructure 
+- **C :** Cloud unit cost i.e cost per second incurred when using a cloud service
+- **U :** Utility Premium = C / B
+
+Now, when we measure the costs for a time period of T, then we get 
+$$
+\begin{alignedat}{2}
+&B_T = P.B.T \\
+&C_T = \int L(t)dt = A.U.B.T \\
+\end{alignedat}
+$$
+
+The condition for the cloud services to b cheaper is that the aggregated cost of using the cloud is less than the cost of owning the service i.e $C_T < B_T$ and when combined with the above equations, we get the condition as : 
+
+$$
+U < \frac P A
+$$
+
+Thus, by checking if the utility premium is less than the peak-to-average ratio it can be determined whether the cloud is beneficial or not. 
+
+## Value Created by Cloud
+
+The value that the cloud provides is through the following two methods: 
+1. Resource Pooling: When resources are shared between multiple services, the profit can be made in reducing the overhead of setting up the infrastructure (like colling facility, etc.) and economies of scale that come with exploiting synergies.
+2. Multiplexing: By multiplexing services over time, the benefit comes from building the infrastructure for handling peak and average loads.
+
+### Measuring the benifit of Multiplexing: Smoothness
+
+The figure below shows the activity profile of a sample of 5,000 Google Servers over a period of 6 months:
+
+<img width=500 height=300 src="static/Clouds/Google-sample.png">
+
+The way multiplexing helps here is twofold: 
+1. For the part that is built to handle peak load, it yields higher utilization and lowers costs per resource
+2. For the part build to handle less than peak load, it reduces the unserved requests ad penalties associated with them on the off chance that service level agreements are violated.
+
+To understand how multiplexing does this, the metric used is the **smoothness** of the load. This is measured by a load variation coefficient defined as follows: 
+
+$$
+\begin{alignedat}{2}
+&C_v = \sigma / | \mu | \\
+\end{alignedat}
+$$
+
+Here, $\sigma$ is the standard deviation of the load variation and $\mu$ is the mean of this standard deviation. This coefficient is always non-negative since we are taking the modulus of the mean, and so when its value is closer to 1 the load is smoother since this either happens with lower standard deviation or with higher mean. Now, let's take the case of n independent jobs $X_1, X_2, ..., X_n$  running with the same values for the mean and standard deviation. Thus, when we multiplex them, we get
+
+$$
+\begin{aligned}
+&X = X_1 + X_2 + ... + X_n \\
+&\mu(X) = n*\mu \\
+&Var(X) = n*Var(X_i) \\
+&\sigma(X) = \sqrt{n} \sigma
+\end{aligned}
+$$
+
+Thus, the  coefficient for the multiplexed variable comes out to be
+$$
+C_v(X) = \frac {1} {\sqrt{n}} C_v(X_i)
+$$
+
+Thus, by multiplexing the load variation scales down proportional to the number of jobs that are multiplexed! The idea scenario is when two jobs are negatively correlated, in which case $X_2 = 1 - X_1$ nd we get a deviation of 0, which leads to a flat curve.
+
+## Virtualization
+
+The key idea behind virtualization is sharing computing resources among multiple applications. This translates to mapping the key components to abstract counterparts i.e CPU to a virtual CPU, Disk to a virtual disk, NIC to virtual NIC, etc., to create a **Virtual Machine** that can be used in the place of a real machine. Through this, each tenant can be provided with a virtual machine that they can use to access the compute resources, and thus, multiple tenants can be hosted, as shown below: 
+
+<img width=400 height=300 src="static/Clouds/VM-Arch.png">
+
+This mapping is created through a **Virtual Machine Monitor (VMM)**, also called a **Hypervisor**, which can be of two types : 
+- Type 1: VMM runs directly on the hardware, and performs scheduling and allocation of resources. E.g. VMWare ESX Server 
+- Type 2: VMM is built completely on top of an OS where the host OS provides the resource allocation and standard execution environment. E.g User-mode Linux (UML), QEMU
+
+### How it works 
+
+The CPU has the **Instruction Set Architecture (ISA)** which defines the registers and the memory available to the user and the operations that can be used to modify the contents of these. The ISA has 2 parts: 
+1. **User ISA :**  This is used for computation and has the fetch, decode, etc. instruction that can modify the user virtual memory, but it cannot modify the kernel
+2. **Sysem ISA :** This is controlled through privilege and used for resource management of the kernel. It can modify the actual registers, can set traps, and interrupts and modify the Memory Management Unit. 
+
+Virtualization creates an isomorphism between the ISA on the machine and the virtual system provided to the user by emulating the commands entered on the VM on the ISA on the host machine. This decoupling allows controlling what multiple users can modify by abstracting that bit out into the VM that is provided to them. This emulation is done by encapsulating the instruction set on the host machine into a set of commands that can be executed on the guest machine and creating a schema that maps these commands from the guest machine to the host machine. There are three ways to do this, each one addressing a problem in the previous approach: 
+1. **Exact Mapping :** The most basic way is to create a 1-1 mapping between each command. This is exhaustive and easy to implement but can be extremely slow due to the interpretation overhead that comes with it.
+2. **Trap and Emulate :** The key realization in this approach is only the instructions written to the system ISA need to be interpreted and 'worked around'. Thus, we let the user ISA instructions run as they are and every time the command to the kernel is accessed, the system will generate an interrupt which can be caught (trap) and handled by rewriting them by an interpreter in the privileged mode (emulate). The issue with this approach is that not all architectures (For example, x86) trap the attempts to write to privileged mode from unprivileged access.
+3. **Binary Translation :** Here we translate each guest instruction to the minimal binary set of host instructions required to emulate it, thus avoiding the function-call overhead of an interpreter. We can also re-use translations by using a translator cache. However, this is still slower than direct execution.
+
+in the [DISCO Approach](https://dl.acm.org/doi/10.1145/268998.266672) we get the best of both worlds by using trap and emulate for the non-privileged part of the guest instruction set and using binary translation for the privileged part.
+
+### Containers
+
+Containers raise the abstraction to another level by viirtualizing over the OS as shown: 
+
+<img width=400 height=300 src="static/Clouds/Containers.png">
+
+The key benefits come to the hosting providers: 
+1. It is now possible to host multiple applications/tenants on a single server as containers work on an OS abstraction level as compared to the hypervisors that work on the hardware abstraction level
+2. They offer high density as multiple containers can be packed in a server
+3. They are easy to scale-up (Everything in google is containerized)
+4. There is no virtualization overhead
+5. They reduce multitenancy and license fee that comes with providing the OS and libraries for every application
+6. They dramatically improve the SDLC
+
+The key point here is to find a way to extend OS to securely isolate multiple applications by observing and controlling the resource allocation and limiting visibility and communication across and between multiple processes. This was first done in Linux through Control Groups (CGroups) and Namespaces, which allowed multiple Linux distributions to share the same kernel (LXC). Thus, apart from the Linux kernel, multiple applications running on RHEL, Debian, Ubuntu, etc. could be isolated. 
+
+**Docker** was the obvious next step that has primarily two functions: 
+1. **Package System :** Can pack an application and all dependencies as a container image after development 
+2. **Transport System :** Ensures that the application image runs exactly similar on test and production systems 
+
+Thus, with Docker one can package everything from libraries to applications, and till the time the kernel is shared, it can be run on multiple devices, servers, etc. 
 
 
+### Serverless Computing
+
+The idea here is to abstract even above OS and allow multiple applications to share the server and runtime. 
+
+<img width=350 height=200 src="static/Clouds/Serverless.png">
+
+The model is primarily event-driven and can be described as follows: 
+1. The developer develops business logic and provides it to a provider (like amazon) which encapsulates this in the form of functions (FaaS) 
+2. Whenever a client requests a function through the application, a notification is triggered by a listener
+3. The server tries to locate the code that is responsible for answering the request
+4. Only the relevant bit of code is loaded into a container which then executes the code
+5. The result of the execution is used to build a response which is then sent to the client
+
+The way the listener works is through using the backend for authentication as a separate service. The advantages of the serverless approach are: 
+- Less server-side work 
+- Reduced Cost that comes through being able to charge on the usage of the functions i.e pay-as-you-go and economies of scale
+- Reduced risk and increased efficiency through specialization
+- Scalability 
+- Shorter lead time
+
+The limitations of this approach are: 
+- Managing the state is relatively complex
+- Higher latency due to increased calls
+- Vendor lock-in due to control shifted to the providers. This might change as more providers enter the market.
 
 
+<!-- %%% -->
 # Clouds: Introduction to Cloud Technologies
 The best way to look at the development of the cloud is to look at the lifecycle for major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring the water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rate basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
 
@@ -121,13 +445,15 @@ The applications that can be enabled by the cloud are of 4 types
 5. Improved Resource Utilization
 6. Decrease in Carbon Footpriint
 
+<!-- %%% -->
 # MobMod: Vehicular Flow Modelling
 
+<!-- %%% -->
 # MobMod: Palm Calculus
 Palm calculus is a way to reconsile differences in metrics that arise from sampling differences. To simply explain this, the rudimentary example is that of a cyclist going through the
 
 
-
+<!-- %%% -->
 # MobMod: Random Mobility
 As with any analysis, the basics start from idealized scenarios. In terms of modeling, this would be random mobility. The historical viewpoint on this comes from Brownian Motion, which is the model of the movement of particles suspended in a liquid or gas caused by collisions with molecules of the surrounding medium. The two most basic models of random mobility are:
 - **Random Walk :** For every new interval $t$, each node randomly and uniformly chooses its new direction $\theta(t)$ from $(0, 2\pi]$. The new speed follows a uniform distribution or a Guassian distribution from $[0, V_{max}]$. Therefore, during time interval t, the node moves with the velocity vector $(v(t)cos(\theta(t)),v(t)sin(\theta(t)))$. If the node moves according to the above rules and reaches the boundary of simulation field, the leaving node is bounced back to the simulation field with the angle of $\pi - \theta(t)$ or $\theta(t)$, respectively. This effect is called border effect.
@@ -232,17 +558,18 @@ Consequently, the abstractions that this network viewpoint offers can be on thre
 2. Vehicular Flow Model: Abstractions of the physical inter-dependencies
 3. Vehicular Driver Model: Abstractions of the actions of individual nodes, like breaks, turns, etc.
 
+<!-- %%% -->
 # MALIS: Introdution to Machine Learning 
 
 
-
+<!-- %%% -->
 # RL: Model-Free Control
 
 While prediction is all about estimating the value function in an environment for which the underlying MDP is not known, Model-Free control deals with otimizing this value function.
 
 
 
-
+<!-- %%% -->
 # RL: Model-Free Prediction
 One of the problems with DP is that it assumes a full knowledge of the MDP, and consequently, the environment. While this holds true for a lot of applications, it might not hold true for all cases. In fact, the upper limit does turn out to be the ability to be accurate about the underlying MDP. Thus, if we don't know the true MDP behind a process, the next best thing would be to try to approximate them. One of the ways to go about this is **Model-Free RL**. 
 
@@ -383,7 +710,7 @@ $$
 Thus, when $\lambda = 0$, we get TD(0) and when $\lambda = 1$, the credit is deferred to the end of the episode nand we get MC
 
 
-
+<!-- %%% -->
 # RL: Planning and Dynamic Programming
 
 Dynamic programming (DP) is a method that solves a problem by breaking it down into sub-problems and then solving each sub-problem individually, and then combining them into a solution. A godo example is the standard fibonacci sequence calculation problem, where traditionally the way to solve ti would be through recursion
@@ -517,7 +844,7 @@ The intuition is to start from teh final reward and work your way backward. Ther
 
 <img width=500 height=150 src="static/Reinforcement Learning/sync_DP_summary.png">
 
-
+<!-- %%% -->
 # RL: Markov Processes
 These are random processes indexed by time and are used to model systems that have limited memory of the past. The fundamental intuition behind Markov processes is the property that the future is independent of the past, given the present. In a general scenario, we might say that to determine the state of an agent at any time instant, we only have to condition it on a limited number of previous states, and not the whole history of its states or actions. The size of this window determines the order of the Markov process.
 
@@ -742,6 +1069,7 @@ MDPS, as a concept, has been extended to make them applicable to multiple other 
 3. **Undiscounted and Average Reward MDP :** These are used to tackle ergodic MDPs - where there is a possibility that each state can be visited an infinite number of times ( Recurrence), or there is no particular pattern in which the agent visits the states (Aperiodicity) - and to tackle this, the rewards are looked at as moving averages that can be worked with on instants of time.
 
 
+<!-- %%% -->
 # RL: Introduction to Reinforcement learning
 The way I like to think about Reinforcement learning is by imagining myself as a ring-master who has to train a certain creature. One of the reasons why I like this visualization is because RL has historical roots in trial and error and the psychology of animal learning. So, let's say I want to train this creature to perform some tricks around a hula-hoop, one of the ways I might go about this is by creating a scheme where the creature would be punished for not jumping through the hoop. As the training goes on, the punishment guides it to go to places where it does not receive punishment, and over time, it learns to jump through the hoop.
 
@@ -777,6 +1105,7 @@ Finally, certain paradigms are common in RL which recurs regularly and thus, it 
 - **Exploration and Exploitation :** This is the central choice the agent needs to make every time it takes an action. At any step, it has certain information about the world and it can go on exploiting it to eventually reach a goal (maybe), but the problem is it might not know about the most optimal way to reach this goal if it just acts on the information it already has. Thus, to discover better ways of doing things, the agent can also decide to forego the path it 'knows' will get it the best reward according to its current knowledge and take a random action to see what kind of reward it gets. Thus, in doing so the agent might end up exploring other ways of solving a problem that it might not have known, which might lead to higher rewards than the path it already knows. Personally, the most tangible way I can visualize it is by thinking of a tree of decisions, and then imagining that the agent knows one way to reach the leaf nodes with the maximum reward. However, there might exist another portion of the tree that has higher rewards, but the agent might not ever go to if it greedily acts on its current rewards.
 - **Prediction and Control :** Prediction is just finding a path to the goal, while control is optimizing this path to the goal. Most of the algorithms in RL can be distinguished based on this.
 
+<!-- %%% -->
 # LIS: Setting up RAI on HPC
 
 ## List of RPMs:
@@ -1010,7 +1339,7 @@ readlink -f /path/file
 
 
 
-
+<!-- %%% -->
 # Misc: Setting up Envrironment
 
 #### Installing VS Code 
