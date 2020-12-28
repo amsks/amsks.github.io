@@ -7,6 +7,8 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Deep Learning by Ian Goodfellow et. al](https://www.deeplearningbook.org/)
 - [Learning with kernels by Schölkopf & Smola](http://agbs.kyb.tuebingen.mpg.de/lwk/)
 - [Artificial Intelligence by Russel and Norvig](https://www.cin.ufpe.br/~tfl2/artificial-intelligence-modern-approach.9780131038059.25368.pdf)
+- [Understanding Machine Learning: From theory to Algorithms by Schwartz and David](https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/copy.html)
+- [Bayesian reasoning and Machine Learning – Barber](http://web4.cs.ucl.ac.uk/staff/D.Barber/textbook/091117.pdf)
 
 ### Primers
 - [Supervised ML Primer](https://github.com/kashefy/mi1notes)
@@ -14,6 +16,8 @@ This is a list of references that I use in my studies, the books that I have rea
 - [AI Primer](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-AI.pdf)
 - [Foundations of ML](https://bloomberg.github.io/foml/#lectures)
 - [Collection of DL Resources](http://www.jeremydjacksonphd.com/category/deep-learning/)
+- [Review of Probability Theory](http://cs229.stanford.edu/section/cs229-prob.pdf)
+- [Python cheat Sheet](https://perso.limsi.fr/pointal/_media/python:cours:mementopython3-english.pdf)
 
 ### Articles
 - [Learning to Learn](https://bair.berkeley.edu/blog/2017/07/18/learning-to-learn/)
@@ -92,7 +96,8 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Guided Visual Foresight](https://arxiv.org/abs/1904.05538)
 
 
-## Optimizations
+
+## Optimization
 - [Materials for the Course]()
 - [Convex Optimization by Boyd and Vanderberghe](https://web.stanford.edu/~boyd/cvxbook/bv_cvxbook.pdf)
 
@@ -100,6 +105,8 @@ This is a list of references that I use in my studies, the books that I have rea
 - [Survey of Mobility Models](https://www.cise.ufl.edu/~helmy/papers/Survey-Mobility-Chapter-1.pdf)
 - [PALM Calculus and Simulation of Mobility Models](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf)
 - [Lecture Resources](https://drive.google.com/drive/folders/1EnK0oB_0Eh1bqtIqWbzrL-he4cmQlmpo)
+
+
 
 ## Misc
 - [The Beginnings of English Literary Study in British India](https://pdfs.semanticscholar.org/ad21/caa9ae97766707419c5f74cf27456757e2d5.pdf)
