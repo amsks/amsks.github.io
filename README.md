@@ -33,156 +33,1117 @@
 
 #### Zettelkasten
 
-# Meta-RL: 
 
 <!-- %%% -->
-# Optimization: Unconstrainted Optimization
+# Clouds: Agreement in Distributed Systems
+
+Agreement is the crown problems in Distributed systems → How to make different nodes work together even while they have different view. The Agreement Problem is essentially the scenario that **some nodes propose value v and some nodes propose value v' and now all nodes need to have a way to decide which value to accept!**. The values that these nodes agree on can be something  like 
+
+- whether or not to commit transaction to DB
+- Who has a lock in a distributed lock service, when multiple clients are requesting it
+- Whether to move to a new stage etc.
+
+The fundamental requirements here are:
+
+1. **Safety →** All nodes agree on the same value, which is  proposed by some node 
+2. **Liveness** → If less than some fraction of nodes crash, the rest should still reach an agreement
+
+
+Failure Models help us understand classes of failures, ad in this case we use 2 models: 
+
+- **Synchronous Systems** → We set a timer and compare the activity of each machine to that. Thus, if the machine is inactive after the timeout, we know there is a failure because either hte machine crashed or the network is slow
+- **Asynchronous Systems →** systems can arbitrarily be delayed and so there is no proper way to tell if the machine is just slow or if it has crashed.
+
+Agreement problem comes in two flavors: 
+
+1. **Atomic Commitment Problem** → Participants need to agree on a value but each has its own specific constraint on what makes a value acceptable. Thus, the issue is whether a participant can individually commit or not. For example, people agreeing on a time to meet together is a commitment problem since everyone might not be comfortable at all times.
+2. **Consensus Problem** → Participants need to agree on a value and they are willing to accept any value. For example, people have decided when to meet and now the issue is where to meet and everyone is 'fine with any place' as long as they get to meet
+
+
+## Atomic Commitment
+
+The origin of this problem comes from partitioning DB to store and access them in a distributed manner. For example, in the way of 3 copies of chunks in GFS, and this creates Semantic Challenges → We usually segregate the DB into shards based on certain criteria. For example, a Banking application getting end-client requests from users might segregate it into 3 shards based on User-ID . However, what happens when transactions span multiple shards ? For example, a transaction involving a user in one node and another user in another shard → How do we manage agreement and the related issues of atomicity and sharing ?   
+
+### Single Phase Commit
+
+This is a simple way of managing atomicity in which a transaction coordinator is assigned with the following responsibilities: 
+
+1. It begins the transaction and assigns unique IDs
+2. It is responsible for commits and aborts
+
+Many systems allow any client to be the co-ordinator and thus, the servers with the data would be the participants. When a commit is validated by the coordinator, it broadcasts **'commit'** and waits for all participants to acknowledge
+
+- **Issue** → What if one participant fails? The other participants cannot undo what they have already committed, as instructed by the coordinator
+
+### 2-Phase Commit 
+
+Here we break down the comi into 2 phases: 
+
+1. **Voting** → Each participant prepares to commit and votes on whether it can commit or not commit
+2. **Commit →** Each participant commits or aborts 
+
+This can be realized through the following operations : 
+
+- `canCommit(V)` → Coordinator asks the participants whether they can commit the value V
+- `doCommit(V)` → the Coordinator asks the participant to actually commit the value V
+- `doAbort(V)` →  The Coordinator asks te participant to abort the commit process
+- `haveCommitted(participant, V)` → Participant tells the coordinator if it actually committed value V
+- `getDecision(V)` → Participant can ask the coordinator if V can be committed or not
+
+In the voting process, the coordinator asks the participants whether they can commit or not through `canCommit`. The participants prepare to commit using **permanent storage** and write `prepare-yes` to the log. Once the participant replies yes to the `canCommit`, they are not allowed to abort. However, the outcome of event V is uncertain till the doCommit or doAbort happens. The coordinator, then, collects all the votes. If there is a unanimous yes from the participants, then the commit is a go. However, even if one participant votes No, then the commit is aborted. After Voting the coordinator records the fate in permanent storage and then issues the `doCommit` or `doAbort` to the participants. Following is a timeline of this process:
+
+<img height=500 width=800 src="static/Clouds/Agreement/2PC.png">
+
+The following figure shows the state transitions for participant and coordinator:
+
+<img height=500 width=800 src="static/Clouds/Agreement/2PC-1.png">
+
+Now, we can see that that recovery in this scenario is easy → since the participants have been logging their state changes, we can track them. However, these can be differentiated on the basis of timeouts and failures. In timeouts, the issue is that the `ACK` has not been sent by the participant while in failures, there will be an `ACK`.
+
+#### Handling Timeouts
+From the coordinator's perspective, two timeout scenarios are relevant: 
+
+1. **Timeout happens in the wait state** → In this case the coordinator cannot unilaterally commit or abort
+2. **Timeout in Commit or Abort States** → Here, since the commit has already begun, there is nothing that the coordinator can do but wait for `ACK`.
+
+From the perspective of the participants, following scenarios are possible : 
+
+1. **Timeout in Initial State** → The only way this is possible is if the coordinator has failed the change. Thus, unilaterally Abort
+2. **Timeout in Ready** →  Since the participant is in an uncertain state where the decision to commit or abort hasn't been made, a **termination protocol** needs to be activated, which can be blocking or co-operative:
+
+In **Blocking** protocols, we the node waits until communication can be re-established. In **cooperative** protocol, 
+the node asks the other participants about the information of the commit and proceeds as follows:
+    - Q in commit → P can move to commit
+    - Q in Initial → P must Abort
+    - Q in Abort → P must abort
+    - Q in Ready → Contact another proces
+    - The protocol blocks if everyone is in READY 
+
+#### Handling Failures
+
+From the coordinator,  the following scenarios are possibe : 
+
+1. **Failure in Initial state** → Start the commit upon recovery 
+2. **Failure in Wait state** → Restart the commit after recovery 
+3. **Failure in Abort or Commit States** → If all ACKs have been received, do nothing. Otherwise, a **termination protocol** is needed
+
+From the participant , the following scenarios are possible : 
+
+1. **Failure in  Initial** → Unilaterally Abort 
+2. **Failure in Ready State** → The Coordinator has been informed already, follow the termination protocol, blocking or cooperative 
+3. **Failure in Commit or Abort** → Nothing special needs to be done
+
+
+**The 2 phase commit is called a blocking protocol because it cannot make progress during failures**. For example, if the TC sends a message to a node and it commits, but then both crash, then all other nodes need to keep waiting for them to recover since they can't be sure of what to do → A could have sent either yes or no to canCommit and so, they can't move forward! → T**his also makes  2PC vulnerable to the failures of the TC Node.** **Thus, 2PC is safe, but not live!**
+
+### 3-Phase Commit
+
+The idea here is to alleviate the blocking nature of 2PC by splitting commit into 2 phases: 
+
+1. Communicate te outcome to everyone 
+2. Let them commit only after everyone knows the outcome === ACK
+
+
+<img height=500 width=800 src="static/Clouds/Agreement/3PC.png">
+
+It is clear in the timeline, we now have a preCommit message and an associate ACK, after which the commit can happen. The relevant state transitions now become :
+
+<img height=400 width=800 src="static/Clouds/Agreement/3PC-1.png">
+
+The blocking issue of 2PC can now solved as follows : If both TC and a node fail :-  
+
+- If even one of the nodes has received a pre-commit → They all commit
+- If no one received a preCommit → Unilateral Abort
+
+Thus, we now have a live protocol. However, while it is safe in the case of the failure of TC and node,  it is not safe in the cases where TC or node are just offline and not actually crashed. The following Scenario is a good example:
+
+- A receives prepareCommit from TC
+- Then, A gets partitioned from B/C/D and TC crashes
+- None of B/C/D have received prepareCommit, hence they all abort upon timeout
+- A is prepared to commit, hence, according to protocol, after it times out, it unilaterally decides to commit
+
+
+This is a classic example of Asynchronocity! 3PC guarantees safety and liveness for synchronous machines since in that case we know the upper bound for message delays and can see if timeout exceeds that to determine if a system has crashed or not!
+
+### Fischer-Lynch-Paterson Impossibility Result (FLP)
+
+- Thus, we see that **3PC trades safety for liveness, while 2PC trades liveness for safety.** The obvious question is "**Can we design a system that is both safe and live in the general scenario ? "**
+- The answer is **NO!** 
+- According to the FLP Result,  It is impossible for a set of processors in an asynchronous system to agree on a binary value, even if only a single process is subject to an unannounced failure.
+- However, the FLP result does not talk about asymptotic sense with safety and liveness i.e. it never specifies how close a system can get to Safety and Liveness, without actually ideally reaching it!! This leads us to Consensus protocols like Paxos, Raft that actually get close in practice
+
+
+## Consensus
+
+The consensus problem for a collection processes $P_i$ can be described as follows:
+
+- The  processes propose values $V_i$ and send messages to others to exchange proposals
+- Different processes propose different values, but they all need to accept a single value, which can be any one of the proposed value
+- Only one of the proposed values can be chosen and all nodes need to know this one value
+
+
+This puts the following constraints: 
+
+1. **Consistency** → Once a value is chosen, the chosen value for all working processes is the same 
+2. **Validity →** The chosen value was proposed by one of the processes
+3. **Termination** → Eventually all processes agree on the same value
+
+
+### Process Reliance
+The core idea behind process resilience is that even if some processes fail, we should be able to deliver to the client's request. to achieve this, we develop methods to **replicate the process** so that we have ways of getting a backup process running
+
+- **K-Fault Tolerant Group** → A group of processes that can mask any K-concurrent failures of their member processes. Here, **k is called the degree of fault tolerance**. 
+
+In this group, we make assumptions about the members:
+
+1. They are all working identically
+2. They process commands in the same order
+
+Thus, now we basically need a way to ensure that **Non-faulty group members reach a consensus on which command to execute next**
+
+## Flooding-Based Consensus
+
+### Model
+
+1. The process group is $\bm{P} = \{P_i\}$
+2. Every process either fails or runs, there is no mid-way. Thus, the process has a **Fail-Stop model** in which on failure it stops and this allows us to reliably detect failures
+3. Each process maintains a list of proposed commands 
+4. A client contacts process $P_i$ to request it to execute a command
+
+The fail-stop model basically allows us to detect errors reliably. Thus, we need at least (k + 1) processes running so that if k processes go wrong, we know at least 1 process will go right
+
+### Algorithm
+
+For each round r :
+
+1. At the start of the round, each process $P_i$  multicasts its list of commands $C^r$ to all other processes 
+2. At the end of the round, all the commands in the lists of all processes in $\bm{P}$ are merged together into a new set $C$
+3. the next command is selected through a **globally shared deterministic function** from the this new set of merged commands : $cmd  \leftarrow select(C_j^{r+1})$
+
+### Example
+
+<img height=400 width=700 src="static/Clouds/Agreement/FBC.png">
+
+Here, there are 4 processes → $\bm{P} = \{P1, P2, P3, P4\}$ → and at the start of our observation, they all try to share their commands with each other process.  However, in the process of sharing its commands, P1 fails, and thus, only P2 receives the commands from P1. Now, P2 has received the commands from all processes and thus, proceeds to make a decision, but P3 and P4 have not received the command from P1. Since they are maintaining a timer with them, they will be able to reliably detect that P1 has failed, but are not sure if it was able to share any command with P2 or not. Thus, here P3 and P4 do not proceed forward and wait for the next round, in which they move with the knowledge that P1 has failed and so they don't need to wait. Thus, in the next round, when they receive the command from P2, and they make their decision. This works because P2 has factored-in P1's proposed command and since P3 and P4 only wait since they can reliably detect failure, they are able to rely on the next command of P2 since it made its decision based on having received P1's command. 
+
+- In the worst case, we would have only process moving forward since it is the only non-faulty one!
+
+While this model works, its **Fail-Stop assumption makes it non-realistic**. Moreover, the reliability assumption is also not the most realistic one!
+
+## Building up to Paxos 
+
+### Assumptions 
+1. Partially synchronous system (Can be even asynchronous)
+2. Communication between processes may be unreliable since the messages can be lost, duplicated or  re-ordered
+3. Corrupted messages can be detected
+4. Deterministic operations → Once an execution starts, we know exactly what it will do 
+5. Processes can exhibit Crash failures, but not arbitraty failures
+6. Processes do not collude
+
+Here, we need at least ( 2k + 1 ) processes, where if k processes can arbitrarily go wrong, we need k +1 other processes to be non-arbitrary so that we can reliably detect the failure and in the end, at least 1 process will run.
+
+### Starting Point 
+
+We assume a client-server architecture with initially one client. To this, we add a backup server, so that one server is the primary server and the other is the secondary server. To ensure that commands are executed in order, we assign sequence numbers to them, and so, each server executes commands in the same order - whatever that may be
+
+#### 2 Server situation 
+
+<img height=400 width=700 src="static/Clouds/Agreement/2SS.png">
+
+- In this scenario we have servers S1 and S2, where S1 is the primary server - also called the Leader - and S2 is the secondary server. There are two clients C1 and C2, which are requesting operations $o^n$  from the servers. The servers respond to these commands as $\sigma^i_j$ where i is the number of the server and j is the sequence number of the operation.
+- In Paxos, a leader sends an accept message  - `ACC(o,t)` - to the backups when it assigns a timestamp t to operation o, and the backup server responds by sending a learned message - `LRN(o,t)`. If the leader notices that it has no received `LRN` from the backups, it re-transmits the `ACC`.
+- In the first case, we think of a situation where the primary sends the ACC and then decides to move forward with accepting operation o1, in which case it assigns it sequence number 1 and sends $\sigma^1_1$ to C1. However, S2 never received the ACC and so, looks at its timeout counter for failure and notices that it has been exceeded. It assumes the leadership role and decides to go for o2 first, thus, assigning it sequence 2 and sending $\sigma^2_2$ to C2. **This is a consensus violation.**
+
+<img height=400 width=700 src="static/Clouds/Agreement/2SS-1.png">
+
+**Solution → Never execute an operation before it is clear that it has been learned**. Thus, if  S1 does not move forward without receiving an LRN from S2, the above situation is rectified since now S1 re-transmits the message till it receives `LRN`, and then both S1 and S2 have a consensus on which operation to perform.
+
+<img height=400 width=700 src="static/Clouds/Agreement/2SS-2.png">
+
+#### 3 Servers with 2 crashes
+
+<img height=400 width=700 src="static/Clouds/Agreement/3SS.png">
+
+- In this case, we see the same issue and we realize that we need to extend the requirement of not moving forward before receiving LRN to S2 and S3 both. Thus, S1 should not execute unless it gets a LRN from both, S2 and S2. 
+- But what if LRN from S2 never reaches S1 ? →  even if the LRN from S2 to S1 is lost, it should wait till it gets LRN(o1) from S3 before proceeding. 
+
+Thus, the **Paxos Fundamental Rule → A server S cannot execute an operation o until it has received `LRN(o)` from all other non-faulty servers.**
+
+
+### Removing the Failure Detection Assumption
+
+**Let's remove the assumption that the processes can reliably detect crashes.** Thus, in an asynchronous system the only solution is **Heartbeat →** Each server periodically sends an `ALIVE` signal to all the servers, and tracks for this signal using a timer from each server. On timeout, it tries to ping the server to determine if the server is still alive.
+- But what if the Heartbeat is delayed ? → Say the heartbeat of S2 is delayed, S1 will assume the leadership and execute and S2 will assume the leadership and execute if S1 is delayed!!
+
+<img height=400 width=700 src="static/Clouds/Agreement/HBT.png">
+
+Thus, in this scenario, we need at least 3 servers so that for each server it needs 2 heartbeats to get a majority and then execute consensus. **Extending this to k faults, we need (2k+1) servers to get a majority!**
+
+<img height=400 width=700 src="static/Clouds/Agreement/HBT-2.png">
+
+- **Adapted Fundamental Rule** →  In Paxos with three servers, a server S cannot execute an operation o until it has received at least one (other) LRN(o) message so that it knows that a majority of servers will execute o.
+
+Now in this 3 server 1 failure scenario let's look at another possibility. Let's say the Leader crashes after executing o1. In this case, let's say S1 executes o1 and dies, then 2 things can happen:
+1. **S3 has no idea of the activity of S1** → S3 never received the `ACC` from S1 so it waits. However, S2 received the `ACC`, after which it detected the crash and became the leader. S2 now sends the `ACC(o2, 2)` to S3, at which point S3 sees the unexpected timestamp 2 and sends a negative back to S2 that it missed o1. Thus, S2 re-transmits `ACC(o1,1)`, and S3 is able to catch-up
+2. **S2 missed ACC(o1,1)** → S2 detects the crash and becomes the leader and either sends `ACC(01,1)` to S3, which then either transmits `LRN(o1)`, or it sends `ACC(o2,1)` in which case S3 notices that it was expecting o1 and sends a negative allowing S2 to catch-up
+
+**Thus,  Paxos (with three servers) behaves correctly when a single server crashes, regardless of when that crash took place.**
+
+### False Crash Detection
+
+What if the ACC by S1 is highly delayed? → In this case, S2 detects a failure and becomes a leader, while S3 receives `ACC(o1,1)` after `ACC(o2,2)`. This can be solved by adding the identity of the current leader in messages. 
+
+- However, Paxos can still come to grinding halt when LRN form S3 is lost, which blocks S1 and S2 from doing anything → It is not Live
+
+### Liveness in Paxos
+To deal with Liveness, we add an explicit Takeover of leadership where before a takeover, the server  has to deal with any outstanding tasks by the former leader → This takeover needs to be communicated explicitly to all the servers
+
+
+## PAXOS Actual Protocol
+
+### General Rules on Protocols 
+
+Each proposal has a unique number, so that:
+- Higher numbers take priority over lower numbers
+- The proposer should be able to choose this number to be higher than anything it has ever received or seen.This can be implemented by setting Proposal Number to be a concatenation of Round Number and Server ID, so that each server stores the maxRound - the Largest round number it has seen so far and a new proposal number can easily be generated by incrementing the maxRound and concatenating it with server ID. 
+
+Each Node maintains four variable  : 
+- `my_n` → my proposal number in the current Paxos
+- `n_a` → higher proposal number accepted
+- `v_a` → value corresponding to the highest proposal number
+- `n_h` → highest proposal number seen
+
+### Propose Phase
+- A node decides to be the leader and propose
+- proposer chooses `my_n > n_h`
+- leader sends `<preapre, n>` to all nodes 
+- Upon receiving `<preapre, my_n>`: if `n < n_h` → reply `<prepare-reject>`, else → reply `<prepare-ok, n_a, v_a>` and update `n_h = n`.
+
+### Accept Phase
+- If the leader gets a majority of `<prepare-accept>` → It sends `<accept, my_n, V>` to all nodes, where V is `n_a` if it is not null, or a random value
+- If majority is not there, then restart Paxos
+- Upon getting `<accept, n, V>`, the nodes: reply with `<accept-reject>` if `n < n_h`,  else → update `n_a = n,  v_a = V, n_h = n` and send `<accept-ok>`
+
+### Decide Phase
+- If the leader gets a majority of `<accept-ok>` then it sends a `DONE`  to the client
+- It keeps sending `<Decide, v_a>` to all nodes until it gets `<Decide-ok>` to ensure no nodes are left behind
+
+
+
+
+
 
 
 <!-- %%% -->
-# Clouds: Parallelism and Distributed Programming
+# Clouds: Concurrency and Consistency 
+
+The major issue here is solving the scenario of multiple people trying to access the same database. For this, let's assume we have a pointer to the DB or its attribute, or whatever  → X. We can read and write to X. Now, if we want to do two operations on X, say subtracting 20 and adding 10, we need to do these operations in isolation. If we interleave these operations, we can get a situation where subtracting 20 and adding 10 to 100 might result in a final value of 110. The clearest solution is Do not perform simultaneous R/W to the Db. However, this does not exploit the fact that most DBs are on multiple cores and thus, can actually benefit from parallel execution of queries. Moreover, if this value 100 is, say, the value in our bank account and while executing the query there comes a failure, then how do we handle that? → We need to build failure tolerance into it.
+
+## Transactions
+Transactions are a sequence of one or more SQL operations treated as a unit. These transactions appear to run in isolation and changes are only registered if they are complete. Thus, if our system fails, then we restart the incomplete transaction which would be the ones that were not registered. The correctness of transactions is determined by the **ACID Properties**:
+- **A**tomicity →  Either all actions in the transaction happen, or none happen. In other words, transactions can't be done partially → They are atomic.
+- **C**onsistency → If the DB starts consistent, and all transactions are consistent, then the DB ends up consistent
+- **I**solation → Execution of one transaction is isolated form another transaction.
+- **D**urability → If a transaction commits, its effects persist.
+
+### Atomicity
+A transaction might **commit** after completing all of its actions, or **abort** after completing none or partial action. The key point is that from the user's point of view, a transaction always executes all, or none, of its actions → There is no sense of partial completion. This can be implemented in 2 ways :
+
+- **Logging →** DBMS logs all the actions so that it can undo actions for non-atomic transactions in case of failures (Think Github )
+- **Shadow Paging →** While executing a new transaction, the execution is done on a shadow of the original DB units, so that any intermediate failures will not hamper the concurrency of the original unit (Think caching). Once the  transaction is complete, all the units that referred to the original page are updated to refer to the shadow page
+
+### Durability
+It has 3 phases when a crash occurs
+
+1. **Analysis →** Scan the log from the most recent checkpoint to see for all the actions that were active when the crash happened
+2. **Redo →** Redo the updates as needed so that all the logged updates are carried-out and written to the disk.
+3. **Undo →** Undo the write of all the transactions that were active at the crash.
+
+
+Thus, at the end only the commited updates are reflected in the database
+
+### Consistency
+We need to enforce the integrity constraints in the database so that the input and the output of consistent transactions are consistent Databases
+
+### Isolation
+Each transaction operates as if it were the only transaction running.  This is done by the database in a fashion where the interleaving of operations do not result in simultaneous updates. For example, transaction $T_1, T_2$ are shown below which operate in isolation
+
+<img height=100 width=500 src="static/Clouds/CC/Isolation.png">
+
+## Anomalies in Concurrency 
+
+There are 3 kinds of anomalies that usually occur: 
+
+- **Reading Uncommitted Data** → When the data has not been committed and we read it in the middle of interleaving, it creates **dirty reads**. So, in the example shown below, T1 did not commit after Reading and Writing to A and the un-committed value was read by T2 from A and was committed, which is wrong. 
+
+<img height=50 width=500 src="static/Clouds/CC/RUD.png">
+
+- **Unrepeatable Reads** → The reads do not produce the same value. In the below example, T1 reads A and then again reads it to verify, but T2 comes in the middle and Writes something leading to the 2 reads of A by T1 not producing the same result.
+
+<img height=60 width=500 src="static/Clouds/CC/UR.png">
+
+- **Overwriting Uncommitted Dat**a → Data is written over before being committed, as seen in the example below where T1 writes to A and B and commits, but before it committed, T2 has already written values to A and B, and thus, the data is  not the same.
+
+**We solve this through serializability!** But for that we need to define **Conflicting Operations** → Two operations conflict if they are performed on the same data by different  transactions and one of them is a write
+
+
+## Schedules
+Scheduling is creating a schema Interleaved actions from different transactions. These can be done in three manners: 
+1. **Serial** → does not interleave data
+2. **Equivalent** → 2 schedules creating equivalent effect. Schedules are conflict equivalent  if they involve the same actions on the same data and the conflicting actions are ordered the same way
+3. **Serializable**→  A schedule that is equivalent to some serial execution of the transactions. Schedules are conflict serializable iff a schedule is conflict equivalent to a serializable schedule
+
+Let's take an Example:
+
+<img height=300 width=700 src="static/Clouds/CC/Sch-ex.png">
+
+Here, we have schedules $S_1, S_2, S_3$  working on DBs A and B, and the conflicting operations are: 
+
+$$
+\begin{aligned}
+&R_1(A) \leftrightarrow W_2(A) \\
+&R_2(A) \leftrightarrow W_1(A) \\
+&W_1(A) \leftrightarrow W_2(A) \\
+&R_1(B) \leftrightarrow W_2(B) \\
+&R_2(B) \leftrightarrow W_1(B) \\
+&W_1(B) \leftrightarrow W_2(B) \\
+\end{aligned}
+$$
+
+Now, in $S_1$ and $S_2$ we see that for the case of both A and B, $R_1$ and $W_1$ precede $W_2$ and $W_1$ precedes $W_2$ in the same manner. Thus, $S_1 \equiv S_2$ . Moreover, we see that $S_2$  is a serial schedule, thus, $S_1, S_2$  are serializable, but this is not the case with $S_1, S_3$ since the actions of the T2 come before T1.
+
+### Precedence Graphs
+
+We can formalize the check for conflict serializability in schedules by the simple process of swapping adjacent non-conflicting schedules to see if we get a serial schedule or not, as shown below 
+
+<img height=300 width=650 src="static/Clouds/CC/pg.png">
+
+But an even better way is to see it in terms of a precedence graph. So, we just go along the order of operations in a schedule and for each conflict, we see if which transaction's operation precedes, and we make a connection on the nodes name after transactions in that order. For example, in the schedule below, we see that in the cases of A and B both, the operations of the first transaction precede that of the second, and so we have a single like from the first to second in the graph.
+
+<img height=350 width=700 src="static/Clouds/CC/pg-2.png">
+
+If we have a graph with cycles, then we know that the  schedule is not conflict serializable, as shown in the example below
+
+<img height=350 width=700 src="static/Clouds/CC/pg-3.png">
+
+Voila! now we have a framework that tells us that if our schedule of interleaved operations is conflict serializable, then it is a valid schedule, and thus, the transactions would crate valid databases if acting on a valid Database! Voila! now we have a framework that tells us that if our schedule of interleaved operations is conflict serializable, then it is a valid schedule, and thus, the transactions would crate valid databases if acting on a valid Database! 
+
+## 2PL Locking 
+
+There is a better way to ensure that our schedule is conflict serializable → Locking. We create two kinds of locks
+
+- **Shared Lock** → Acquired by the Transaction for reading the  object and can be acquired by multiple transactions at the same tie - hence, the name shared
+- **Exclusive Lock** → Acquired b the transaction while writing to an object and can only be acquired by one transaction at a time
+
+The rule is → once a transaction releases a lock, then it can't acquire any more locks. Thus,  we can have a graph showing the slow growth phase of acquiring locks nad a release phase of  releasing locks
+
+<img height=300 width=600 src="static/Clouds/CC/2pl.png">
+
+Thus, if our system sticks to this schedule, then it will be conflict serializable. However, this leads to a problem of cascaded Aborts, where the issue is that in case a data  object is written to before the first transaction aborts the operation, then it might lead to issues, as shown below: 
+
+<img height=60 width=500 src="static/Clouds/CC/2pl-1.png">
+
+To alleviate this we create a stricter 2PL where the release happens all at once for each lock and thus, after acquiring alll locks the transactions wait to complete everything and then release the locks, resulting in the graph shown below:
+
+<img height=300 width=600 src="static/Clouds/CC/2pl-2.png">
+
+## Networked File System (NFS)
+
+It allows remote hosts to mount file systems over a network and interact with those file systems as though they are mounted locally. This enables system administrators to consolidate resources onto centralized servers on the network. The schematic is shown below: 
+
+<img height=300 width=600 src="static/Clouds/CC/NFS.png">
+
+- The communication is over TCP/IP and Remote Procedure Calls (RPC) encapsulates the low-level data handling on the network into a set of procedures that can be used by the code, by creating procedures for API calls on client-side and executing these procedures on the server-side. Some common RPC frameworks are → **SOAP, gRPC, Thrift** 
+- So, the naive way to design the FS would be to forward every Fs operation over RPC to the server and thus, make the system operate as if they are working on the same filesystem. However, **the volume of RPC calls adds latency** → So we add client-side caching to this!
+
+### What do we cache?
+- Read-only files
+- Data written by client machine → **write-back caching →** Issue of failure tolerance
+- Data written by other machines → Issues with consistency
+
+### What about Consistency?
+- NFS Caches Data and File Attributes. The data never expires, but the file attributes expire after 60 seconds → so if a file is modified, the new time is reflected in its attribute in the server, and thus, it can be checked and updated on each client.
+- Dirty data are buffered in the client machine until the file closes or till 30 sec → If the machine crashes between that, everything is lost
+- Thus, **NFS sacrifices consistency for less traffic**
+- **Close-to-open consistency →** We can write a way to ask the server for the latest file everytime before opening it!
+- NFS does not provide any guarantee for multiple writes.
+
+### What about Failures?
+- NFS uses a stateless server → The NFS server does not track anything but instead checks for permission for each operation
+- No pending R/W operations across crash
+- Read request needs to get an exact positin of hte file →
+- Operations ar  Idempotent → operations use unique ID of files and so, cannot be confused
+- Write-Through Caching
+
+## Andrew File System (AFS)
+
+In this, the files share the same namespace across machines but work with the assumption that the client-side machines cannot be trusted → thus, they must prove that they have the rights to perform certain operations → this is implemented through modifying RPC to Secure-RPC. TThe client Machines have disks and these can be used for caching. Thus, they  realized the following characteristics, which were then incorporated: 
+- It's very rare for simultaneous R/W → they found this through analysis. Thus, they started aggressively caching on local disks to reduce the traffic load → **Close-to-open consistency is fine!**
+- **Prefetching** → Large reads are faster than a lot of small reads on local disks and so, they fetched the whole data of the file
+- **Invalidation Callback**  → Clients registers with the servers when they have a copy of the file  and when this file changes, the server tells them to invalidate this copy → If the server caches, then we reconstruct callback  information by asking every client what file they have cached
+
+## Google File System (GFS)
+
+Here, the following desing constraints are taken into account 
+
+1. Machine Failures are normal 
+2. Designed for Big-Data workloads
+3. Many files are written once and they are read sequentially 
+4. High bandwidth is more important than latency 
+
+Thus, the GFS is geared towards these characteristics and the google applications are designed to work with this. A file is divided into chunks and labeled with 64-bit global IDs - called handles - which are then stored on **chunk servers.** Each chunk is stored 3 times on 3 different chunk-servers, and the master keeps a track of the metadata → which chunks belong to which files
+
+## Theory of Consistency
+- Consistency concerns arise when we are replicating or caching files.
+
+**Replication** → Maintain data in multiple computers. It is necessary for
+- Improving performance → Closer data is faster
+- Increasing availability of services → To handle server and client crashes
+- Enhancing the scalability of systems → E.g. CDNs  that store the data locally and then
+- Securing against malicious attack
+
+In a Distributed system, we store data in distributed shared memory, distributed databases, or distributed file systems → **referred to as data-store** 
+
+- Multiple processes can access shared data by accessing any replica on the data-store
+
+## Distributed Shared Memory
+
+Communication in Distributed system happens through either sharing the memory or message passing. Shared-memory is more intuitive for consistency and so is more popular. The goal, thus, is to create a distributed system of memory shared by multiple systems, but each system thinks that it is accessing the same memory from the large memory pool! 
+
+<img height=300 width=600 src="static/Clouds/CC/dsm.png">
+
+The naive way to do this would be through local copies of the whole memory with all the machine so that
+- **Read** → Machine reads from local memory → Fast
+- **Write** → The updates are sent to all the memory copies, while the machine does not wait for this to complete
+
+So, in a way, this approach is basically message-passing applied to shared memory. This is fast, but has the following problems:
+1. Since we  are not waiting for ACK after a write operation, what if the message gets lost and the order of delivering messages gets messed up → Since we have no control, we will see weird behavior
+2. Since we have no control over the order of updates, what if there are disagreements in udpates ?
+
+
+## Models of Consistency
+
+In brief, consistency can be summarized as a contract between nodes that the last write of the data is shared. Let's take an example, that we will use again and again, to explain consistency models. Here, we have P1, P2, P3, and P4 as processes that are trying to read and write to the same variable x in the shared memory. The question is that if P1 writes a and P2 writes b, then what do P3 and P4 read?
+
+<img height=200 width=400 src="static/Clouds/CC/moc-1.png">
+
+
+### Strict Consistency
+
+Each operation has a global timestamp and the order of execution is determined by sorting this. The rules are 
+
+1. Each operation gets the latest value of the variable → Reads are never stale  
+2. All operations are executed in the order of their timestamps 
+
+In this case, P3 and P4 will always observe b due to the time stamping of strict consistency → It is like running the process on one processor, where we use semaphores to work with x for all the processes → Target Achieved?
+
+<img height=150 width=400 src="static/Clouds/CC/strict.png">
+
+The issue is the implementation → We need to make the processes wait for write operations to complete before read → this take  time and so we need exact clock synchronization. Computer clocks experience drift in their quartz crystals → leads to change in the rate of the timer interrupts used for maintaining time → Thus, we need **Universal Coordinated Time (UTC)**. The Cs-133 atom-based time is broadcast → the computers can receive this signal and synchronize their clocks. However, even nanoseconds might create issues! **Thus, strict consistency is hard to implement**
+
+### Sequential Consistency
+
+We let go of the assumption of synchronizing in real-time, and instead focus on preserving the order of events so that logical outputs are not affected. Thus, we now have the following rules: 
+1. Each machine has an order on its own operation
+2. Results appear according to **some total order**
+
+Thus, Reads may be stale in terms of real-time, but not in logical time but the writes are strictly ordered! Hence, the output of this on our example would be . For example, in the picture below the second case, which was not possible in the case of strict ordering, we now observe a dirty read. However, if we look at the order of the events, the read of b always happens after the read of a in both the machines. Hence, we still have the same logical order of operations and thus, our program  will be sequentially consistent
+
+<img height=150 width=600 src="static/Clouds/CC/sequential.png">
+
+This is easier to implement than strict consistency since now we can interleave the operations and again if the operations are concurrent serially through the mechanism discussed before, we can have the same execution of programs. 
+
+- Requests to an individual memory location (storage object) are served from a single FIFO queue → Writes occur in a single order and the read happens only after the writes have occurred, thus maintaining consistency
+
+**Thus, we can say that not that all processes agree on exactly what time it is, but that they agree on the order in which events occur** → This is the difference between timed and ordered processes. However, this is still expensive due to communication and wait times!
+
+## Lamport Logical Clocks
+
+The basic idea is understanding which event happens before, which is represented by the '→ ' symbol. This is a partial order since there might be instances in a set of orders where the exact order cannot be determined, but the final order is clear.
+
+Now, we need to use this relation to establish Logical clocks and we do this through **Lamport's Logical Clocks,**. We, first attach a counter to events so that, events (e) satisfy the following properties: 
+- **P1** → If a and b are two events in the same process, then they would be preserved in the time in which they take place $a \rightarrow b \implies C(a) < C(b)$
+- **P2 →**  If  a corresponds to sending a message and b corresponds to receiving that message, then also  $C(a) < C(b)$
+
+Using these properties we have a counter $C_i$ attached to each process $P_i$, such that
+- For each new event in $P_i$ , we increment $C_i$ by 1 
+- Each time a message is sent from $P_i$, it receives a timestamp of the value of $C_i$ so that → $ts(m) = C_i$
+- Whenever $P_j$ receives a message from $P_i$, it adjusts its local counter as → $C_j = \max \{C_j, ts(m)\}$
+
+
+This lamport ordering is based on the events and not the other way round. Thus, $C(e) < C(e')$  does not imply $e \rightarrow e'$, meaning  it does not encode causal relationship. So, if I have $C(a) < C(b)$ then this does not mean that a necessarily preceded b! This is an issue for concurrency 
+
+### Vector Clocks 
+
+We increase the counter to a vector of counter for k processes, so that : 
+
+- Each process $P_i$ has its counter vector that has its counter at $C[i]$ while the count of all other k-1 processes at the other places
+- Whenever a process happens, the process increments the value of $C[i]$ by 1, while all other values remain the same
+- When it has to send a message, the process now shares the whole vector to the other process
+- The process $P_j$ which receives the vector updates its vector to the new value and increments the count of its own by 1 and then follows whatever it has to do
+
+An example of this is shown below: 
+
+<img height=250 width=600 src="static/Clouds/CC/vc.png">
+
+Here, we can see that in part a, all the processes start with values (0,0,0) and this then goes on as follows:
+
+- P2 sends does performs an operation incrementing its counter by 1 in the vector while all other remain 0
+- P2 sends a message to P1, which copies the vector and increments its counter by 1
+- P1 performs an operation and increments its counter by 2
+- P1 sens a message m2 P3, which receives m2 and updates its own counter b 1 after copying the vector
+- P1 performs 2 more operations and then sens m3 to P2, which copies the value and increments its counter by 1
+- P2 performs and operation j and increments its own counter by 1 and then sends the message m4 to P3, which updates its vector and adds 1 to its counter, which was previously at 1 and so the resulting vector is (4,3,2) instead of (4,3,1)
+
+We now define a causal relationship based on the property that **if any message has all its vector value  < or = the values of the vector of another message, and at least one of the values is strictly less, then it causally precedes the other**. So, in this case, ts(m2) = (2,1,0) while the ts(m4)  = (4,3,0), which implies that m2 may causally precede m4. In case (b) we see that ts(m2) =  (4,1,0) while the ts(m4) = (2,3,0) → Thus, m2 and m4 may conflict.
+
+## Causal Consistency
+
+If all causal operations are executed in an order that reflects their casual relationship, then the executions are causally consistent! So if two operations are concurrent, then they can be read in different orders by different machines, till the time the causal order is followed. For the same process example below as other consistencies:
+
+<img height=200 width=500 src="static/Clouds/CC/causal.png">
+
+The issue here is that we see that that P1 writes a, and then P2 reads a and writes b. Since write of b happened after P2 reading a, there might be a causal relationship between P1s write of a and P2s write of b. Thus, when P3 reads b, then it cannot read a again since the writes are not concurrent → We can also reason in terms of messages.  Assume the processes start with a null value for x. Now, after P1 writes a to x, the only way P2 can read a from x is if P1 has sent a message. Thus, when P2 writes b to x, which is clearly happening after it reading a, we can say that the  write of b is causally related to the write of a by P1. Thus, the only way  P3 can read b form the variable is whe P2 sends a message of update to P3. Since no other write has happened after P3 reading b, it is not possible for it to read a again. However, if we modify this as follows:
+
+<img height=200 width=500 src="static/Clouds/CC/causal-2.png">
+
+Now we see that the write of b happens after the write of a, and since there is no global time tracking the writes, these operations might not be causally related and thus, concurrent. Hence, if P first reads b and then reads a, it is acceptable since the writes are concurrent, and the same reasoning allows P4 reading in a different manner! this is very much possible if P1 writes a and sends the message to P4 → In terms of messages, we can see that if P1 writes a and P2 writes b, then essentially they are free to write to the variable since there is no read happening before the write i.e this is possible even if no message is exchanged between the processes. Now, P3 reading b is possible if a message is exchanged between P2 and then it reaching a is possible if it receives another message from P1 on the update. Similarly, P4 reading a is possible if it receives a message from P1 after its update, and then reading b is also possible since it can easily receive a message from P2 after it writes b to x. Hence, this is causally plausible and is thus, consistent
+- **Causal consistency is strictly weaker than sequential and strict consistency, but one can get better performance with it since parallel operations can be executed in different orders by different machines.**
+
+
+<!-- %%% -->
+# Clouds: Apache Spark 
+
+The main issue with MapReduce is the read/write from and to the disk. For example, in the case of K-means, the main steps are: 
+
+- **HDFS Read** → Map → Network Shuffle → Reduce → **HDFS Write**
+
+Now, the issue with the R/W operations is the issue of accessing data from the memory and disk → **Random Access from disk is slower, but it offers a larger volume of data**. So, the question is should I store my data on disk or in Memory? 
+
+The answer → if the data is accessed more than once in 5 minutes, cache it in memory; otherwise, store it on the disk → [The 5-minute rule](https://www.hpl.hp.com/techreports/tandem/TR-86.1.pdf)
+
+### Economics of Data Access 
+- If I have 2000 euros per access from disk and 5 euros for KB of data in memory, then for each kb of data we save 2000 euros for every 5 euros we spend on memory each second. If our rate of access of 1 access per 10 secs, we save 200 euros, and this trend continues. The break-even point is 400 secs, which is roughly 5 minutes. Hence, the 5-minute rule.
+- Now, HDFS stores all data in the disk and so, nothing is cached in memory → misaligned with the 5 minutes rule. Plus, Map and Reduce are too simple computationally.
+
+## Apache Spark 
+- **Let's keep the good stuff from Hadoop, but also add the touch of memory and added functions**.
+
+The main workflow is shown below:
+
+<img height=350 width=400 src="static/Clouds/spark/wf.png">
+
+- While in MapReduce we had only 1 master to assign worker nodes as Map and Reduce, in spark we have a separation where there is a driver program scheduling the applications and the executions, while the cluster manager allocates the resources. The primary advantage is that the driver program can be initiated with a spark-context that holds the main configuration and is flexible to different kinds of configurations - single-threaded, multi-threaded, local, distributed, etc. - and thus, allows managing different operations. 
+- The cluster manager sends app-codes and tasks for executors to run. The workers have a cache that they can use to run their bits composed of locally schedules tasks, in an isolated manner .
+- There is no data shared between workers,  but the executors within workers share the same virtualization. Thus, if we have 2 applications, they can be run on 2 different workers and can have multiple tasks that can be scheduled in executors that share the data, and execute each task as a thread. In MapReduce, this would be executed in a purely distributed manner through mapper nodes with overheads for each. **Thus, overheads are reduced in spark.**
+
+## RDD
+
+Resilient Distributed Datasets extend the concepts of functions to data-structures. Thus, they are immutable objects that either point directly to a data source (HDFS), or apply filter transformations to parent RDDs. Thus the functions are of two types: 
+
+1. **Transformations** → Apply to RDD and return an RDD. E.g., map, filter, groupBy, sortBy
+    - They are lazily evaluated → Only triggered through actions
+2. **Actions** → Use an RDD to return values
+
+Thus, we can write applications as transformations on RDD and need to only execute them based on actions determined on the time on which they need to be executed. This is similar to the lambda functions in python → They work Lazily. 
+
+The execution steps are:
+
+1. Create DAG of computation
+2. Create a Logical execution plan with as much pipelining as possible 
+3. Partition the tasks into nodes
+4. Determine Dependency and Split DAG into “stages” based on the **need to shuffle data** → determined by the kind of function in the stage
+5. Submit Each stage and its task as ready
+6. Launch task via Master
+7. Retry failed and straggler tasks 
+8. Execute tasks
+9. Store and serve blocks
+
+The dependency mentioned in step-4 can be of two types: 
+- **Narrow Dependency** → The mapping from parent to Children RDD is on a 1-1 basis i.e each parent RDD will share data with at-most 1 child RDD. Thus, there is no shuffling step in the middle which reduces overhead. e.g `map`. `filterMap`, `filter`, `sample`.
+- **Wide Dependency** → Multiple child partitions may depend on one partition of the parent RDD. E.g. `sortByKey`, `reduceByKey`, `groupByKey`, `cogroupByKey`, `join`, `cartesian`.
+
+The key idea in creating a pipeline is to look for shuffling → If we have a group of tasks that do not require shuffling, we can group them together as a stage, and then shuffle. Thus, the stuff in one stage can be executed iteratively. For example, in the DAG shown below: 
+
+<img height=400 width=200 src="static/Clouds/spark/pipeline-1.png">
+
+We know that `groupBy()` requires shuffling but the `map()` does not. Thus, we break a stage here. Then, we see that   `mapvalues()` function does not require shuffling, so we have two stages as shown below:
+
+<img height=400 width=300 src="static/Clouds/spark/pipeline-2.png">
+
+
+## RDD and Spark
+- **We can cache outpus in the memory improve performance!**
+
+Let's take the example of Log Mining, where we want to see the error log to look for certain kinds of error like MySQL and php. The following code template would be used for reference:
+
+```python
+lines = spark.textfile("hdfs://...)
+errors = lines.filter(lambda s: s.startswith("Error"))
+messages = errors.map(lambda s: s.split("\t")[2])
+messages.cache()
+
+messages.filer(lambda s: "mysql" in s).count()
+```
+
+Here, we are taking an HDFS file and filtering for the word "Error" in it. Then, we split it around tabs "\t" and look at the second element in the split array. This output is cached. To this cached output, we apply the filter for "MySQL", to search for SQL errors. If we were to close the code till the cache, the output would still be there when we apply MySQL query to it. Now, if we add a PHP query later to this 
+
+```python
+lines = spark.textfile("hdfs://...)
+errors = lines.filter(lambda s: s.startswith("Error"))
+messages = errors.map(lambda s: s.split("\t")[2])
+messages.cache()
+
+messages.filer(lambda s: "mysql" in s).count()
+messages.filer(lambda s: "php" in s).count()
+```
+It would only work on the cached output, and not repeat the process before it. Thus, the new computation would only happen on local machines, and the data would be fetched from the memory instead of the disk. This is the key feature that makes spark aligned with the 5-minute rule: **We can cache the computations that are being accessed regularly while keeping the rest in disk!!**
+
+### Failure Tolerance 
+The RDD abstraction is immutable, and simultaneous updates are not allowed. Thus, it can be cached and shared across processes and tasks! This allows failures to be taken into account easily.
+
+
+
+<!-- %%% -->
+# Clouds: MapReduce
+
+MapReduce is a programming model and an associated implementation for processing and generating big data sets with a parallel, distributed algorithm on a cluster.
+
+## Key Ideas behind MapReduce 
+
+### Scaling out instead of scaling up
+If we have workloads that are data-intensive, it is preferable to do it on a large number of commodity low-end servers (Scaling out) instead of a small number of high-end servers (Scaling up). This is because the scale-up approach is costly since the **costs of machines do not scale linearly** and the costs associated with the operational issues like energy required for cooling etc. are additional overheads that turn out to be less flexible for the latter. Thus, most MapReduce applications are built for low-end servers. Scaling-out leads to the following implications: 
+
+- Processing Data is quick, but I/O is really slow due to the network bottleneck imposed by low bandwidth
+- There is flexibility in what the computers end up sharing → In a shared-nothing architecture, all the systems are performing individual computations and only haring the relevant data as managed by a distributed file system
+
+### Failure is the Norm, not the Exception
+
+In clusters, failures are not only inevitable but commonplace. Mature implementations of the MapReduce programming model are able to robustly cope with failures through a number of mechanisms such as automatic task restarts on different cluster nodes.
+
+### Data Locality Principle
+
+In traditional HPC applications, the servers are segregated into **storage** and **compute nodes** linked together by a high-capacity inter-connect. However, many data-intensive workloads do not require a high processor capability and so, this segregation creates a bottleneck. It is more efficient to move the processing around instead of the data by co-locating the processor and the data storage and running the job on the processor directly attached to the data, **managing synchronization through a distributed file system.**
+
+### Sequentially Process Data
+
+Data-intensive applications mean that the datasets are large and thus, must be held on disks. However, the seek times for random data access on disks are fundamentally limited. Thus, it is more efficient to avoid this and process the data sequentially in batches, which is what the MapReduce architecture is based upon.
+
+### Hide the System Level Details from Developers
+
+MapReduce abstracts the system-level details and provides a framework that the developer can use, thus, separating the lower-level details of the computations from the commands to do them. Thus, the execution framework needs to be designed only once.
+
+### Scalability
+
+We can define scalability along two dimensions: 
+
+- Given twice the amount of Data, the same algorithm should take at-most twice as long to run, if everything else is the same
+- Given twice the number of processors, the same algorithm should take at-most half the time to run
+
+These settings should, ideally, work for a high range of data → MB to PB → and all kinds of clusters. Moreover, the ideal algorithm should not require further tuning. WHile MapReduce does not achieve all of it, it is a step in this direction
+
+
+## MapReduce and Functional Programming
+
+The key feature of functional languages is the concept of **higher-order functions** that can accept other functions as arguments. Two functions that are common are: 
+
+1. **Map →** Takes a function $f$  as an input and applies it to all elements in a list.
+2. **Fold →** Takes a function $g$ and a first data as inputs and applies it to the first item in the list. the result of this computation is stored as an intermediate variable and then applied as an input to the second item, and so on.
+
+This is summarized in the figure below: 
+
+<img height=350 width=300 src="static/Clouds/MR/functional.png">
+
+So, Map is a **transformation** on the input functions that can be parallelized in a straightforward manner since it happens on all the items in a list, while Fold is an aggregation operation that needs to happen on individual elements, that must be brought together before applying it. This is the essence of MapReduce, which can be translated to the following steps: 
+
+1. Apply a user-defined computation in a parallel manner on all the elements in a list
+2. Aggregate intermediate results by another user-specified computation
+
+## MapReduce Working 
+
+The input to a job is data stored on the underlying distributed file system. To this data, a mapper and a reducer are defined a  follows :
+
+- Mapper → $(k_!, v_1) \rightarrow [(k',v')]$
+- Reducer → $[(k',[v'])] \rightarrow [(k_2,v_2)]$
+
+The mapper generates an arbitrary number of intermediate key-value pairs for every input key-value pair, distributed across multiple files. The reducer is applied to all the values associated with an intermediate key - which is sort-of an inherent grouby operation - and generates an output key-value pair. These output key-value pairs from each reducer are written persistently back onto the distributed file system. The files in the file system are of the same number as the number of reducers, and these output files can further serve as an input to another Mapper.
+
+A classic example of  MapReduce is a program to count the words n files, and this would go as follows; 
+
+1. The input to the mapper is of the form - `(document_id, document_text)` - where each document has a unique ID
+2. The mapper tokenizes the document and emits an intermediate key-value pair for every word in a document, where the key is the word and the value is the 1 in the vanilla version, or count if we apply a combiner. So, for this implementation let's say it is the count of the word in that document.
+3. The shuffler guarantees that all the values associated with the same key are brought together to one reducer, and ensure this happens for all the keys. Thus, every pair corresponding to the word **the** would come to the same reducer.
+4. The reducer emits the word and its count as the output, which is in the form of an individual document.
+
+### Partitioners
+
+These determine which reducer is responsible for which data key. The mapper writes the key-value pairs to a partitioning block and the partitioner maps each key to an integer i \in [0,R], which is then used to send the pairs to R reducers. We can also use URLs, hex hashes, etc. to create the identity of the reducers
+
+<img height=400 width=200 src="static/Clouds/MR/part.png">
+
+### Combiners
+These are just mini-reducers. Their input is the same as reducers and the output is the same as mappers. So, in the counting example, the mapper would generate the key-value pairs in the form of  [word, 1] for each word. To this, we can add combiners that aggregate the counts for each file while still maintaining the output format for the mappers, as shown below. This kind of pre-aggregation saves network time. 
+
+<img height=500 width=850 src="static/Clouds/MR/comb.png">
+
+However, there are certain cautionary notes on combiners: 
+
+1.  The correctness of the algorithm cannot depend on computation (or even execution) of the combiners
+2. They don't work for all problems. e.g. Mean of letters
+
+### K-means in MapReduce 
+A classic example of Distributed algorithms would be K-means, which is an iterative task. In this case of an iterative task, we need a driver to run the MapReduce multiple times and check for convergence. Each map-reduce iteration would be as follows: 
+1. We would need a file containing the co-ordinates of each centroid 
+2. The input to the mapper would be the data points, and each mapper would compute the distance of the point from each cluster. the output of the mapper would be (cluster, point)
+3. the reduce would be receive the data points grouped by a cluster ids, and it ou compute the centroid, thus, producing the output (cluster, centroid)
+
+## Architecture of MapReduce
+
+The Architecture is based on the **Google File-System (GFS),** and the run is as follows:
+
+- Master breaks work into tasks and schedules them on workers dynamically
+- Workers implement the MapReduce Functionality on the GFS server daemons
+
+<img height=500 width=850 src="static/Clouds/MR/GFS.png">
+
+The following diagram shows the flow of MapReduce from the paper: 
+
+<img height=150 width=850 src="static/Clouds/MR/GFSPap.png">
+
+It can be explained as follows : 
+
+1. Library splits files into 16-64MB pieces
+2.  Master picks workers and assigns map or reduce task (M map, R reduce tasks)
+3.  Map worker reads input split, calls map function, buffers map output in memory
+4.  Periodically, in-memory data flushed to disk & master is informed of disk location (Partitioning)
+5.  Master notifies reduce worker of location, reduce worker reads map output files, sorts data
+6.  Reduce worker iterates over sorted data, passes each unique key, list of values to reduce function. The output of reduced function written out to files.
+
+### Fault Tolerance 
+- The mapper spreads tasks over GFS Replicas of inputs so that even if a mapper crashes, a copy of the output is available to reducers through re-runs, and the reducers are notified of the re-run
+- If the reducer crashes, the tasks that were completed are stored in GFS with replicas and the ones still remaining are re-run.
+
+### Load-Balancing 
+1. Scales linearly with data → as required
+2. For stragglers i.e the tasks that take a lot of time, the workers who have already finished a task are assigned new tasks  → the  no. of tasks are always greater than the number of workers
+
+
+<!-- %%% -->
+# Clouds: Parallelism and Distributed Computing
 
 
 ## Parallelism in CPUs
-
-A CPU executes instructions in stages, the major stages being Fetch, Decode, Execute, Memory and Write. Paralellism in CPUs can be achieved in many ways, the most basic being through pipelining instructions, where independent instructions are executed together to improve efficiency. This is represented in the waterfall model shown below: 
+A CPU executes instructions in stages, the major stages being Fetch, Decode, Execute, Memory, and Write. Parallelism in CPUs can be achieved in many ways, the most basic being through pipelining instructions, where independent instructions are executed together to improve efficiency. This is represented in the waterfall model shown below:
 
 <img width=650 height=300 src="static/Clouds/waterfall.png">
 
-A measure of how many of the instructions in a computer program can be executed simultaneously is called **Instruction-level parallelism** and a processor that executes this kind of parallelism is called a **Superscalar Processor**. The problem with the above parallelization is the possibility of conflicts that increases with increase in clock cycles i.e fitting increasingly more instructions together as the pipeline stage continues. Moreover, automatic search for independendt instructions requires additional resources.
+A measure of how many of the instructions in a computer program can be executed simultaneously is called **Instruction-level parallelism** and a processor that executes this kind of parallelism is called a **Superscalar Processor**. The problem with the above parallelization is the possibility of conflicts that increases with an increase in clock cycles i.e fitting increasingly more instructions together as the pipeline stage continues. Moreover, automatic search for independent instructions requires additional resources.
 
 ### Vectorization: Automatic and Explicit
-One way to overcome the roadblocks of deeper cycles in CPUs is through exploiting parallelism in data. FOr example, if the same operation - say addition - needs to be performed on two arrays then this operation can be replaced by a single operation on the whole array. This is called **vectorization**.
+One way to overcome the roadblocks of deeper cycles in CPUs is by exploiting parallelism in data. For example, if the same operation - say addition - needs to be performed on two arrays then this operation can be replaced by a single operation on the whole array. This is called **vectorization**.
 
 <img width=350 height=300 src="static/Clouds/vectorization.png">
 
-Vectorization can be **Automatic** when the scalar operation is automatically converted by the processor into a parallel one, and **Explicit** when the user manually implements vectorization. While the obvious benifit of automatic vectorization is the ease of implementation, it does not always work. Foe example, in the following code auto vectorization will not work because for each element the addition depends on the previous element and so, the operation cannot be split into chunks.  
+Vectorization can be **Automatic** when the scalar operation is automatically converted by the processor into a parallel one, and **Explicit** when the user manually implements vectorization. While the obvious benefit of automatic vectorization is the ease of implementation, it does not always work. For example, in the following code auto-vectorization will not work because for each element the addition depends on the previous element and so, the operation cannot be split into chunks.  
 
 ```cpp
 
-for(int i=1; i < n; i++){
-    a[i] += a[i-1]
-}
+    for(int i=1; i < n; i++){
+        a[i] += a[i-1]
+    }
 ```
 
-However, if we just replace the '-' with a '+' as shown in the code below, vectorization works since now all the processor needs to do is take a snapshot of the element that the for loop has not reached yet and add that to the current element.
+The subtraction might work if the loop is not checking the previous, but an element that is one more than the length of the vector
+
+```cpp
+    for(int i=1; i < n; i++){
+        a[i] += a[i - N] ;
+    }
+
+```
+
+However, if we just replace the 'i-1' with an 'i+1' as shown in the code below, vectorization works since now all the processor needs to do is take a snapshot of the element that the for loop has not reached yet and add that to the current element.
 
 ```cpp
 
-for(int i=1; i < n; i++){
-    a[i] += a[i+1] ;
-}
+    for(int i=1; i < n; i++){
+        a[i] += a[i+1] ;
+    }
 ```
 
-The subtraction might work if the loop is not checking the previous, but an element that is one more than the lenght of the vector
+Another case in which Automatic Vectorization does not work is when there is assumed dependence as shown below, where the code would only work if a and b are not aliased ( a == b - 1) and b > a
 
 ```cpp
-
-for(int i=1; i < n; i++){
-    a[i] += a[i - N] ;
-}
+    for(int i=1; i < n; i++){
+        a[i] += b[i] ;
+    }
 ```
-Another case in which Automatic Vecotrization does not work is when there is assumed dependence as shown below, where the code would only work if a and b are not aliased ( a == b - 1) and b > a
+Thus, the limitations of auto vectorization are:
 
-```cpp
-
-for(int i=1; i < n; i++){
-    a[i] += b[i] ;
-}
-```
-Thus, the limitations of auto vectorization are: 
 1. Works on only innermost loops
-2. No Vector dependence 
+2. No Vector dependence
 3. Number of iterations must be known
 
-However, we can guide auto-vectorization by using the simd directives. An example is shown below: 
+However, we can guide auto-vectorization by using the SIMD directives. An example is shown below:
 
 ```cpp
-#pragma omp declare simd 
-double func(double x); 
+    #pragma omp declare simd double func(double x); 
 
-const double dx = a / (double)n ;
-double integral = 0.0 ; 
+    const double dx = a / (double)n ;
+    double integral = 0.0 ; 
 
-#pragma omp simd reduction(+, integral)
-for (int i=0; i<n; i++){
-    const double xip2 = dx * ( (double)i + 0.5) ;
-    const double dI = func(xip2) * dx ; 
-    integral += dI
-}
+    #pragma omp simd reduction(+, integral)for (int i=0; i<n; i++){
+        const double xip2 = dx * ( (double)i + 0.5) ;
+        const double dI = func(xip2) * dx ; 
+        integral += dI
+    }
 ```
-The pragma directive signals the SIMD(Single Instruction Multiple Data) processor to parallelize 'func()' whilethe reduction on addition of the integreal signals that the sum needs to be calculated in reductive manner, where different  parts of the parallel sums are combined to get a result which is then finaly added to the integral variable instead of using a the integral variable everytime. 
-
+The pragma directive signals the **SIMD**(Single Instruction Multiple Data) processors to parallelize 'func()' while the reduction on the addition of the integral signals that the sum needs to be calculated in a reductive manner, where different parts of the parallel sums are combined to get a result which is then finally added to the integral variable instead of using an integral variable every time.
 
 ## Parallelism in Multi-Core CPUs
 
-A mutli-core CPU has multiple CPU units sharing the same  memory, as shown below:
+A multi-core CPU has multiple CPU units sharing the same memory, as shown below:
 
 <img width=700 height=250 src="static/Clouds/multi-core-cpu.png">
 
-Thus, all the stuff explained above is happening on one vector unit. Since the memory is shared, all the CPU units have th ability to accees and modify the contents of the same memory. Thus, they don't need external communication as it is implemented implicitly. However, the relevant issue now becomes the synchronization of these processes since the code written is Multi-Threaded.
+Thus, all the stuff explained above is happening on one vector unit. Since the memory is shared, all the CPU units have the ability to access and modify the contents of the same memory. Thus, they don't need external communication as it is implemented implicitly. However, the relevant issue now becomes the synchronization of these processes since the code written is Multi-Threaded.
 
 ### OpenMP
 
-Open Multi-Processing (OpenMP) is a framework for shared-memeory programming that allows distribution of threads across the CPU cores for parallel speedup. It can be included the cpp programs and easily used through the pragma keyword. For example, in the above reimann sum OpenMP can be applied as follows: 
+Open Multi-Processing (OpenMP) is a framework for shared-memory programming that allows the distribution of threads across the CPU cores for parallel speedup. It can be included in the CPP programs and easily used through the pragma keyword. For example, in the above Reimann sum OpenMP can be applied as follows:
 
 ```cpp
-#pragma omp declare simd 
-double func(double x); 
+    #pragma omp declare simd 
+    double func(double x); 
 
-const double dx = a / (double)n ;
-double integral = 0.0 ; 
+    const double dx = a / (double)n ;
+    double integral = 0.0 ; 
 
-#pragma omp parallel for reduction(+: integral)
-for (int i=0; i<n; i++){
-    const double xip2 = dx * ( (double)i + 0.5) ;
-    const double dI = func(xip2) * dx ; 
-    integral += dI
-}
+    #pragma omp parallel for reduction(+: integral)
+    for (int i=0; i<n; i++){
+        const double xip2 = dx * ( (double)i + 0.5) ;
+        const double dI = func(xip2) * dx ; 
+        integral += dI
+    }
 ```
-Here, the for reduction is applied to use the reduction sum instead of a normal sum as integral is a shared variable that is incremented in each iteration. If we were to use a normal parallel on for without reduction, the performance would not speed up since the mutex between threads would prevent the loops from parallel operation as each loop would wait for one operation to complete adn release the variable. Thus, the addtion of the reduction sum allows parallelization, and the performance improves dramatically as shown inthe figure below: 
+Here, the reduction is applied to use the reduction sum instead of a normal sum as integral is a shared variable that is incremented in each iteration. If we were to use a normal parallel sum without reduction, the performance would not speed up since the mutex between threads would prevent the loops from parallel operation as each loop would wait for one operation to complete and release the variable. Thus, the addition of the reduction sum allows parallelization, and the performance improves dramatically as shown in the figure below: 
 
 <img width=600 height=300 src="static/Clouds/openMP.png">
 
 ### Adding More Cores : MIMD
 
-The next step in the trend was to add more cores and make each core perform the same the function Thus, more number of transistors performing specialized tasks allows splitting independent work over multiple processors, for example in pixel analysis of images. This is called **Task Parallelism**, and this lead to **Multiple Instructions Multiple Data (MIMD)** cores. When the work being done by each core is identical, but the data is different, then is is called **Single Program Multiple Data (SPMD)**, a subcategory of MIMD. The most obvious addition that can be done to SPMDs is sharing the fetch and decode parts of processing amongst multipel processes as shown below: 
+The next step in the trend was to add more cores and make each core perform the same function Thus, more transistors performing specialized tasks allowed splitting independent work over multiple processors, for example in pixel analysis of images. This is called **Task Parallelism**, and this leads to **Multiple Instructions Multiple Data (MIMD)** cores. When the work being done by each core is identical, but the data is different, then it is called **Single Program Multiple Data (SPMD)**, a subcategory of MIMD. The most obvious addition that can be done to SPMDs is sharing the fetch and decode parts of processing amongst multiple processes as shown below:
 
 <img width=600 height=300 src="static/Clouds/simt.png">
 
-This is called **Single Instruction Multiple Thread (SIMT)** approach.
-
+This is called **Single Instruction Multiple Thread (SIMT)** approach, and this is the foundation for GPUs and CUDA.
 
 ## GPUs
-The SIMT appraoch forms the core of the Graphical Processing Units (GPUs) where each unit does identical work. Many SIMT threads grouped together make up a GPU core. A GPU has many such cores and a hierarchy can be created as follows:
+The SIMT approach forms the core of the Graphical Processing Units (GPUs) where each unit does identical work. Many SIMT threads grouped together make up a GPU core. A GPU has many such cores and a hierarchy can be created as follows:
 
 <img width=400 height=600 src="static/Clouds/gpu-cuda.png">
 
-**TODO: CUDA Kernel Docuemntation**
+### Explaining CUDA
 
+As explained before, the core idea in a GPU is to make multiple smaller cores perform the same function, thus, maximizing throughput. This differentiates GPUs from CPUs, which are designed to minimize latency by implementing advanced control logic and caching. Thus, the focus of GPUs is on the cores that have threads executing the same task in large numbers in a parallel fashion, and these cores occupy the major area of the Silicon Wafer. These Cores are called **Kernels**. When we run a function on these kernels - called launching a kernel - each function is mapped to a thread of execution on a core. Thus, these programs are massively multi-threaded. Now, the basic way of going about parallel programs is to make the CPU run the normal execution, but make it share its DRAM with the GPU through a PCI Bus, which allows it to  parallelize computations that are massive and can be broken down to be done by the GPU
+
+<img width=600 height=300 src="static/Clouds/PDC/CUDA.png">
+
+
+Thus, the CPU is called the **Host** and the GPU is the **Device,** and this way of sharing computations is called **Heterogeneous Parallel Programming.** This is implemented in the NVIDIA GPUs through the CUDA language → which is essentially C with added instructions. The threads execute Kernel instructions in a SIMT manner, and are organized into 3 classes: 
+
+1. **Threads** → A set of threads is executed by a Kernel.
+2. **Blocks →** Threads are grouped into blocks executed on a set of cores.
+3. **Grid** → Sets of Blocks → Each kernel Launch is executed as a grid mapped to the entire GPU.
+
+The threads and blocks can be 1D, 2D, and 3D structures. The identifiers are as follows: 
+
+- Grid Dimension → blockDim
+- BLock ID → blockIdx
+- Thread index → threadIdx. 
+
+The Thread Identity depends on the block identities as follows : 
+- 1D → Thread ID == Thread Index
+- 2D → Thread ID (x,y) = $x + D_xy$
+- 3D → Thead ID (x, y, z) = $x + D_xy + D_xD_yz$
+
+1. Decalre pointers to memory 
+2. Allocate memory to the Cuda device → `cudaMalloc (pointer, size of variable type)`
+3. Transfer memory to the device → `cudaMemcpy( dst, src, size of variable type, direction )`
+4. Configure the grid and block parameters → `dim3(x,y,z)`
+5. Launch Kernel → `<<<grid, block >>>(...)`
+6. Copy the results back to the main execution after completion → `cudaMemcpy( dst, src, size of variable type, direction )`
+7. De-allocate the memory → `cudaFree(pointer)`
+
+An example of this is shown below: 
+
+```cpp
+    void main {
+        
+        // Declare vairables
+        int *h_c ;// Host 
+        int *d_c ;// Device 
+        
+        //Allocate the memory to device 
+        cudaMalloc( (void**)&d_c, sizeof(int) ) ;
+
+        //Set-up the Data transfer
+        cudaMemcpy (d_C, h_c, sizeof(int), cudaMemcpyHostToDevice ) ;
+
+        //Define the Grid and Block cofigs
+        dim3 grid_size(3,2) ;
+        dim3 block_size(4,3) ;
+
+        //Launch the kernel 
+        kernel<<grid_size, block_size>>>(...) ;
+
+        //Copy the data after completion
+        cudaMemcpy (h_c, d_C, sizeof(int), cudaMemcpyDeviceToHost ) ;
+
+        //De-allocate the memory 
+        cudaFree(d_c); 
+        cudaFree(h_c);
+
+    }
+```
+
+The kernel is defined using `__global__` keyword and always returns void.  The function defined inside the Kernel will always be executed by all the threads. 
+
+### Parallelizing For Loop
+
+In the CPU code, the for loop is written as : 
+
+```cpp
+    void increment_cpu(int *a, int N) {
+
+        for ( int i=0; i<N; i++) {
+            a[i] = a[i] + 1 ; 
+        }
+
+    }
+```
+
+Since each step fo the loop performs the same  operation, we can parallelize it :
+
+```cpp
+    __global__ void Kernel( int* a, int N) {
+        int i = threadIdx.x ; 
+        
+        if ( i < N ){
+            a[i] = a[i] + 1 ; 	
+        } 
+    }
+
+
+    void main {
+        
+        // Declare vairables
+        int *h_c[N] = ... ;// Host 
+        int *d_c ;// Device 
+        
+        //Allocate the memory to device 
+        cudaMalloc( (void**)&d_c, sizeof(int) ) ;
+
+        //Set-up the Data transfer
+        cudaMemcpy (d_C, h_c, sizeof(int), cudaMemcpyHostToDevice ) ;
+
+        //Define the Grid and Block cofigs
+        dim3 grid_size(1) ;
+        dim3 block_size(N) ;
+
+        //Launch the kernel 
+        kernel<<grid_size, block_size>>>(d_c, N) ;
+
+        //Copy the data after completion
+        cudaMemcpy (h_c, d_C, sizeof(int), cudaMemcpyDeviceToHost ) ;
+
+        //De-allocate the memory 
+        cudaFree(d_c); 
+        cudaFree(h_c);
+
+    }
+```
+Another Example is to do Matrix Multiplication on GPU, shown below: 
+```cpp
+    __global__ void MatrixMultiplyKernel(
+                                const float* devM, 
+                                const float* devN,
+                                float* devP, 
+                                const int width ){
+            
+            int tx = threadIdx.x;
+            int ty = threadIdx.y;
+            
+            // Initialize accumulator to 0
+            float pValue = 0;
+
+            // Multiply and add
+            for (int k = 0; k < width; k++) {
+                float m = devM[ty * width + k];
+                float n = devN[k * width + tx];
+                pValue += m * n;
+            }
+            
+            // Write value to device memory - 
+            // each thread has unique index to write to
+            devP[ty * width + tx] = pValue;
+    }
+
+    void MatrixMultiplyOnDevice(float* hostP, 
+                                                            const float* hostM, 
+                                                            const float* hostN, 
+                                                            const int width
+                                                        )
+    {
+        int sizeInBytes = width * width * sizeof(float);
+        float *devM, *devN, *devP;
+        
+        // Allocate M and N on device
+        cudaMalloc((void**)&devM, sizeInBytes);
+        cudaMalloc((void**)&devN, sizeInBytes);
+        
+        // Allocate P
+        cudaMalloc((void**)&devP, sizeInBytes);
+
+        // Allocate the dimensions
+        dim3 threads(width, width);
+        dim3 blocks(1, 1);
+        
+        // Copy M and N from host to device
+        cudaMemcpy(devM, hostM, sizeInBytes, cudaMemcpyHostToDevice);
+        cudaMemcpy(devN, hostN, sizeInBytes, cudaMemcpyHostToDevice);
+        
+        // Launch the kernel
+        MatrixMultiplyKernel<<<blocks, threads>>>(devM, devN, devP, width)
+        
+        // Copy P matrix from device to host
+        cudaMemcpy(hostP, devP, sizeInBytes, cudaMemcpyDeviceToHost);
+        // Free allocated memory
+        cudaFree(devM);
+        cudaFree(devN);
+        cudaFree(devP);
+    }
+```
 
 ## Inter-node parallelism 
 
-
-All that has been discussed previously is specific to parallelism implemented within a node on a cluster and so, is called **Intra-node parallelism**. Sine the memory is shared between the CPUs and each of them can have their one caches, synchronized using mutexes and executed in a multi-threaded manner, the previous approach is also called **Shared-Memory Parallelism**. However, when we speak of computing on several nodes in a cluster, the intra-node sync vanishes since now each node has its own memory which is separate form the other nodes, and so this is called **Inter-Node Parallelism**. Moreover, now the synchronization cannot happen through the shared memory approach and is implemented by passing messaged between nodes - **Message Passing Parallelism** - and so, the thing that is central here is deadlock.  
-
+All that has been discussed previously is specific to parallelism implemented within a node on a cluster and so, is called i**ntra-node parallelism**. Since the memory is shared between the CPUs and each of them can have their own caches, synchronized using mutexes and executed in a multi-threaded manner, the previous approach is also called **Shared-Memory Parallelism**. However, when we speak of computing on several nodes in a cluster, the intra-node sync vanishes since now each node has its own memory which is separate from the other nodes, and so this is called **Inter-Node Parallelism**. Moreover, now the synchronization cannot happen through the shared memory approach and is implemented by passing messages between nodes → **Message Passing Parallelism →** and so, the thing that is central here is **a deadlock.**
 
 <img width=500 height=250 src="static/Clouds/msg-psng.png">
 
 
 ### Message Passing Interface (MPI)
 
-MPI is a library standard defined by a committee of vendors, implementers, and parallel programmers that is used to create parallel programs based on message passing. It is Portable and the De-facto standard platform for the High Performance Computing (HPC) community. The 6 basic routines in MPI are : 
+MPI is a library standard defined by a committee of vendors, implementers, and parallel programmers that is used to create parallel programs based on message passing. It is Portable and the De-facto standard platform for the High-Performance Computing (HPC) community. The 6 basic routines in MPI are :
 
-```cpp
-1. MPI_Init : Initialize 
-2. MPI_Finalize : Terminate : 
-3. MPI_Comm_size : Determines the number of processes 
-4. MPI_Comm_rank : Determines the label of calling process
-5. MPI_Send : Sends an unbuffered/blocking message
-6. MPI_Recv : Receives an unbuffered/blocking message.
-```
-**MPI Communicators** define the communication interface over MPI  and ar  used by the message passing functions. The prototypes of each of the above functions are shown below: 
+1. `MPI_Init` : Initialize 
+2. `MPI_Finalize` : Terminate : 
+3. `MPI_Comm_size` : Determines the number of processes 
+4. `MPI_Comm_rank` : Determines the label of calling process
+5. `MPI_Send` : Sends an unbuffered/blocking message
+6. `MPI_Recv` : Receives an unbuffered/blocking message.
+
+**MPI Communicators** define the communication interface over MPI and are used by the message passing functions. The prototypes of each of the above functions are shown below:
 
 ```cpp
 1. int MPI_Init(int *argc, char ***argv)
@@ -193,183 +1154,32 @@ MPI is a library standard defined by a committee of vendors, implementers, and p
 6. int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag, MPI_Comm comm, MPI_Status *status)  
 ```
 
-MPI also provides a Send and Recieve function that helps in avoiding deadlock through handshakes, and other functions for scattering and broadcast.
+MPI also provides a Send and Receive function that helps in avoiding deadlock through handshakes, and other functions for scattering and broadcast.
 
-```cpp
-1. MPI_Sendrecv : Send and Recieve in one-shot 
-2. MPI_Bcast : Broadcast same data to all processes in a group
-3. MPI_Scatter : Send different pieces of an array to different 
-                 processes through partitioning
-4. MPI_Gather : Take elements from many processes and gather them 
-                to one single process
-```
+1. `MPI_Sendrecv` : Send and Recieve in one-shot 
+2. `MPI_Bcast` : Broadcast same data to all processes in a group
+3. `MPI_Scatter` : Send different pieces of an array to different  processes through partitioning
+4. `MPI_Gather` : Take elements from many processes and gather them to one single process
+
 There are two other important functions that help in reduction sums: 
 
-```cpp
-1. MPI_Reduce : Takes an array of input elements on each process 
-                and returns an array of output elements to the 
-                root process given a specified operation 
-2. MPI_Allreduce : Like MPI_Reduce but distribute results to all 
-                   processes
-```
+1. `MPI_Reduce` : Takes an array of input elements on each process and returns an array of output elements to the root process given a specified operation 
+2. `MPI_Allreduce`: Like `MPI_Reduce` but distribute results to all processes
 
+As an example, we can use the `MPI_Allreduce` for numerical Integration and it gives a massive advantage, even compared to the vanilla Multi-threading:
 
+<img width=600 height=300 src="static/Clouds/PDC/MPI-AR.png">
 
-
-
-
-
-<!-- %%% -->
-# Clouds: Fundamentals of Cloud Computing
-
-In 2012, Joe Weinman came up with the economic theory to estimate the business value of cloud computing, calling it Cloudonomics. The major benefits of the cloud that come out are the following: 
-1. Common Infrastructure
-2. Location Independence
-3. Online connectivity 
-4. Utility pricing 
-
-## Utility Pricing Calculation
-To understand how utility pricing allows cloud services to be advantageous, we look at the load and the related quantities as follows: 
-- **L(t) :** Load demand as a function of time, with T being the total time 
-- **P :** maximum load or peak load 
-- **A :** Average load 
-- **B :** Baseline cost i.e the cost associated with owning the infrastructure 
-- **C :** Cloud unit cost i.e cost per second incurred when using a cloud service
-- **U :** Utility Premium = C / B
-
-Now, when we measure the costs for a time period of T, then we get 
-$$
-\begin{alignedat}{2}
-&B_T = P.B.T \\
-&C_T = \int L(t)dt = A.U.B.T \\
-\end{alignedat}
-$$
-
-The condition for the cloud services to b cheaper is that the aggregated cost of using the cloud is less than the cost of owning the service i.e $C_T < B_T$ and when combined with the above equations, we get the condition as : 
-
-$$
-U < \frac P A
-$$
-
-Thus, by checking if the utility premium is less than the peak-to-average ratio it can be determined whether the cloud is beneficial or not. 
-
-## Value Created by Cloud
-
-The value that the cloud provides is through the following two methods: 
-1. Resource Pooling: When resources are shared between multiple services, the profit can be made in reducing the overhead of setting up the infrastructure (like colling facility, etc.) and economies of scale that come with exploiting synergies.
-2. Multiplexing: By multiplexing services over time, the benefit comes from building the infrastructure for handling peak and average loads.
-
-### Measuring the benifit of Multiplexing: Smoothness
-
-The figure below shows the activity profile of a sample of 5,000 Google Servers over a period of 6 months:
-
-<img width=500 height=300 src="static/Clouds/Google-sample.png">
-
-The way multiplexing helps here is twofold: 
-1. For the part that is built to handle peak load, it yields higher utilization and lowers costs per resource
-2. For the part build to handle less than peak load, it reduces the unserved requests ad penalties associated with them on the off chance that service level agreements are violated.
-
-To understand how multiplexing does this, the metric used is the **smoothness** of the load. This is measured by a load variation coefficient defined as follows: 
-
-$$
-\begin{alignedat}{2}
-&C_v = \sigma / | \mu | \\
-\end{alignedat}
-$$
-
-Here, $\sigma$ is the standard deviation of the load variation and $\mu$ is the mean of this standard deviation. This coefficient is always non-negative since we are taking the modulus of the mean, and so when its value is closer to 1 the load is smoother since this either happens with lower standard deviation or with higher mean. Now, let's take the case of n independent jobs $X_1, X_2, ..., X_n$  running with the same values for the mean and standard deviation. Thus, when we multiplex them, we get
-
-$$
-\begin{aligned}
-&X = X_1 + X_2 + ... + X_n \\
-&\mu(X) = n*\mu \\
-&Var(X) = n*Var(X_i) \\
-&\sigma(X) = \sqrt{n} \sigma
-\end{aligned}
-$$
-
-Thus, the  coefficient for the multiplexed variable comes out to be
-$$
-C_v(X) = \frac {1} {\sqrt{n}} C_v(X_i)
-$$
-
-Thus, by multiplexing the load variation scales down proportional to the number of jobs that are multiplexed! The idea scenario is when two jobs are negatively correlated, in which case $X_2 = 1 - X_1$ nd we get a deviation of 0, which leads to a flat curve.
-
-## Virtualization
-
-The key idea behind virtualization is sharing computing resources among multiple applications. This translates to mapping the key components to abstract counterparts i.e CPU to a virtual CPU, Disk to a virtual disk, NIC to virtual NIC, etc., to create a **Virtual Machine** that can be used in the place of a real machine. Through this, each tenant can be provided with a virtual machine that they can use to access the compute resources, and thus, multiple tenants can be hosted, as shown below: 
-
-<img width=400 height=300 src="static/Clouds/VM-Arch.png">
-
-This mapping is created through a **Virtual Machine Monitor (VMM)**, also called a **Hypervisor**, which can be of two types : 
-- Type 1: VMM runs directly on the hardware, and performs scheduling and allocation of resources. E.g. VMWare ESX Server 
-- Type 2: VMM is built completely on top of an OS where the host OS provides the resource allocation and standard execution environment. E.g User-mode Linux (UML), QEMU
-
-### How it works 
-
-The CPU has the **Instruction Set Architecture (ISA)** which defines the registers and the memory available to the user and the operations that can be used to modify the contents of these. The ISA has 2 parts: 
-1. **User ISA :**  This is used for computation and has the fetch, decode, etc. instruction that can modify the user virtual memory, but it cannot modify the kernel
-2. **Sysem ISA :** This is controlled through privilege and used for resource management of the kernel. It can modify the actual registers, can set traps, and interrupts and modify the Memory Management Unit. 
-
-Virtualization creates an isomorphism between the ISA on the machine and the virtual system provided to the user by emulating the commands entered on the VM on the ISA on the host machine. This decoupling allows controlling what multiple users can modify by abstracting that bit out into the VM that is provided to them. This emulation is done by encapsulating the instruction set on the host machine into a set of commands that can be executed on the guest machine and creating a schema that maps these commands from the guest machine to the host machine. There are three ways to do this, each one addressing a problem in the previous approach: 
-1. **Exact Mapping :** The most basic way is to create a 1-1 mapping between each command. This is exhaustive and easy to implement but can be extremely slow due to the interpretation overhead that comes with it.
-2. **Trap and Emulate :** The key realization in this approach is only the instructions written to the system ISA need to be interpreted and 'worked around'. Thus, we let the user ISA instructions run as they are and every time the command to the kernel is accessed, the system will generate an interrupt which can be caught (trap) and handled by rewriting them by an interpreter in the privileged mode (emulate). The issue with this approach is that not all architectures (For example, x86) trap the attempts to write to privileged mode from unprivileged access.
-3. **Binary Translation :** Here we translate each guest instruction to the minimal binary set of host instructions required to emulate it, thus avoiding the function-call overhead of an interpreter. We can also re-use translations by using a translator cache. However, this is still slower than direct execution.
-
-in the [DISCO Approach](https://dl.acm.org/doi/10.1145/268998.266672) we get the best of both worlds by using trap and emulate for the non-privileged part of the guest instruction set and using binary translation for the privileged part.
-
-### Containers
-
-Containers raise the abstraction to another level by viirtualizing over the OS as shown: 
-
-<img width=400 height=300 src="static/Clouds/Containers.png">
-
-The key benefits come to the hosting providers: 
-1. It is now possible to host multiple applications/tenants on a single server as containers work on an OS abstraction level as compared to the hypervisors that work on the hardware abstraction level
-2. They offer high density as multiple containers can be packed in a server
-3. They are easy to scale-up (Everything in google is containerized)
-4. There is no virtualization overhead
-5. They reduce multitenancy and license fee that comes with providing the OS and libraries for every application
-6. They dramatically improve the SDLC
-
-The key point here is to find a way to extend OS to securely isolate multiple applications by observing and controlling the resource allocation and limiting visibility and communication across and between multiple processes. This was first done in Linux through Control Groups (CGroups) and Namespaces, which allowed multiple Linux distributions to share the same kernel (LXC). Thus, apart from the Linux kernel, multiple applications running on RHEL, Debian, Ubuntu, etc. could be isolated. 
-
-**Docker** was the obvious next step that has primarily two functions: 
-1. **Package System :** Can pack an application and all dependencies as a container image after development 
-2. **Transport System :** Ensures that the application image runs exactly similar on test and production systems 
-
-Thus, with Docker one can package everything from libraries to applications, and till the time the kernel is shared, it can be run on multiple devices, servers, etc. 
-
-
-### Serverless Computing
-
-The idea here is to abstract even above OS and allow multiple applications to share the server and runtime. 
-
-<img width=350 height=200 src="static/Clouds/Serverless.png">
-
-The model is primarily event-driven and can be described as follows: 
-1. The developer develops business logic and provides it to a provider (like amazon) which encapsulates this in the form of functions (FaaS) 
-2. Whenever a client requests a function through the application, a notification is triggered by a listener
-3. The server tries to locate the code that is responsible for answering the request
-4. Only the relevant bit of code is loaded into a container which then executes the code
-5. The result of the execution is used to build a response which is then sent to the client
-
-The way the listener works is through using the backend for authentication as a separate service. The advantages of the serverless approach are: 
-- Less server-side work 
-- Reduced Cost that comes through being able to charge on the usage of the functions i.e pay-as-you-go and economies of scale
-- Reduced risk and increased efficiency through specialization
-- Scalability 
-- Shorter lead time
-
-The limitations of this approach are: 
-- Managing the state is relatively complex
-- Higher latency due to increased calls
-- Vendor lock-in due to control shifted to the providers. This might change as more providers enter the market.
+The advantages offered by MPI, clearly, are in the allocation of resources that it allows through explicit and direct communication with the resources. Thus, it is very useful in the scientific domain for HPC applications. However, it has certain weaknesses:
+1. it requires careful tuning of applications 
+2. It is not tolerant to variability
+3. Dealing with failures is hard → No way to save information for later use
 
 
 <!-- %%% -->
-# Clouds: Introduction to Cloud Technologies
-The best way to look at the development of the cloud is to look at the lifecycle for major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring the water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rate basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
+# Clouds: Basics of Cloud Technologies
+
+The best way to look at the development of the cloud is to look at the lifecycle of major utilities throughout history. Take the case of water, initially, the people procured water themselves which was very intensive in terms of effort and time. However, models were developed to separate the process of procurement of water and its usage. Thus, the market moved towards some players procuring water and delivering it to the populace who could use it. However, this also went ahead and developed into a system where water was delivered through pipelines and a user would be charged on a pro-rata basis, depending on their usage. The same thing happened with electricity. This trend can be generalized to the lifecycle shown in the figure below:
 
 <img width=500 height=200 src="static/Clouds/general-cycle.png">
 
@@ -383,59 +1193,61 @@ Cloud Computing can be defined in the following three ways:
 
 ### IT as a Service
 There are 3 primary ways in which IT as a service can be offered:
-1. **Software-as-a-Service (SaaS) :** These are applications running on a browser
-2. **Platform-as-a-Service (Paas) :** These are software platforms made available to developers through APIs, to build applications
-3. **Infrastructure-as-a-Service (Iaas) :** These are basic computing resources like CPU, Memory, Disk, etc. made  available to users in the form of Virtual Machine Instances
+1. **Software-as-a-Service (SaaS):** These are applications running on a browser
+2. **Platform-as-a-Service (Paas):** These are software platforms made available to developers through APIs, to build applications
+3. **Infrastructure-as-a-Service (Iaas):** These are basic computing resources like CPU, Memory, Disk, etc. made  available to users in the form of Virtual Machine Instances
 
-Some other models that are also possible are **Hardware-as-a-Service (Haas)** where users can get access to barebones hardware machines, do whatever they want with them (E.g clusters), and **X-as-a-service (Xaas)** which might extend to Backend, Desktop, etc.
+Some other models that are also possible are: 
+ - **Hardware-as-a-Service (Haas):** where users can get access to barebones hardware machines, do whatever they want with them (E.g clusters)
+ - **X-as-a-service (Xaas):** which might extend to Backend, Desktop, etc.
 
 ### Cloud Infrastructure
-Servers are computers that provide to user machines - the client - and the main idea behind these is that they can be designed for reliability and to service a high number of requests. Dual socket servers are the fundamental building blocks of cloud infrastructure. Organizations usually require many physical servers, like a web server or database server, to provide various services. These servers are grouped, organized, and placed into racks. For standardization, 1 Rack Unit (RU) is defined as 4.45 cm.
+Servers are computers that provide service to user machines - the client - and the main idea behind these is that they can be designed for reliability and to service a high number of requests. Dual socket servers are the fundamental building blocks of cloud infrastructure. Organizations usually require many physical servers, like a web server or database server, to provide various services. These servers are grouped, organized, and placed into racks. For standardization, 1 Rack Unit (RU) is defined as 4.45 cm.
 
 <img width=500 height=200 src="static/Clouds/RU.png">
 
 A data center is a facility that is used to house a large number of servers. It needs to provide Air-Conditioning to cool the servers, Power supply to all the servers and needs to implement monitoring, network, and security mechanisms for these servers. Now the companies all have the option of privately owned data centers, but these are certain problems associated with this:
 - These are expensive to set-up with a high CAPEX for real-estate, servers, and peripherals
 - They have high OPEX in energy and administration costs
-- It is difficult to grow or shrink applications. If the company initially budgets a small number of servers, and then there a demand surge, sometimes even overnight for companies like FaceApp, they would have to expand the area abruptly, which is very difficult. Now, let us say they are able to expand the area and resource pool, they would not be able to shrink these if they demand tapers off. These things are simply not possible for smaller companies, as much as they are for bigger companies like Dropbox
+- It is difficult to grow or shrink applications → If the company initially budgets a small number of servers, and then a demand surge happens, sometimes even overnight for companies like FaceApp, they would have to expand the area abruptly, which is very difficult. Now, let us say they are able to expand the area and resource pool, they would not be able to shrink these if they demand tapers off. These things are simply not possible for smaller companies, as much as they are for bigger companies like Dropbox.
 - Servers can also suffer from the problem of low utilization. This can be caused by uneven usage of applications, where one application might be exhausting one resource while leaving the others stranded-off. Another reason for this is sudden demand spikes, which taper off even more suddenly
 
-Thus, the idea behind cloud infrastructure is to alleviate this problem by separating the server infrastructure from the end-users. The servers can be grouped into a large resource pool and then access can be given to applications based on their demand and the pricing can be set-up based on the usage of this resource pool. Hence, the applications don't need to worry about the usage statistics as far as to look into load balancing. Moreover, the sudden demand spikes and shrinks can be easily adjusted by changing the user requests. However, to offer such a service two requirements need to be met:
-- Means for rapidly and dynamically satisfying application's fluctuating resource need. This is provided by **Virtualization**
-- Means for servers to Quickly and reliable access shared and persistent data. This is done by programming models and distributed file/storage/database systems
+Thus, the idea behind cloud infrastructure is to alleviate these problems by separating the server infrastructure from the end-users. The servers can be grouped into a large resource pool and then access can be given to applications based on their demand and the pricing can be set-up based on the usage of this resource pool. Hence, the applications don't need to worry about the usage statistics as far as to look into load balancing. Moreover, the sudden demand spikes and shrinks can be easily adjusted by changing the user requests. However, to offer such a service two requirements need to be met:
+- A Means for rapidly and dynamically satisfying fluctuating resource need of the application → provided by **Virtualization**
+- A Means for servers to Quickly and reliably access shared and persistent data → done by programming models and distributed file/storage/database systems
 
 This resource pool can also be defined based on its location:
 - **Single-Site Cloud :** This would be the collection of hardware and software that the vendors use to offer computing resources and services to users.
-- **Geographically Distributed Cloud :** This is a resource pool that is spread across multiple locations and has a composition of different structures and services
+- **Geographically Distributed Cloud :** This is a resource pool that is spread across multiple locations and has a composition of different structures and services.
 
 ### Cloud Hardware and Software stack
 The full stack for clouds has 9 components, as shown in the figure below:
 
 <img width=200 height=300 src="static/Clouds/cloud-stack.png">
 
-- **Applcations :** These are applications like Web-apps or Scientific Coputation Jobs etc.
-- **Data :** These are the database systems like Old SQL (Oracle, SQLServer), No SQL (MongoDB, Cassandra), and  New SQL (TimesTen, Impala, Hekaton) systems
+- **Applcations :** These are applications like Web-apps or Scientific Computation Jobs etc.
+- **Data :** These are the database systems like Old SQL (Oracle, SQLServer), No SQL (MongoDB, Cassandra), and New SQL (TimesTen, Impala, Hekaton) systems.
 - **Runtime Environment :** These are runtime platforms like Hadoop, Spark, etc. to support cloud programming models.
 - **Middleware :** These are platforms for Resource Management, Monitoring, Provisioning, Identity Management, and Security.
-- **Operating Systems :** These are operating systems like Linux used on a personal machine, but they can also be packed with libraries and software for quick deployment. For example, Amazon Machine Images (AMI) contain OS as well as required software packages as a “snapshot” for instant deployment
-- **Virtualization :** This layer is the key enabler of the cloud services. It creates a mapping between the lower hardware layers and the upper applications and OS layers and contributes towards multi latency. For example, the Amazon EC2 is based on the Xen virtualization platform, and Microsoft Azure is based on HyperV
+- **Operating Systems :** These are operating systems like Linux used on a personal machine, but they can also be packed with libraries and software for quick deployment. For example, Amazon Machine Images (AMI) contain OS as well as required software packages as a “snapshot” for instant deployment.
+- **Virtualization :** This layer is the key enabler of the cloud services. It creates a mapping between the lower hardware layers and the upper applications and OS layers and contributes towards multi latency. For example, the Amazon EC2 is based on the Xen virtualization platform, and Microsoft Azure is based on HyperV.
 
-The stuff below virtualization has already been discussed. However, one thing that can now b understood is how does this stack help in differentiating between the offered services. As shown in the figure below, in the case of Saas the user has only access to the applications offered by the cloud. In the case of Paas, the user manages the application and Data layer of the stack. In the case of Iaas, the user has access to all the layers above the virtualization layer, so that they can build their own application on the offered resources.
+The stuff below virtualization has already been discussed. However, one thing that can now be understood is how does this stack help in differentiating between the offered services. As shown in the figure below, in the case of Saas the user has only access to the applications offered by the cloud. In the case of Paas, the user manages the application and Data layer of the stack. In the case of Iaas, the user has access to all the layers above the virtualization layer, so that they can build their own application on the offered resources.
 
 <img width=800 height=300 src="static/Clouds/stack-resources.png">
 
 ### Types of Cloud
 There are three basic types of clouds:
-1. **Public (external) Cloud :** This is a resource pool that serves as an open market for on-demand computing and IT resources. However, the availability, reliability, security, trust, and SLAs can have limitations.
-2. **Private (Internal) Cloud :** This is the same set of services of cloud, but devoted to the functions of a large enterprise with the budget of large-scale IT
-3. **Hybrid Cloud :** This is the best of both worlds. The private cloud is extended by connecting it to other public cloud vendors to make use of their available cloud services. So, a company can use their private cloud, and when the resources surge they can also extend usage to the public cloud, of course paying pro-rata
+1. **Public (external) Cloud :**  This is a resource pool that serves as an open market for on-demand computing and IT resources. However, the availability, reliability, security, trust, and SLAs can have limitations.
+2. **Private (Internal) Cloud :** This is the same set of services of cloud, but devoted to the functions of a large enterprise with the budget of large-scale IT.
+3. **Hybrid Cloud :** This is the best of both worlds. The private cloud is extended by connecting it to other public cloud vendors to make use of their available cloud services. So, a company can use their private cloud, and when the resources surge they can also extend usage to the public cloud, of course paying pro-rata.
 
 ### Applications Enabled by the Cloud
 The applications that can be enabled by the cloud are of 4 types
-1. **High-Growth Applications :** This the same case as FaceAPP that was discussed previously. Imagine a startup that is growing. They would need a dynamic resource usage mechanism, that as discussed previously, is comfortably offered by the cloud. The risk of not setting up a distributed resource management method is losing on customer experience. This was the case with Friendster(2001), that had a similar offering as Facebook but could not keep up with the user growth.
-2. **Aperiodic Applications :** These are applications that face sudden demand peaks and need a way to handle this. The cloud enables them comfortably, and again the risk is user experience. For example, Flipkart offered the 'Big-Billion Day' sale in a similar manner to Amazon's Prime Day, but initially, they could not handle the load and the customer experience was ruined. However, they did fix it over time
-3. **On-off Applications :** These are one-off applications that for which extending private resources makes no sense. for example, scientific simulations requiring 1000s of computers
-4. **Periodic Applications :** These are applications that will have a periodic demand surge, like stock market analysis tools or HFT tools, and thus, dynamic, flexible infrastructure can reduce costs, improve performance
+1. **High-Growth Applications:** This the same case as FaceApp that was discussed previously. Imagine a startup that is growing. They would need a dynamic resource usage mechanism, that as discussed previously, is comfortably offered by the cloud. The risk of not setting up a distributed resource management method is losing on customer experience. This was the case with Friendster(2001), which had a similar offering as Facebook but could not keep up with the user growth.
+2. **Aperiodic Applications:** These are applications that face sudden demand peaks and need a way to handle this. The cloud enables them comfortably, and again the risk is user experience. For example, Flipkart offered the 'Big-Billion Day' sale in a similar manner to Amazon's Prime Day, but initially, they could not handle the load and the customer experience was ruined. However, they did fix it over time.
+3. **On-off Applications:** These are one-off applications for which extending private resources makes no sense. for example, scientific simulations requiring 1000s of computers.
+4. **Periodic Applications:** These are applications that will have a periodic demand surge, like stock market analysis tools or HFT tools, and thus, dynamic, flexible infrastructure can reduce costs, improve performance.
 
 ### Advantages Offered by Cloud Computing
 1. Pay-as-you-go economic model
@@ -444,6 +1256,165 @@ The applications that can be enabled by the cloud are of 4 types
 4. Flexible options
 5. Improved Resource Utilization
 6. Decrease in Carbon Footpriint
+
+
+## Cloudonomics
+In 2012, Joe Weinman came up with the economic theory to estimate the business value of cloud computing, calling it **Cloudonomics**. The major benefits of the cloud that come out are the following:
+1. Common Infrastructure
+2. Location Independence
+3. Online connectivity
+4. Utility pricing
+
+### Utility Pricing Calculation
+To understand how utility pricing allows cloud services to be advantageous, we look at the load and the related quantities as follows:
+- **L(t) →** Load demand as a function of time, with T being the total time
+- **P →** maximum load or peak load
+- **A  →** Average load
+- **B  →** Baseline cost i.e the cost associated with owning the infrastructure
+- **C →** Cloud unit cost i.e cost per second incurred when using a cloud service
+- **U →** Utility Premium = C / B
+
+Now, when we measure the costs for a time period of T, then we get:
+$$
+\begin{alignedat}{2}
+&B_T = P.B.T \\
+&C_T = \int L(t)dt = A.U.B.T \\
+\end{alignedat}
+$$
+
+The condition for the cloud services to be cheaper is that the aggregated cost of using the cloud is less than the cost of owning the service i.e 
+
+$$
+C_T < B_T
+$$
+
+When combined with the above equations, we get the condition as :
+$$
+U < \frac {P}{A}
+$$
+
+Thus, by checking if the utility premium is less than the peak-to-average ratio it can be determined whether the cloud is beneficial or not. 
+
+## Value Created by Cloud
+
+The value that the cloud provides is through the following two methods:
+
+1. Resource Pooling: When resources are shared between multiple services, the profit can be made in reducing the overhead of setting up the infrastructure (like cooling facility, etc.) and economies of scale that come with exploiting synergies.
+2. Multiplexing: By multiplexing services over time, the benefit comes from building the infrastructure for handling peak and average loads.
+
+### Measuring the benefit of Multiplexing: Smoothness
+
+The figure below shows the activity profile of a sample of 5,000 Google Servers over a period of 6 months:
+
+<img width=500 height=300 src="static/Clouds/Google-sample.png">
+
+The way multiplexing helps here is twofold:
+
+1. For the part that is built to handle peak load, it yields higher utilization and lowers costs per resource
+2. For the part build to handle less than peak load, it reduces the unserved requests and penalties associated with them on the off chance that service level agreements are violated.
+
+To understand how multiplexing does this, the metric used is the **smoothness** of the load. This is measured by a load variation coefficient defined as follows:
+
+$$
+C_v = \sigma / | \mu |
+$$
+
+Here, $\sigma$ is the standard deviation of the load variation and μ is the mean of this standard deviation. This coefficient is always non-negative since we are taking the modulus of the mean, and so when its value is closer to 1 the load is smoother since this either happens with a lower standard deviation or with a higher mean. Now, let's take the case of n independent jobs $X_1, X_2, ..., X_n$ running with the same values for the mean and standard deviation. Thus, when we multiplex them, we get: 
+
+$$
+\begin{aligned}
+&X = X_1 + X_2 + ... + X_n \\
+&\mu(X) = n*\mu \\ 
+&Var(X) = n*Var(X_i) \implies \sigma(X) = \sqrt{n} \sigma \\
+\end{aligned}
+$$
+
+Thus, the  coefficient for the multiplexed variable comes out to be
+$$
+C_v(X) = \frac {1} {\sqrt{n}} C_v(X_i)
+$$
+
+Hence, by multiplexing the load variation scales down proportional to the number of jobs that are multiplexed! The ideal scenario is when two jobs are negatively correlated, in which case $ X_2 = 1 - X_1$ and we get a deviation of 0, which leads to a flat curve.
+
+## Virtualization
+
+The key idea behind virtualization is sharing computing resources among multiple applications. This translates to mapping the key components to abstract counterparts i.e CPU to a virtual CPU, Disk to a virtual disk, NIC to virtual NIC, etc., to create a **Virtual Machine** that can be used in the place of a real machine. Through this, each tenant can be provided with a virtual machine that they can use to access the compute resources, and thus, multiple tenants can be hosted, as shown below:
+
+<img width=400 height=300 src="static/Clouds/VM-Arch.png">
+
+This mapping is created through a **Virtual Machine Monitor (VMM)** , also called a **Hypervisor**, which can be of two types :
+- **Type 1:** VMM runs directly on the hardware, and performs scheduling and allocation of resources. E.g. VMWare ESX Server.
+- **Type 2:** VMM is built completely on top of an OS where the host OS provides the resource allocation and standard execution environment. E.g User-mode Linux (UML), QEMU.
+
+### How it works 
+
+The CPU has the **Instruction Set Architecture (ISA)** which defines the registers and the memory available to the user and the operations that can be used to modify the contents of these. The ISA has 2 parts:
+
+1. **User ISA:** This is used for computation and has the fetch, decode, etc. instruction that can modify the user virtual memory, but it cannot modify the kernel
+2. **System ISA:** This is controlled through **privilege** and used for resource management of the kernel. It can modify the actual registers, can set traps, and interrupts and modify the Memory Management Unit.
+
+Virtualization creates an isomorphism between the ISA on the machine and the virtual system provided to the user by emulating the commands entered on the VM on the ISA on the host machine. This decoupling allows controlling what multiple users can modify by abstracting that bit out into the VM that is provided to them. This emulation is done by encapsulating the instruction set on the host machine into a set of commands that can be executed on the guest machine and creating a schema that maps these commands from the guest machine to the host machine. There are three ways to do this, each one addressing a problem in the previous approach:
+
+1. **Exact Mapping:** The most basic way is to create a 1-1 mapping between each command. This is exhaustive and easy to implement but can be extremely slow due to the interpretation overhead that comes with it.
+2. **Trap and Emulate:** The key realization in this approach is only the instructions written to the system ISA need to be interpreted and 'worked around'. Thus, we let the user ISA instructions run as they are and every time the command to the kernel is accessed, the system will generate an interrupt which can be caught (trap) and handled by rewriting them by an interpreter in the privileged mode (emulate). The issue with this approach is that not all architectures (For example, x86) trap the attempts to write to the privileged mode from unprivileged access.
+3. **Binary Translation:** Here we translate each guest instruction to the minimal binary set of host instructions required to emulate it, thus avoiding the function-call overhead of an interpreter. We can also re-use translations by using a translator cache. However, this is still slower than direct execution.
+
+In the [DISCO Approach](https://dl.acm.org/doi/10.1145/268998.266672) :
+
+- trap-and-emulate for the non-privileged part of the guest instruction set
+- binary translation for the privileged part.
+
+### Containers
+
+Containers raise the abstraction to another level by virtualizing over the OS as shown: 
+
+<img width=400 height=300 src="static/Clouds/Containers.png">
+
+The key benefits come to the hosting providers:
+
+1. It is now possible to host multiple applications/tenants on a single server as containers work on an OS abstraction level as compared to the hypervisors that work on the hardware abstraction level
+2. They offer high density as multiple containers can be packed in a server
+3. They are easy to scale-up (Everything in google is containerized)
+4. There is no virtualization overhead
+5. They reduce multitenancy and license fee that comes with providing the OS and libraries for every application
+6. They dramatically improve the SDLC
+
+The key point here is to find a way to extend OS to securely isolate multiple applications by observing and controlling the resource allocation and limiting visibility and communication across and between multiple processes. This was first done in Linux through Control Groups (CGroups) and Namespaces, which allowed multiple Linux distributions to share the same kernel (LXC). Thus, apart from the Linux kernel, multiple applications running on RHEL, Debian, Ubuntu, etc. could be isolated.
+
+**Docker** was the obvious next step that has primarily two functions:
+
+1. **Package System :** Can pack an application and all dependencies as a container image after development
+2. **Transport System:** Ensures that the application image runs exactly similar on test and production systems
+
+Thus, with Docker one can package everything from libraries to applications, and till the time the kernel is shared, it can be run on multiple devices, servers, etc.
+
+### Serverless Computing
+
+The idea here is to abstract even above OS and allow multiple applications to share the server and runtime.
+
+<img width=350 height=200 src="static/Clouds/Serverless.png">
+
+The model is primarily event-driven and can be described as follows:
+
+1. The developer develops business logic and provides it to a provider (like amazon) which encapsulates this in the form of functions (FaaS)
+2. Whenever a client requests a function through the application, a notification is triggered by a listener
+3. The server tries to locate the code that is responsible for answering the request
+4. Only the relevant bit of code is loaded into a container which then executes the code
+5. The result of the execution is used to build a response which is then sent to the client
+
+The way the listener works is through using the backend for authentication as a separate service. The advantages of the serverless approach are:
+
+- Less server-side work
+- Reduced Cost that comes through being able to use a pay-as-you-go model and economies of scale
+- Reduced risk and increased efficiency through specialization
+- Scalability
+- Shorter lead time
+
+The limitations of this approach are:
+
+- Managing the state is relatively complex
+- Higher latency due to increased calls
+- Vendor lock-in due to control shifted to the providers, but this might change as more providers enter the market.
 
 <!-- %%% -->
 # MobMod: Vehicular Flow Modelling
