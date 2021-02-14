@@ -33,6 +33,511 @@
 
 #### Zettelkasten
 
+<!-- %%% -->
+# MALIS: State-Vector Machines
+
+## Intuition
+Classification is essentially finding a boundary that separates the data points into two segments so that when we get a new data point, the segment that it falls on determines the label it belongs to! The real challenge is positioning this boundary → which is the focus of every classifier.  Let's take the figure shown below as an example
+
+<img height=50 width=400 src="static/MALIS/SVM/svm-1.png">
+
+Here, the data is 1D - Mass(g) - and we need to classify the person as Obese (Green) or Not Obese (Red). If we put the decision boundary at the edge of the red points, as shown below, our classifier would work for points inside the respective clusters, but for a point at the boundary, as shown, it would classify it as not obese even though this point is closer to the red cluster. 
+
+<img height=70 width=400 src="static/MALIS/SVM/svm-2.png">
+
+This is clearly not desirable, and this would also be the case if we move this boundary very close to the green points. Let's define the shortest distance between the observations and the boundary as the Margin. One way to get a decent classifier would be to place this boundary in such a way so that the margins are equal → This is possible in the case where we put the boundary at exactly half the shortest distance between the data-sets, as shown below 
+
+<img height=70 width=400 src="static/MALIS/SVM/svm-3.png">
+
+This is called the Maximum Margin Classifier since the margins, in this case, have the largest value than any other possible case. But the shortfall of this is that it is sensitive to outliers:
+
+<img height=70 width=400 src="static/MALIS/SVM/svm-4.png">
+
+Here, the outliers push the Max Margins very close to the green cluster and thus, overfit the boundary to the training set as clearly a more equally distributed test set would have to make some misclassifications! Thus, to make a boundary that is more robust to these outliers, we must allow misclassifications by introducing soft margins around our boundary that signify regions in which misclassifications are allowed:
+
+<img height=120 width=400 src="static/MALIS/SVM/svm-5.png">
+
+Thus, any red data point within this soft margin that falls in the green zone would be classified as green while the data in the red zone would be classified as red. This soft margin, in contrast to the margin above, need not be the shortest distance from the data to the boundary but can be tuned through cross-validation. This classifier is called a **Support Vector Classifier →** The observations within the soft margins are called support vectors which  can be tuned. In 2D, the boundary  would be a line, in 3D a plane → In general, it is called a hyperplane. 
+
+### Non-linearly seperable data
+Now, let us look at new case of drug dosage classification, where the dosage is only safe within a certain range of values and unsafe outside it:
+
+<img height=70 width=400 src="static/MALIS/SVM/svm-6.png">
+
+Here, the data is not linearly separable since no single boundary can separate it. Thus, support vector classifiers fail here! One way to tackle this is by transforming this data into a higher dimensional plane. If we square each data point and look at the 2D data, then we see that it is now linearly separable!  
+
+<img height=150 width=400 src="static/MALIS/SVM/svm-7.png">
+
+Now, we can create a boundary in this new higher dimensional plane and just map that back to our original plane. This is called a **Support Vector Machine.** The transformation we performed on the data is called a **Kernel,**  and in this case, the Kernel is a $d^n$ kernel with n having the value of 2 → Polynomial kernel.Technically, the support vector classifier is also an SVM in is dimension.
+
+
+## Math of SVM
+
+### Hard MArgin SVM
+
+For a set of training data $\{x_i, y_i\}$, with $x \in \R^M$  and $y \in \{-1,+1\}$ with the classifications being -1 and + 1 and $i = 1, ...., N$  , let us apply a transformation first
+
+$$
+\phi: \R^M \rightarrow \R^D \,\,\, s.t. \,\,\, \phi(x) \in \R^D
+$$
+
+Our objective is to fit a line through this data, and so our model is 
+
+$$ 
+\hat{y}(\bm{x}) = \bm{w}^T \phi(\bm{x}) + w_0
+$$
+
+which implies that classifications are:
+
+- $y_i(\bm{w}^T\phi(x_i) + w_0 ) > 0$ if the classification  is correct
+- $y_i(\bm{w}^T\phi(x_i) + w_0 ) < 0$ if the classification is incorrect.
+
+The distance of any training sample from the seperation line line is → $d(\phi(x_i), L) = \frac{y_i}{||\bm{w}||}(\bm{w}^T\phi(x_i) + w_0 )$ 
+
+Now, our optimization problem is to **maximize the minimum distance for each class,** which can be formalized as  
+
+$$
+\argmax_{\bm{w}, w_0} M = \argmax_{\bm{w}, w_0} \{\min_i d(\phi(\bm{x_i}),L) = \argmax_{\bm{w}, w_0} \frac{1}{||\bm{w}||} \{ \min_i y_i (\bm{w}^T\phi(\bm{x_i}) + w_0 ) \}
+$$
+
+Now, we add some constraints to our Margin → Set $M = 1/||\bm{w}||$ , which essentially means that the minimum distance for our problem has been set to 1 so that we only have to worry about $\frac{1}{||w||}$. In other words, we need to have: 
+
+$$
+|\bm{w}^T \phi(\bm{x_i})* + w_0| = 1 
+$$
+
+This is only possible if data points satisfy: 
+
+$$
+y_i(\bm{w}^T \phi(\bm{x_i}) + w_0 ) \geq 1
+$$
+
+If we look at the problem of maximizing $1/||w||$, it is the same as minimizing $||w||$  → Let's add two transformations to it :
+
+1. $||w|| \rightarrow ||w||^2$
+2. $||w||^2 \rightarrow \frac{1}{2}||w||^2$
+
+We  see our minimization of $||w||$  is still satisfied since minimizing half of its square will still give us the same result and so minimizing $\frac{1}{2}||w||^2$  should be the same as maximizing $||w||^{-1}$, which was out the original problem. Thus, we now have to find:
+
+$$
+\min_{\bm{w},w_0} \frac{1}{2}||\bm{w}||^2  \,\,\, s.t. \,\,\, y_i(\bm{w}^T\phi(\bm{x_i}) + w_0 ) \geq 1 \,\,\,\, \forall \,\,\,\, i = 1, ...., N
+$$
+
+This is called the **primal form** → the form we reached using our intuition. We had a maximization type optimization and we converted it to a minimization problem without messing with our original goal. We now have to solve a constrained minimization problem. We solve this by creating a Langrangian Formulation →  a function of the form: 
+
+$$
+L(x,y,\lambda) = f(x,y) - \sum \lambda_i g_i(x,y) 
+$$
+
+where f is our optimization target and we put constraints on it in the form of $g_i$  which are $\lambda_i$ is the Lagrange multipliers. Our approach to solving this is to differentiate the Lagrangian w.r.t the variables to get critical points
+
+$$\nabla L(x,y,\lambda) = 0 \longrightarrow \nabla f(x,y) = \lambda \nabla g(x,y) $$
+
+and substitute it back into $L$ to get a **Dual Formulation**. So, formalizing our SVM minimization as a Lagrangian with $\alpha$ as our multiplier, we get: 
+
+$$
+L(\bm{w}, w_0, \bm{\alpha}) = \frac{1}{2}||\bm{w}||^2  - \sum_{i=1}^{N}\alpha_i [y_i(\bm{w}^T \phi(\bm{x_i}) + w_0 ) - 1]
+$$
+
+To minimize this  function, we first differentiate L w.r.t $\bm{w}$ : 
+
+$$
+\begin{aligned}
+&\partial L/\partial \bm{w} = \bm{w} - \sum\alpha_iy_i \phi(\bm{x_i}) = 0 \\
+\implies &\bm{w} = \sum\alpha_iy_i \phi(\bm{x_i}) \\
+\end{aligned}
+$$
+
+Then, we differentiate L w.r.t $w_0$ as follows:
+
+$$
+\begin{aligned}
+& \partial L/\partial w_0 = - \sum\alpha_iy_i = 0\\
+\implies &\sum \alpha_iy_i = 0 \\
+\end{aligned}
+$$
+
+Then we differentiate w.r.t w :
+
+$$
+\begin{aligned}
+& \partial L/\partial \bm{w} = \bm{w} - \sum\alpha_iy_i\phi(x_i) = 0 \\
+\implies & \bm{w} = \sum \alpha_iy_i\phi(x_i) \\
+\end{aligned}
+$$
+
+We now plug the values into our lagrangian: 
+
+$$ 
+\begin{aligned}
+&\frac{1}{2}||\bm{w}||^2  - \sum_{i=1}^{N}\alpha_i [y_i(\bm{w}^T \phi(\bm{x_i}) + w_0 ) - 1] \\
+ &= \frac{1}{2}(\sum\alpha_iy_i \phi(\bm{x_i})  \sum\alpha_jy_j\phi(\bm{x_j})) - (\sum\alpha_iy_i\phi(\bm{x_i}) \sum\alpha_jy_j \phi(\bm{x_j})) - (\sum \alpha_iy_iw_0) + \sum \alpha_i \\
+\therefore \,\,\, & L(\bm{\alpha}) = \sum \alpha_i - \frac{1}{2}\sum_i \sum_j \alpha_i \alpha_j y_i y_j  [\phi(\bm{x_i}) . \phi(\bm{x_j})] \\
+\end{aligned}
+$$
+
+The new Expression → $L(\bm{\alpha}) = \sum \alpha_i - \frac{1}{2}\sum_i \sum_j \alpha_i \alpha_j y_i y_j  [\phi(\bm{x_i}) . \phi(\bm{x_j})]$ is the **Dual Form** of the Maximum Margin Problem. An important thing to notice is that our dual form only depends on the dot products of our data points and thus, we can take advantage of Kernelization to make this independent of the nature of $\phi$ :
+
+$$L(\bm{\alpha}) = \sum \alpha_i - \frac{1}{2}\sum_i \sum_j \alpha_i \alpha_j y_i y_j K(\bm{x_i}.\bm{x_j})$$
+
+And for classifying any new point, all we have to do it replace it in the place of $x_j$ as shown: 
+
+$$\hat{y}_{test} = \sum_{i=1}^{N} \hat{\alpha_i} [y_i(\phi(\bm{x_i}).\phi(\bm{x_{test}}) + w_0 )]$$
+
+and this should satisfy the Karush-Kuhn-tucker conditions: 
+
+1. $\alpha_i \geq 0$ 
+2. $y_i(\bm{w}^T\phi(\bm{x_i}) + w_0 ) - 1 > 0$ 
+3. $\alpha_i [y_i(\bm{w}^T\phi(\bm{x_i}) + w_0 ) - 1] = 0$
+
+This is the key to SVMs → If $\alpha = 0$ then the point is not contributing to the margin and is not a support vector and for all $\alpha > 0$ , the point $\bm{x}$  is a support vector and contributes to the margin.
+
+
+<img height=400 width=450 src="static/MALIS/SVM/svm-8.png">
+
+Thus, in summary, the dual expression gives us a set of $\alpha_i$ that represent points that are either support vectors or not. If we want to find the best boundary for these hard margins, all we have to do is compute   
+
+$$
+\bm{\hat{w}} = \sum \hat{\alpha_i} y_i \phi(\bm{x_i})
+$$
+
+Which we then substitute into the third KKT condition, t get $w_0$ as follows: 
+
+$$
+\begin{aligned}
+&\alpha_i [y_i(\bm{\hat{w}}^T\phi(\bm{x_i}) + w_0 ) - 1] = 0 \\
+\implies &y_i(\bm{\hat{w}}^T\phi(\bm{x_i}) + w_0 ) = 1 \\
+\end{aligned}
+$$
+
+Now, the y labels are either +1 or -1, and so, $w_0 = 1 - \bm{\hat{w}}^T\phi(\bm{x_i})$  or $w_0 = -1 - \bm{\hat{w}}^T\phi(\bm{x_i})$ , which we can also write as:   
+
+$$
+w_0 = y_i - \bm{\hat{w}}^T\phi(\bm{x_i}) 
+$$
+
+In practice, we compute $w_0$  by summing multiple such expressions and dividing by $\alpha_i$. A new point will be classified to 
+
+- Class 1 if $\bm{\hat{w}}^T\phi(\bm{x_i}) + \hat{w}_0 > 0$
+- Class 2 if $\bm{\hat{w}}^T\phi(\bm{x_i}) + \hat{w}_0 < 0$
+
+### Soft-Margin SVM
+
+The hard-margin constraint is very strong but does not work very well for overlapping classes or spread out data. Thus, we relax the constraints by allowing points to violate the margins → this is quantified by the slack variable $\xi_i \geq 0$ for each point i, which measures the extent of violation.
+
+<img height=400 width=450 src="static/MALIS/SVM/svm-9.png">
+
+Thus, for point outside the margins $\xi_i = 0$ and for points inside the margin $\xi_i = |y_i - \hat(y(\bm{x_i})|$, and now, our constraint becomes 
+
+$$
+y_i(\bm{w}^T\bm{x_i} + w_0 ) \geq 1 - \xi_i
+$$
+
+And so, our problem becomes:
+
+$$
+\min_{\bm{w},w_0, \bm{\xi}} C \sum \xi_i + \frac{1}{2} ||w||^2 \,\,\,\, s.t \,\,\,\, y_i(\bm{w}^T\phi(\bm{x_i}) + w_0 ) \geq 1 - \xi_i \,\,\,\, \xi_i \geq 0 \,\,\, \forall n
+$$
+
+We again formulate the Lagrangian:
+
+$$
+L(\bm{w}, w_0, \bm{\xi}, \bm{\alpha}, \bm{\lambda}) =  = \{\frac{1}{2}||\bm{w}||^2 + C\sum_i \xi_i \}- \sum_{i=1}^{N}\alpha_i [1 - \xi_i - y_i(\bm{w}^T \phi(\bm{x_i}) + w_0 )] + \sum_i \lambda_i(-\xi_i)
+$$
+
+Which, when differentiated gives the follownig expresions:
+
+$$
+\begin{aligned}
+&\bm{w} = \sum\alpha_iy_i \phi(\bm{x_i})\\
+&\sum \alpha_iy_i = 0 \\
+&C - \alpha_i - \lambda_i = 0
+\end{aligned}
+$$
+
+The interesting thing is that the third expression helps us eliminate $\xi_i$ from the Dual form to get the expression:
+
+$$\sum \alpha_i - \frac{1}{2}\sum_i \sum_j \alpha_i \alpha_j y_i y_j \phi(\bm(x_i)).\phi(\bm(x_j))$$
+
+Which is the same as before. Thus, we can see that the only impact $\xi$ has is in shifting translating the constraint to include misclassifications. Thus, soft-margins allow us to perform the same optimization with an added impact on the classification constraint.
+
+<!-- %%% -->
+# MALIS: Naive Bayes Classifier
+
+source: StatQuest
+
+## Multinomial Naive Bayes
+
+Let's take the case of spam classification → we have emails with the combination of words tha  we want to use to classify future emails as spam or not. Let's say they have the combination of the four words : **Dear, Friend, Lunch, Money**. Now, we just count the frequency of these 4 four words in the normal emails and then assign **Likelihoods** to each as follows. Say D = 8, F = 5, L =3, M=1:
+
+$$
+\begin{aligned}
+&P(D|N) = 8/17 = 0.47 \\ 
+&P(F|N) = 5/17 = 0.29 \\
+&P(L|N) = 3/17 = 0.18 \\
+&P(M|N) = 1/17 = 0.06 \\
+\end{aligned}
+$$
+
+Now , we do the  same for 7  spam emails:
+$$
+\begin{aligned}
+&P(D|S) = 2/6 = 0.29 \\
+&P(F|S) = 1/7 = 0.17 \\
+&P(L|S) = 0/7 = 0 \\
+&P(M|S) = 4/7 = 0.57 \\
+\end{aligned}
+$$
+
+Then, we define the ratios for the Normal (N) and Spam (S) : 
+
+$$
+\begin{aligned}
+&P(N) = 0.67 \\ 
+&P(S) = 0.33 \\
+\end{aligned}
+$$
+
+Thus, now every word combination we get, we just multiply the priors with the likelihoods and compare. For example, If we get **Dear Friend :**
+
+$$
+\begin{aligned}
+&P(N) * P(D|N) * P(F|N) = 0.09 \\
+&P(S) * P(D|S) * P(F|S) = 0.01 \\
+\end{aligned}
+$$
+
+The key realization is that the product of the priors and likelihood, according to the Bayes theorem,  should be proportional to the Likelihood of email being normal given the letters seen i.e P(N) and the same for spam. Thus, directly comparing the two values above tells us that the email has more chance of being normal → We classify it as normal. But, what if the a word not previously encountered in spam is seen in the email? → Take the example of **Lunch Money Money Money Money  :** 
+
+$$
+\begin{aligned}
+&P(N) * P(L|N) * P(M|N) ^4 = 2e-5 \\
+&P(S) * P(L|S) * P(M|S) ^ 4 = 0  \\
+\end{aligned}
+$$
+
+This is a problem since it limits our ability to classify → We alleviate this by introducing **placeholder observations** into the spam group. These observations are $\alpha$ in number and can be included in the counting process for frequentist likelihoods to eradicate this problem → so, for the value of 1 additional observation, we get 
+
+$$
+\begin{aligned}
+&P(D|N) = 9/(17 + 4) = 0.43 \\ 
+&P(F|N) = 6/(17 + 4) = 0.29 \\
+&P(L|N) = 4/(17 + 4) = 0.19 \\
+&P(M|N) = 2/(17 + 4) = 0.10 \\ 
+&\\
+&P(D|S) = 3/(7+ 4)  = 0.27 \\
+&P(F|S) = 2/(7+ 4) = 0.18 \\
+&P(L|S) = 1/(7+ 4) = 0.09 \\
+&P(M|S) = 5/(7+ 4) = 0.45 \\
+\end{aligned}
+$$
+
+Using hte  same prior values,  we get :
+
+$$
+\begin{aligned}
+&P(N) * P(L|N) * P(M|N) ^4 = 1e-5 \\
+&P(S) * P(L|S) * P(M|S) ^ 4 = 1.22e-5  
+\end{aligned}
+$$
+
+Now, we see that the email is more likely to be spam!
+
+### why Naive ?  
+Naive bayes treats language as just bag of words and so the score for **Dear Friend** would be the same as **Friend Dear →** In the general sense, for any such problem, the Naiive bayes does not exploit inter-dependencies in value, as seen from the probability segregation into disjoint sets while calculation
+
+## Gaussian Variant
+
+We do the sam process, but this time we create gaussian distributions for the variables to represent likelihoods and thus, we take the points on these gaussian curves as the likelihood values that need to be multiplied by the prior to generate the score
+
+- To manage underflow, we take the log of all probabilities and add them to calculate the score
+- The score with the higher log value is the class into which the new observation should be classified
+
+One way to study the impact of different variables is to weight the different classes → weighted log-loss. Cross validation helps in determining which class has more impact
+
+<!-- %%% -->
+# MALIS: Maximum Likelihood Estimation
+
+Main Idea: 
+
+1. Make an explicit assumption about what distribution the data was modeled from 
+2. Set the parameters of this distribution so that the data we observe is most likely i.e maximize the likelihood of our data 
+
+For  a simple example of coin toss, we can see this as maximizing the  probability of observing heads from a binomial distribution: 
+
+$$
+p(z_1, ..., z_n) = p(z_1 ...., z_n|\theta)
+$$
+
+If we assume I.I.D condition, we should be able to break this down into:
+
+$$
+p(z_1|\theta)p(z_2|\theta)....p(z_n|\theta) 
+$$
+
+Formally, let us define a likelihood function as:
+
+$$
+L(\theta) = \prod_{i=1}^N p(z_i|\theta)
+$$
+
+Now, our task it to find the $\hat{\theta}$ that maximizes this likelihood:
+
+$$
+\hat{\theta}_{MLE} = \argmax_{\theta}\prod_{i=1}^N p(z_i|\theta)
+$$
+
+Instead of maximizing a product, we can also view this problem as minimizing a sum if we take the log of all values:
+
+$$
+\hat{\theta}_{MLE} = \argmax_{\theta}\sum_{i=1}^N Log(p(z_i|\theta))
+$$
+
+Let us use this idea for the regression problem. We assume that our outputs are distributed in a gaussian manner around the line w  have to find out. This basically means that our $\epsilon$  is a gaussian Noise that is messing up our outputs from the fundamental distribution, as shown below 
+
+<img height=500 width=800 src="static/MALIS/MLE.png">
+
+Thus, our equation for getting this probability of our output would be :
+
+$$
+p(y_i|x_i; w_i, \sigma^2) = \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}
+$$
+
+Our task, therefore, is to estimate $\hat{w}$ such that the likelihood of p is maximized. This, in other words, means find the value of $w$ that maximizes the above expression:
+
+$$
+
+\begin{aligned}
+&\hat{w} = \argmax_{w}\prod_{i=1}^N p(y_i|x_i; w_i, \sigma^2) \\
+\implies &\hat{w} = \argmax_{w}\prod_{i=1}^N \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \} \\
+\end{aligned}
+$$
+
+we can again do the log trick to make this a sum maximization:
+
+$$
+\begin{aligned}
+&\hat{w} = \argmax_{w} \sum_{i=1}^N Log(\frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \})\\
+\implies &\hat{w} = \argmax_{w} \{ \sum_{i=1}^N Log(\frac{1}{\sigma \sqrt {2\pi}}) + \sum_{i=1}^N  Log(exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}) \} \\
+\implies &\hat{w} = \argmax_w -\sum_{i=1}^N \frac{(y_i - x_iw)^2}{2 \sigma^2} \\
+\end{aligned}
+$$
+
+This is basically the same as the normal expression we had, the only difference being the normalizing factor $\sigma$, if we change the negative maximization to minimization:
+
+$$
+\hat{w} = \frac{1}{2 \sigma^2} \argmin_w \sum_{i=1}^N (y_i - x_iw)^2
+$$
+
+Which is the same as minimizing:
+
+$$
+\hat{w} = \argmin_w \sum_{i=1}^N (y_i - x_iw)^2
+$$
+
+and the solution is: 
+
+$$
+\bm{w} = (\bm{X}^T\bm{X})^{-1} \bm{X}^T\bm{y}
+$$
+
+Surprise, Surprise!!
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- %%% -->
+# MALIS: Linear Regression
+
+**Main ideas :**
+
+- Use Least squares to fit a line to Data
+- Use R square
+- Use p value
+
+**Fitting the Line →** Try to minimize a metric that represents the fit
+
+- Let the Line be $y(x) = w_0 + w_1x$
+- Now, our optimization goal is to find the values of $w_0, w_1$ so that the variation around this line is minimal → We do this by minimizing the squared Errors
+
+To know if taking into the samples actually improves anything or not, all we have to do is calculate the variance around the fit and compare it with variance around the mean of the y values of the point, and give an answer in percentages! This is called the $R^2$ value: 
+
+$$
+R^2  = \frac {Var(mean) - Var(fit)}{Var(mean)}
+$$
+
+Thus, if this value is 0.6 , we get a 60% improvement in the variance by taking the x features into account. 
+
+Let's go to the interesting stuff → The Math of this all 
+
+## Math of Regression 
+
+Let's take the  case of a set of multidimensional features $\bm{X} \in \R^D \,\,\,$where, $i= 1,...,N$. For each of these set of D dimensional inputs, we have one output $\bm{y} \in \R$. Thus, we have our data as $\{(X_i,y_i)\}$ to which we have to fit a D dimensional hyperplane so that the variance around this hyperplane is minimal. Let's start by defining our model:
+
+$$
+\begin{aligned}
+&y_i(X_i) = f(X_i) + \epsilon \\
+&\hat{y_i} = \hat{f}(X_i) \\
+\end{aligned}
+$$
+
+Here, the actual data is a function $f: \R^D \rightarrow  \R$ and our hyperplane is function $\hat{f}: \R^D \rightarrow \R$ which produces the targets $y$  and prediction $\hat{y}$, respectively. So, we can check the error between our actual data and the predicted data, which  we call the Sum-of-square error:
+
+$$
+\begin{aligned}
+&\bm{e} = (\bm{y} - \bm{\hat{y}})^2 \\
+&\bm{e} = (\bm{y} - \bm{\hat{y}})^T(\bm{y} - \bm{\hat{y}})\\
+\end{aligned}
+$$
+
+Here, I have used bold to represent vector notation. since our model is linear, we can define it as:
+
+$$
+\hat{f}(\bm{X}) = \bm{X}\bm{w} 
+$$
+
+- **Note:** to make this work by taking bias into account we let $\bm{w}  \in \R^{D+1}$ where the D weights are corresponding to D features and the extra weight is the bias. Thus, $\bm{X} \in \R^{NX(D+1)}$ which basically means that our N observations are stacked vertically and each observation is of D dimensions, but to make the notation work, we add a 1 at the start, which will be the multiplier for our bias term, and thus, have D+1 as the dimension of the row.
+
+Thus, our error now becomes
+
+$$
+\begin{aligned}
+&\bm{e} = (\bm{y} -\bm{X}\bm{w}  )^T(\bm{y} - \bm{X}\bm{w}) \\
+\implies &\bm{e} = (\bm{y} -\bm{w}^T\bm{X}^T  )(\bm{y} - \bm{X}\bm{w}) \\
+\implies &\bm{e} = \bm{y}^T\bm{y} -  \bm{y}^T\bm{X}\bm{w} - \bm{w}^T\bm{X}^T\bm{y} + \bm{w}^T\bm{X}^T\bm{X}\bm{w} \\
+\end{aligned}
+$$
+
+Now, to get our optimal weights we follow the method to get the minima of e i.e differentiate e w.r.t $\bm{w}$ and then set it to 0:
+
+$$
+\begin{aligned}
+&\nabla_w\bm{e} = 0 \\
+\implies &\nabla_w(\bm{y}^T\bm{y} -  \bm{y}^T\bm{X}\bm{w} - \bm{w}^T\bm{X}^T\bm{y} + \bm{w}^T\bm{X}^T\bm{X}\bm{w} ) = 0 \\
+\implies &\nabla_w(\bm{y}^T\bm{y}) -  \nabla_w(\bm{y}^T\bm{X}\bm{w}) - \nabla_w(\bm{w}^T\bm{X}^T\bm{y}) + \nabla_w(\bm{w}^T\bm{X}^T\bm{X}\bm{w}) = 0 \\
+\implies &-2\bm{y}^T\bm{X} - 2\bm{w}^T\bm{X}^T\bm{X} = 0 \\
+\implies &(\bm{X}^T\bm{X})\bm{w}^T = \bm{y}^T\bm{X} \\
+\therefore \,\, &\bm{w} = (\bm{X}^T\bm{X})^{-1} \bm{X}^T\bm{y}\\
+\end{aligned}
+$$
+
+Hence, all we need to do is plug-in $\bm{w} = (\bm{X}^T\bm{X})^{-1} \bm{X}^T\bm{y}$ into our original equation and we get the solution. Of course, this is the optimization variant of our regression problem and gradient descent goes around this by computing this solution iteratively by taking an initial guess of \bm{w} and then moving towards the direction of decrease, and moving proportionally to the rate of decrease. However, the solution to which it should end up converging is the same! We can also do all sorts of gymnastics around this solution to make the variance go down even further. For example, we could transform our input $\bm{X}$ to a new space by $\bm{\phi(\bm{X})}$, in which subject to 1-1 mapping, our solution would simply become
+
+$$
+\bm{w} = (\bm{\phi(\bm{X})}^T\bm{\phi(\bm{X})})^{-1} \bm{\phi(\bm{X})}^T\bm{y}
+$$
+
+The essence of regression remains the same. in the case where $D= 2$, we use this same technique on 2D matrices and those simplistic equation for the starting points of regression that we see in most places.
+
+
 
 <!-- %%% -->
 # Clouds: Agreement in Distributed Systems
@@ -1528,9 +2033,6 @@ Consequently, the abstractions that this network viewpoint offers can be on thre
 1. Vehicular Traffic Model: Abstraction of the large scale trajectories employed by the vehicles
 2. Vehicular Flow Model: Abstractions of the physical inter-dependencies
 3. Vehicular Driver Model: Abstractions of the actions of individual nodes, like breaks, turns, etc.
-
-<!-- %%% -->
-# MALIS: Introdution to Machine Learning 
 
 
 <!-- %%% -->
