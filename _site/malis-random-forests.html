@@ -1,0 +1,26 @@
+<!DOCTYPE html><meta charset='UTF-8'><html><head><link rel='stylesheet' href='katex/katex.min.css'    integrity='sha384-AfEj0r4/OFrOo5t7NnNe46zW/tFgW6x/bCJG8FqQCEo3+Aro6EYUG4+cU+KJWu/X'    crossorigin='anonymous'><!-- The loading of KaTeX is deferred to speed up page rendering --><link rel='stylesheet' href='prism/prism.css'><title> Cogito Ergo Sum </title><style>@font-face {font-family: 'Blog Mono'; src: url('/static/iosevka-fixed-extended.ttf');}@font-face {font-family: 'Blog Text'; src: url('/static/Exo2-Regular.ttf');}html { font-size: 100%; }html,body { text-size-adjust: none; -webkit-text-size-adjust: none; -moz-text-size-adjust: none; -ms-text-size-adjust: none; } body { background-color: #FFFFFF; color: #000000;  font-family: 'Blog Text', sans-serif; font-size: 18px; line-height: 1.4em;  max-width: 100%; overflow-x: hidden; }
+img { display:block; }.container { overflow-x: auto; overflow-y: hidden;  max-width:100%; }@media (max-width: 480px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (max-width: 1024px) { .container { margin-left: 5%; margin-right: 5%; } body { font-size: 30px; } }@media (min-width: 1024px) { .container { margin-left: 25%; margin-right: 20%; } }.image { }
+a:hover { color: #1a73e8; text-decoration: underline;  }
+a { color: #1a73e8; text-decoration: none; }
+a:visited { color: #1a73e8; text-decoration: none; }
+a:active { color: #1a73e8; text-decoration: none; }
+
+blockquote { margin-left: 0px; margin-right: 0px; } pre, .latexblock, blockquote { border-left-color:#BBB;  border-left-style: solid;      border-left-width: 1px; }pre, blockquote { padding-left: 10px; }
+pre { font-family: 'Blog Mono', monospace; font-size: 90%;  }pre {  overflow-x: auto; }.latexblock, blockquote, pre { margin-top: 10px; margin-bottom: 10px; padding-bottom: 5px; padding-top: 5px; background-color: #FFFFFF; }.latexblock { line-height: 1em }
+pre, kbd, samp, tt{ font-family:'Blog Mono',monospace; }ul, ol { list-style-position: inside; padding-left: 0; }</style></head><body><div class='container'><h2><a id=malis-random-forests href='#malis-random-forests'> § </a><span class='centered'> MALIS: Random Forests</h2>
+<ul><li><span class='centered'>source<a href=https://www.youtube.com/watch?v=J4Wdy0Wc_xQ><span class='centered'>StatQuest</a></li></ul>
+The issue with Decision Trees is that they are not flexible to achieve high accuracy. So, we use Random Forests, which alleviate this problem by creating multiple trees from different starting points. The steps are as follows: 
+<ul><li><span class='centered'> Create a Bootstrapped Dataset of the same size by selecting random samples with replacement 
+    <img height=250 width=300 src="static/MALIS/RF/rf-1.png">
+    <img height=250 width=300 src="static/MALIS/RF/rf-2.png"></li><li><span class='centered'> Create a Decision tree by selecting questions at random from this bootstrapped dataset, and use the impurtiy function to segregate the metric to used
+    <img height=250 width=300 src="static/MALIS/RF/rf-3.png"></li><li><span class='centered'> Wherever a question needs to be asked, select the new metric randomly out of the metrics except the one used i.e in this case Good blood Circulation
+    <img height=250 width=300 src="static/MALIS/RF/rf-4.png"></li><li><span class='centered'> Go back to step 1 and repeat to create a new bootstrapped dataset and repeat everything to create another tree → Do this process a fixed number of times.</li></ul>
+Thus, by creating a variety of trees → A forest → We are able to get trees with different performances that can predict the labels. For new data items, run it down all the trees and keep a track of the classification - Yes and No - and then choose the classification with the bigger number → <b><span class='centered'>Bagging = Bootstrapping + Aggregating</b>. Thus, Bagging is an ensemble technique where we train multiple classifiers on subsets of our training data and then combine them to create a better classifier.
+<h3><a id=evaluating-rf href='#evaluating-rf'> § </a><span class='centered'> Evaluating RF</h3>
+the entries that didn't' end up in the bootstrap dataset - Out of bag Data - are run through the tree to get the classification from all the trees and again use Bagging to see what the final classification is → For all out of bag samples, we evaluate the confusion matrix and calculate the precision, accuracy, sensitivity, and specificity  
+<h3><a id=hyperparameters-in-rf href='#hyperparameters-in-rf'> § </a><span class='centered'> Hyperparameters in RF</h3>
+The hyperparameters in the RF are :
+<ol><li><span class='centered'> m → The number of variables we are using out of the subset in bootstrap to create the tree </li><li><span class='centered'> k → the number of trees we have in the forest </li></ol>
+We can do the Out-of-Bag stuff on different random forests and select the one with the best accuracy
+
+</container></body></html>

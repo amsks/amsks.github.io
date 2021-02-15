@@ -33,6 +33,485 @@
 
 #### Zettelkasten
 
+
+<!-- %%% -->
+# MALIS: Gradients
+
+## Gradient Descent
+
+- **predicted value** $= intercept + slope$ 
+- **metric** → $y = C + dy/dx x$
+
+let $y'$ be the expected value:
+- residual $= y' - y $ 
+- sos = $(y' - y)^2$. 
+- Thus, our optimization target becomes : $\frac{1}{2} \sum (y' - (C + Mx))^2$
+
+How gradient Descent works is by taking steps towards the optimal target. This is different from least-squares since in the latter we numerically compute the optimal solution by differentiating the target w.r.t C and setting it to 0 to find the inflection, which will be the minimal point. Gradient descent, on the other hand, works by first selecting a random value of intercept, say  $C_1$ , and then moving a step in the direction of decrease in value. This step is determined by the learning rate $\alpha$ which is a hyperparameter. So, at $C_1$, we differentiate the SOS target w.r.t C and calculate the value by putting $C = C_1$ and then multiply this value by alpha to get the next intercept point → Thus, when we are far away from the inflection, we take larger steps and when we are closer to the inflection, we take smaller steps since the slope is saturating. evident in N-dimensional metrics → the same thing is happening on hyperplanes
+- The learning rate $\alpha$ determines the size of the steps we take and tuning this is important, since if it is too small, our time to convergence is slower, while if it is too large, we overshoot the solution → Classic control phenomenon!
+- One solution is to start with a large learning rate and make it smaller with each step! → **Schedule the Learning Rate**
+
+
+## Stochastic Gradient Descent
+
+The computations in the Gradient Descent step scale up pretty fast and thus, convergence becomes an issue. SGD resolves this by sampling points for the intercept residual calculation!  → Instead of using all points, we can randomly sample n points - **Mini-batch** - and use them → This is especially helpful when points are clustered in different clusters, since the points in one cluster wil more-or-less have similar residuals! 
+- Again the sensitivity to $\alpha$ comes into picture and again we can adapt scheduling  to overcome this!
+
+
+
+<!-- %%% -->
+# MALIS: Generic ML Concepts
+
+## Cross-Validation
+
+Allows us to compare different ML methods! When working with a dataset for training a learner: 
+- Naive Idea → Use all data 
+- Better Idea →  Use x percent for training and y percent for testing
+
+the issue is how do we know that the selection is good ? The lord answers through **K-Fold Cross Validation** → split data into K blocks → For each K-block train the data on the rest of the K-1 blocks and test it on K block and log the metric → Average out the performance and use this for comparison
+- **Leave one out cv** → us each sample as a block 
+
+## Confusion Matrix
+Plot the Predicted Positives and Negatives vs, Ground truths : 
+
+<img height=300 width=500 src="static/MALIS/Confusion.png">
+
+NOTE: 
+- The diagonal always shows the True values
+- The non-diagonal elements ar  always false
+
+The major Metrics are: 
+- **Sensitivity →** Positive Labels correctly predicted : $\frac{TP}{TP + TN }$
+- **Specificity →** Negative Labels Correctly predicted : $\frac{TN}{TN + FN}$
+
+Let's say we test out logistic regression against Random Forests to classify patients with and without heart disease. Then the algorithm with the higher sensitivity should be chosen if our target is to classify patients with heart disease, while the algorithm with higher specificity should be chosen if we want to classify patients without heart disease
+
+### What about Non-binary classification 
+Calculate these values for each label by treating the values as Label and !label. For if we have three labels, we take the true positives as all the classifications done for label i and the TN as all the misclassifications done for label i → This means that if the data actually belonged to the other classes and was still classified as belonging to i, then it is a False Positive. Similarly, we take True Negative as all the classifications done on all other classes except out current label and the false negatives as the classifications. Let's take the following example:
+
+<img height=300 width=500 src="static/MALIS/Confusion-2.png">
+
+Here, for The class Cat, we get : 
+
+- Sensitivity $= 5/(5 + 3 + 0) = 5/8 = 0.625$
+- Specificity $= (3 + 2 + 1 + 11)/(3 + 2 + 1 + 11 + 2 ) = 17/19 = 0.894$
+
+Other major metrics are: 
+- **Accuracy** → $(TP+TN)/total = (100+50)/165 = 0.91$
+- **Misclassification Rate** → $(FP+FN)/total = (10+5)/165 = 0.09$ = 1 - accuracy
+- **Precision → $TP/predicted yes = 100/110 = 0.91$**
+- **TP Rate** →  $TP/yes = 100/105 = 0.95$
+- **FP Rate**  → $FP/No = 10/60 = 0.17$
+
+The idea is to strike a balance between things and get hang of how our classifier is actually performing!
+
+## Bias and Variance
+
+- **Bias** → The inability for an algorithm to capture the true relationship in the data. Formally, it is the inherent error that we obtain from the model even with infinite training data due to the classifier being biased to a particular solution
+- **Variance** → Difference in fits between the training and the testing data, i.e the error caused from sensitivity to fluctuations in the training set
+
+High bias means the learned model is simpler and might not fit the training data very well and when it does not perform so well on the test set → **Underfitting**. High variance means that the learned model is has a better fit to the training set but does not perform so well on the test set → **Overfitting**
+
+- What is happening is that the training set can be viewed essentially as a the true relationship curve plus some noise that scatters the data around the curve. This is the same for training and test sets. now, if our model fits so well to the training set that it is able to exactly pass through each data point, it has actually fitted to the the noise that scattered the data from the actual signal. Thus, is has so much variability that it won't perform good on other datasets which might inherently be sampled from the same curve with some random noise that scatters the data a bit differently. This is why the model has over-fitted to the training set by adapting to the noise.
+
+In general, Error depends on the square of bias and the directly varies with variance and Noise:
+
+$$
+E= B^2 + V + N
+$$
+
+And this variation can be plotted as follows:
+
+<img height=300 width=500 src="static/MALIS/BVT.png">
+
+## ROC and AUC
+
+The whole idea of ROC curve is adjusting our classification threshold for example in the case of logistic regression - to mess-around with the rates of TP and FP. We plot these values for each threshold against each other on a graph, as shown: 
+
+<img height=200 width=350 src="static/MALIS/ROC.png">
+- Here, we have plotted sensitivity a.k.a the True positive rate against FP Rate a.k.a 1 - specificity. At point (1,1) we see that our classifier is classifying all samples as TP and FP. Now, let's say our problem is to predict whether the patient has a certain disease or not, then this is not acceptable since the FP Rate is high, and we can't afford False Positive classification. So, we adjust our threshold and see the sensitivity remain the same through the next two points on the left, but the FP Rate decrease, which means our model is getting better. Then we see that both the rates fall and then, finally, our model reaches a level where the TP Rate is positive while the FP rate is negative. This is a desirable performance for our purposes. In case we are willing to accept some FPs for a better TP classification, we can select points on the right that increase the TP but also end up having some misclassifications
+
+AUC -Area Under the Curve - is used to compare the performance of two classifiers, as shown below:
+
+<img height=200 width=350 src="static/MALIS/AUC.png">
+
+Since the AUC is greater for the red curve, and so the model that it represents is better since for the  same levels of FP, it delivers more TPs
+
+
+<!-- %%% -->
+# MALIS: Clustering
+
+## Hierarchical Clustering
+We take a group of points and cluster them according to similarity, or dissimilarity. Let's say we have N points, each parameterized by n dimensions. to measure the similarity, all we do is create a **meaning of distance between the points**,  which can be done in many  ways, two common ones being: 
+
+1. **Euclidean Distance** → Take the difference of values across the n dimensions, square each one and add and then  take the square root 
+2. **Manhattan Distance** → Sum the magnitudes of differences across n dimensions
+
+So, we calculate the distances between all 2 combinations of samples and then see the one with the smallest distance → We combine them into a single cluster, for which we define the values across all dimensions based on the mean metrics of the point. These values are used for further selection, as we treat this cluster as a single point and repeat the procedure, this gives us a dendrogram diagram as shown below:
+
+<img height=200 width=500 src="static/MALIS/cluster/hh.png">
+
+The way to figure out or each point, to which cluster it belongs, we can use three metrics: 
+
+1. Average values of all points in the cluster → **centroid linkage** 
+2. Closest point fro each cluster  → **single linkage** 
+3. Furthest point from each cluster → **Complete linkage** 
+
+There are two kinds of problems that might arise here: 
+
+1. **Chaining:** in the case of single linkage, we are taking the best similarity out of all the points in the clusters → What if the clusters are too far spread out and thus, overlap? 
+2. **Crowding:** In the case of complete linkage, we take the worst-case scenario → What if the points in different clusters are closer together than the point in consideration i.e the clusters are too compact?
+
+Average Linkage resolves this → centroids FTW
+
+## K-means Clustering
+
+Here, we try to fit our points into K clusters: 
+
+1. Select the value of K 
+2. Take K points out of data randomly
+3. Calculate distances of all other points from these K points 
+4. Classify each point into the cluster to which it has the smallest distance 
+5. Repeat the process with the reference points now being the centroids of the points in the cluster 
+6. Stop when the clusters do not change
+7. Repeat all the steps fro 2-6 with different initial points 
+
+Let's say we conduct N experiments, we now need to see which cluster is the best → We do this by selecting the one with the **least total variation across all clusters** → Variation is calculated just like in PCA i.e sum squares of distances of all points in the cluster from the center and then divide it by the number of points in the cluster.
+
+<img height=200 width=500 src="static/MALIS/cluster/k-means.png">
+
+
+<!-- %%% -->
+# MALIS: PCA
+- source: [StatQuest](https://www.youtube.com/watch?v=FgakZw6K1QQ&t=1081s)
+
+The main idea is dimensionality reduction: We have data of say n dimensions, where each sample depends on all the n dimension. No we can't really visualize this data and we can't really work with storing all the data all the time since the curse of dimensionality messes us up. So, we start to analyze the importance of each dimension on each sample and try to project then according to that → This groups the samples with similar impacts from the n dimensions together and allows us to see them in clusters. Let's take the case of 2 gene, for multiple cells. We do PCA in the following steps:
+
+<img height=300 width=500 src="static/MALIS/PCA/pca-1.png">
+
+- On the two axes we take the mid-point of this data:  
+    <img height=200 width=300 src="static/MALIS/PCA/pca-2.png">
+- We now center the points around this mid-point
+    <img height=200 width=300 src="static/MALIS/PCA/pca-3.png">
+- We draw a random line that goes through the origin and then fit it through these points by projecting these points on to the line and then either minimizing the distances to this line or maximizing the distance of the projected points from the origin:
+    <img height=200 width=300 src="static/MALIS/PCA/pca-4.png">
+- The slope of this line to our original axes tells us the ratio of the importance of gene1 to gene2 i.e. if we were to make a call, we would need to mix 4 parts of gene1 and 1 part of  gene2 in this case
+    <img height=200 width=300 src="static/MALIS/PCA/pca-5.png">
+- The unit vector along this line → the **eigenvector** of this data → tells us these proportions through its span components : ( 0.97, 0.242 ) → **Loading scores**
+- The square of the distances of the projected points on the eigen vector are the **eigenvalue of PC1: $\sum d_i^2 = EV_{PC_1}$**
+    <img height=200 width=300 src="static/MALIS/PCA/pca-6.png">
+- Similarly,  we can get another principal component to this data through the process which will be perpendicular to PC1 and it will also have its eigenvector and eigenvalue 
+    <img height=200 width=300 src="static/MALIS/PCA/pca-7.png">
+- Now we just remove the original axes and rotate the eigen vectors to see the points throgh the EVs, and the squared sum of the projected points on each PC gives us the original point
+    <img height=200 width=300 src="static/MALIS/PCA/pca-8.png">
+- We can convert the EVs into variations by dividing them by the sample size , and in this case, we V1 = 15 and V2 = 3 → Thus , PC1 contributes $\frac{15} {(15+3)} = 83%$ in importance, while  PC2 contributes $\frac{3} {(15+3)} = 17%$ in importance. These can be plotted on a **scree plot** , which tells us the importance of each PC 
+    <img height=200 width=300 src="static/MALIS/PCA/pca-9.png">
+
+
+In theory, for genes there should be n components → So, even if we can't visualize them we can just see the scree plots and analyze the data and the principal components decrease in order of importance. So, we can roughly take the two most important ones and use them for understanding
+
+
+<!-- %%% -->
+# MALIS: AdaBoost
+
+Learners can be considered weak or strong as follows: 
+- **Weak** → Error Rate is only slightly better than random
+- **Strong** → Error Rate highly correlated with the actual classification
+
+**Adaboost combines a lot of weak learners to create a strong classifier!**. This is characterized by 3 key points: 
+
+1. It creates an RF of **stumps** → trees with only one question used for classification → which act as weak learners
+2. All stumps in this forest don't have equal **say**, some have more and some have less and they are used as  weights for the classification that each stump makes
+3. The errors made by the previous stumps are taken into account by the next stump to reduce misclassification i.e the stumps sequentially try to reduce misclassification in contrast to a vanilla RF where the stumps are all separate
+
+The steps are a follows:
+- Start with the dataset, but assign each data point a weight i.e create a new column with weights, which have to be normalized, and at the start, all have equal values
+    <img height=300 width=300 src="static/MALIS/ADA/ada-1.png">
+- Use a weighted impurity to classify nodes → We use the same formula, but for each label we use the associated weights in the gini calculation. Since all weights are the same, we ignore them for now and see that the gini for patient weight is the lowest, so we use it for our first stump:
+- Now we see how many errors this stump made → in this case it is 1. We determine the say of this stump by summing the weights of the erroneously classified samples → $E = \sum W_i$ → and the total say as $S = \frac{1}{2} log(\frac{1 - E}{E})$ → we get the say as 0.47 for this stump
+- Now we update the weight of the incorrectly classified sample using the formula: $w \leftarrow w * e^S$ and so, we get the new weight for the incorrect sample as 
+- Now we will decrease the amount of weights for all the correctly classified samples by using the formula : $w \leftarrow w * e^{-S}$ which gives us the new weights of all other labels as 0.05
+- Now we normalize the updated weight by dividing each weight by the sum all weights
+    <img height=300 width=150 src="static/MALIS/ADA/ada-2.png">
+- We repeat the procedure using a weighted gini index or just creating duplicates of the samples with the large weights.  
+
+The main thing that characterizes this algorithm is Boosting, which is a fancy name for when we train multiple weak classifiers to create a stringer classifier by taking errors of the previous classifiers into account. AdaBoost is creating a forest of stumps, but each new stumps uses the normalized weights to determine which kind of mis-classifications to focus on and thus, in a sense, uses the errors of the previous stumps to improve. 
+
+
+
+<!-- %%% -->
+# MALIS: Random Forests
+-source[StatQuest](https://www.youtube.com/watch?v=J4Wdy0Wc_xQ)
+
+The issue with Decision Trees is that they are not flexible to achieve high accuracy. So, we use Random Forests, which alleviate this problem by creating multiple trees from different starting points. The steps are as follows: 
+
+- Create a Bootstrapped Dataset of the same size by selecting random samples with replacement 
+    <img height=250 width=300 src="static/MALIS/RF/rf-1.png">
+    <img height=250 width=300 src="static/MALIS/RF/rf-2.png">
+- Create a Decision tree by selecting questions at random from this bootstrapped dataset, and use the impurtiy function to segregate the metric to used
+    <img height=250 width=300 src="static/MALIS/RF/rf-3.png">
+- Wherever a question needs to be asked, select the new metric randomly out of the metrics except the one used i.e in this case Good blood Circulation
+    <img height=250 width=300 src="static/MALIS/RF/rf-4.png">
+- Go back to step 1 and repeat to create a new bootstrapped dataset and repeat everything to create another tree → Do this process a fixed number of times.
+
+Thus, by creating a variety of trees → A forest → We are able to get trees with different performances that can predict the labels. For new data items, run it down all the trees and keep a track of the classification - Yes and No - and then choose the classification with the bigger number → **Bagging = Bootstrapping + Aggregating**. Thus, Bagging is an ensemble technique where we train multiple classifiers on subsets of our training data and then combine them to create a better classifier.
+
+## Evaluating RF
+
+the entries that didn't' end up in the bootstrap dataset - Out of bag Data - are run through the tree to get the classification from all the trees and again use Bagging to see what the final classification is → For all out of bag samples, we evaluate the confusion matrix and calculate the precision, accuracy, sensitivity, and specificity  
+
+## Hyperparameters in RF
+The hyperparameters in the RF are :
+
+1. m → The number of variables we are using out of the subset in bootstrap to create the tree 
+2. k → the number of trees we have in the forest 
+
+We can do the Out-of-Bag stuff on different random forests and select the one with the best accuracy
+
+<!-- %%% -->
+# MALIS: Decision Trees
+- Source: [StatQuest](https://www.youtube.com/watch?v=7VeUPuFGJHk)
+
+Basically a way of codifying decisions as tree data structures. The tree has the same concepts as trees in basic data structures with: 
+
+- Root Node→ starting node of the tree
+- Intermediate nodes → All the nodes that come after the root node that need to be parsed in a depthwise search
+- Leaf Nodes → The terminal nodes of the tree
+
+<img height=200 width=300 src="static/MALIS/DT/dt-1.png">
+
+The main idea is to start from the root and traverse along the intermediate nodes to reach decisions on observations and actions. 
+
+## Creating a Tree
+
+Based on the video from, Let us predict heart disease based on metrics :
+
+- Chest Pain
+- Good Blood Circulation
+- Blocked Arteries
+
+and we have the following table:
+
+<img height=200 width=250 src="static/MALIS/DT/dt-2.png">
+
+Let the observation nodes be represented as x/y, where x represents heart disease while y represents no heart disease. For chest pain, suppose we get the following observations from the labels:
+
+<img height=150 width=220 src="static/MALIS/DT/dt-3.png">
+
+For Good blood circulation:  
+
+<img height=150 width=220 src="static/MALIS/DT/dt-4.png">
+
+And for Blocked arteries:
+
+<img height=150 width=220 src="static/MALIS/DT/dt-5.png">
+
+Here, the total number of patients for each of these metrics is different, since some patients did not have observations for all metrics. Now, since none of the leaf nodes have 100% observation on whether the patient has heart disease, they are considered impure → We need a way to measure and compare this impurity to determine which metric is better and use that as a higher level node.
+
+### Gini Impurity
+
+The Gini impurity is mathematically written as :
+
+$$
+G(s) = 1 - \sum_{i=1}^Kp_i(1-p_i)
+$$
+
+Here, $p_i$  are the probabilities of the sub-observations → take one metric and divide it by total observations in that leaf node. In our example, for the case of chest pain, the gini for the leaf node corresponding to the observations that come when chest pain is detected, can be calculated as: 
+
+$$
+1 - (\frac{105}{105+39})^2 - (\frac{39}{105+39})^2 = 0.395
+$$
+
+Similarly, the gini of the other leaf node for chest pain is: 
+
+$$
+1 - (\frac{34}{34+125})^2 - (\frac{125}{34+125})^2 = 0.336
+$$
+
+Since the total number of heart patients in the leaf nodes for chest pain is not the same, we take a weighted average of Gini impurities as the Gini impurity for chest pain : 
+
+$$
+G_{cp} = (\frac{144}{144+159})0.395 + (\frac{159}{144+159})0.336 = 0.364
+$$
+
+Similary the coefficient blood circulation is →  $G_{GBC} = 0.360$ and the coefficient for blocked arteries is → $G_{BA} = 0.381$
+
+Since good blood circulation has the lowest Gini value, it has the lowest impurity → it separates the heart disease the best! Thus, we will use is as the root node, and so our tree is:
+
+<img height=150 width=220 src="static/MALIS/DT/dt-6.png">
+
+So, in our decision we start with looking at good blood circulation. If the patient has good blood circulation then there are 37 such patients wth heart disease and 127 without, and if they don't have good blood circulation, then 100 such patients with heart disease and 33 without. Now, in the left node we again compute the sub-trees for Chest pain and blocked arteries, out of these 37 patients **from the table** to get the following possible branches:
+
+<img height=150 width=400 src="static/MALIS/DT/dt-7.png">
+
+The Gini values are:
+
+$$
+\begin{aligned}
+&G_{CP} = 0.3 \\
+&G_{BA} = 0.290
+\end{aligned}
+$$
+
+Thus, blocked arteries is a better metric after Good blood circulation, and so we update it in the tree:
+
+<img height=220 width=220 src="static/MALIS/DT/dt-8.png">
+
+Now, we repeat this procedure for the left and right nodes of blocked arteries. For the left child of blocked arteries to get the chest pain values as:
+
+<img height=150 width=200 src="static/MALIS/DT/dt-9.png">
+
+This will be added to the left child of blocked arteries. Ideally, we would repeat this procedure for the right child, but there is one important factor that comes into play here, which is that the Gini impurity of the right child of Blocked arteries is: 
+
+$$1- (\frac{13}{13 + 102}) + (\frac{102}{13 + 102}) = 0.2$$
+
+While the Gini for the chest pain in this case is:
+
+<img height=150 width=200 src="static/MALIS/DT/dt-10.png">
+
+$$
+G_{CP} = 0.29
+$$
+
+Thus, the right child of blocked arteries is by itself a better separator than chest pain, and so, we let it be! Hence, we can summarize the steps followed as: 
+
+1. Calculate the Gini scores 
+2. If the Gini of the node is lower, then there is no point separating patients and it becomes a leaf node.
+3. If separating the data improves the gini, then separate it with the separation of the lowest gini value
+
+We repeat these steps for the right child of the root node, and the final tree comes out to be:
+
+<img height=400 width=600 src="static/MALIS/DT/dt-11.png">
+
+## Other Impurities
+
+Gini is just one of the ways to measure the impurities. It is used in the CART algorithm. Another measure for quantifying impurity is Entropy: 
+
+$$
+H(S) = - \sum_i p_i log(p_i)
+$$
+
+It is primarily used to define information, which is defined in terms of the change in entropy. It used in the ID3 algorithm, which does similar stuff as described above. The basic idea of working with trees remains the same → Use an impurity function to determine if the node needs further improvement, and then improve it by asking the question that would lead to the best separation.
+
+## Feature Selection
+
+If we are to follow the procedure described previously for trees, then the issue that comes is that of over-fitting and to deal with this, we can do feature selection to simplify the tree. For example, if chest pain in the previous example never gave an improved separation as compared to the leaf nodes, then we can just remove this feature and thus, the tree would only have good blood circulation adn blocked arteries. Similarly, we could also specify a threshold for separation saying if te gini is low than this threshold, then we consider the separation good and thus, if any feature is unable to separate below this threshold, we discard it! 
+
+
+
+
+
+
+<!-- %%% -->
+# MALIS: Kernels
+
+The basic idea of Kernels is the problem of separating randomly distributed data, as shown below:
+
+<img height=200 width=300 src="static/MALIS/Kernels.png">
+
+The separating hyperplane is not exactly a line in this 2D space. So, how can we learn this separation? One trick is to Transform this data by mapping each data point into a new space for computation, learn the separator in that space, and then transform this data back to our original space. This is a similar technique to what we do in the time-frequency transformations of signals using Fourier transforms, to better understand some characteristics in time and frequency domains. The naive way to do this transformation is through a kernel is to the variable x from our initial space to a variable $\phi(x)$ in the new space. Thus, if this problem is transformed into a linear classification problem in this new space, then we are essentially applying a linear classifier to a non-linear classification problem. The only issue with this is the issue of computation that comes with higher dimensional problems! To alleviate this, we use Kernels
+
+## Kernel Trick
+
+Let's say we have the base features $x_i$ and we apply a transformation on them $\phi(x_i)$ which  transforms each point according to some set rule. Now, if we were to apply any technique, say linear regression, on the original points, our problem would be to calculate the weights: 
+
+$$
+w = (X^TX)^{-1} X^TY
+$$
+
+And so, with the transformations, it becomes: 
+
+$$
+w = (\phi^T\phi)^{-1} \phi^TY
+$$
+
+If we add regularization to it, we just add the ridge regression term to it:
+
+$$
+w = (\phi^T\phi + \lambda I)^{-1} \phi^TY
+$$
+
+The problem is, calculating $\phi(x)$ is hard! And when we look at high volume data and the central role that these transformations might play in the case of SVMs, calculating this transformation for every point just adds complexity. Let's try to simplify this a bit, by looking at our ridge-regressor:
+
+$$
+\begin{aligned}
+&J(w) = \sum_{i=1}^N(y_n - w^T\phi(x_n))^2 + \frac{\lambda}{2} \sum_{i=1}^N ||w||^2 \\
+\implies &\bm{w}^* = \frac{1}{\lambda} \sum_{i=1}^N (y_n - \bm{w}^T\phi(\bm{x}_n))\phi(\bm{x}_n)
+\end{aligned}
+$$
+
+Let first term be:                    
+$$
+\alpha_n = \frac{1}{\lambda} \sum_{i=1}^N (y_n - \bm{w}^T\phi(\bm{x}_n))
+$$
+
+Thus, we can re-write the weights as:
+
+$$
+\bm{w}^* = \bm{\phi}^T\bm{\alpha}
+$$
+
+Thus, if we substitute this value in the expression for $J(\bm{w})$ , we get a dual form that depends on the $\bm{\alpha}$  and $\bm{\phi}^T \bm{\phi}$ , very similar to what we get in the dual form of SVMs. This dot product transformation can be written as a **Kernel Matrix**:
+
+$$
+\bm{\phi} \bm{\phi}^T = K = [\phi(x_i)\phi(x_j)] \,\,\,\,\,\, \forall \,\,\,\,\,\, i,j = 1, ..., N 
+$$
+
+This matrix has 2 properties: 
+
+1. It is Symmetric → $K = K^T$
+2. It is Positive Semi-Definite → When we multiply it by some other matrix and its transpose, we get a result greater tha or equal to 0 i.e  $\alpha^T K \alpha \geq 0$
+
+When we put this in our simplification term, we get the following result:
+
+$$
+\bm{\alpha}^* = (\bm{K} + \lambda ' \bm{I})^{-1} Y
+$$
+
+The difference between the original problem to this problem is simple → Before we had to compute $\bm{\phi}^T \bm{\phi}$  but now we have to compute $K = \bm{\phi} \bm{\phi}^T$ which seems similar but there is a catch: 
+
+According to Mercer's Theorem, any Symmetric and PSD Matrix can be expressed as an inner product 
+
+$$
+K(x,y) = \langle \phi(x), \phi(y) \rangle
+$$
+
+In other words, we can write K as an inner product of the original features:
+
+$$
+\bm{\phi} \bm{\phi}^T = K = [\phi(x_i)\phi(x_j)] = [K(x_i,x_j)]
+$$
+
+This is the Kernel Trick!  To better elaborate, let's take a transformation: 
+
+$$
+\phi: x \rightarrow \phi(x) = [x_1^2 \,\,\,\, \sqrt(2)x_1x_2 \,\,\,\, x_2^2]^T
+$$
+
+A dot product of this transformation can be re-written as
+
+$$
+\begin{aligned}
+&\phi(x_m)^T\phi(x_n) = x_{m1}^2x_{n1}^2 + 2x_{m1}x_{n1}x_{m2}x_{n2} + x_{m1}^2x_{n1}^2 \\
+\implies &\phi(x_m)^T\phi(x_n) = (x_{m1}x_{n1} + x_{m2}x_{m2})^2 = (\bm{x^T_m}\bm{x_n})^2
+\end{aligned}
+$$
+
+Thus, all we need is this final form of the kernel to work since the whole optimization relies on this dot-product and we don't really need to transform every feature through the original expression! For predictions, originally we needed to calculate the weights since :
+
+$$
+y = \bm{w}^T \phi(x)
+$$
+
+But, as we have shown these weights depend on the dot-product which can be expressed as a Kernel
+
+$$
+\bm{w}^T \phi(x) = y(\bm{K} + \lambda ' \bm{I})^{-1} k_x
+$$
+
+And to compute this Kernel, we don't need to know the true nature of $\phi(x)$ !  This is what allows the SVMs to work in higher dimensions.
+
+
 <!-- %%% -->
 # MALIS: State-Vector Machines
 
