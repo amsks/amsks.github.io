@@ -33,6 +33,253 @@
 
 #### Zettelkasten
 
+<!-- %%% -->
+# MobMod: Vehicular Flow Modelling
+
+<!-- %%% -->
+# MobMod: Palm Calculus
+- Source: [J-Y Le Boudec's Original Paper](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=650FABC44E04160877ED5C48308BFD62?doi=10.1.1.85.8803&rep=rep1&type=pdf) , [RWP Considered Harmful by Yoon et. al](http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=EE482699E40FC579D10F9B0D112599A9?doi=10.1.1.12.1241&rep=rep1&type=pdf)
+
+## Issue with Random Models
+
+To do this, we have to first realize that the performance measures of ad-hoc mobility models are directly impacted by the selection of the mobility model. So, to have any talk about the issues, we need to be clear about the model we are talking about first. Let us select the Random Waypoint Model. Now, one of the most important parameters of most mobility models is the speed, either of the individual particles as a constant value, or a distribution of speeds. Thus, if we have to compare the performance of routing protocols using the RWP model, then we have to be able to adjust this parameter in order to compare the performance of routing protocols under different levels of nodal speed. To be able to make this comparison, we need to assume that the model will reach a steady-state of speeds that can be used to compare average metrics, and in the RWP this average is often believed to be either half of the maximum speed $V_{max}$since the node speeds are chosen from a uniform distribution  $(0, V_{max}]$, or some other justified value in this range. Thus, to analyze the performance of a protocol and make comparisons, we assume that this average is reached at the start of the simulation. Hence, we would find simulations making comparisons by varying the value of $V_{max}$, and packaging results into averaged comparisons.
+
+### Decay in Random Waypoint 
+To understand the problem, let us take the average instantaneous speed which we define as 
+
+$$
+\bar{v}(t) = \frac{\sum_{i=1}^N v_i(t)}{N}
+$$
+
+Where, $N$ is the total number of nodes in the simulation, and $v_i(t)$ is the speed of a node at time $t$. For $V_{max} = 20$  and null pause times, an average of the instantaneous average speeds over 30 scenarios is shown in the following graph
+
+<img width=500 height=350 src="static/MobMod/palm.png">
+
+We see that this instantaneous average is consistently decreasing and it was proven that this can mathematically decay to 0 in the RWP model. An intuitive explanation is that the random waypoint model chooses a destination and a speed for a node at random and independently, and the node will keep moving at that speed until it reaches the destination. So, if we have a node with slow speed and a far-away destination, it is quite possible that this node might move so slow that it may take a very long time to finish the trip, or worse, never reach the destination. More and more nodes can be stuck with these slow speeds and thus, dominate the average value over time and this is what leads to the decay. This is a recurring issue with the majority of such model comparisons.
+
+## Resolving through Palm Calculus
+
+To understand Palm Calculus, we have to understand the difference between time and event averages. Time averages are obtained by sampling the system at arbitrary time instants, for example, the figure below is obtained by sampling the system every 10 sec of simulated time.
+
+<img width=500 height=350 src="static/MobMod/palm-2.png">
+
+Event averages are obtained by sampling the system when selected state transitions occur. For example, the figure of the same system as time averages, when sampled on the times at which the nodes reach end of Waypoints is shown below: 
+
+<img width=500 height=350 src="static/MobMod/palm-3.png">
+
+Palm calculus is a set of formulas that relate time averages versus event averages. Thus, the distribution obtained through event sampling is called a Palm distribution.
+
+### Stationary Processes
+A stationary process is one that is independent of a shift that can be applied to it. SO, for the joint distribution of stochastic variable $S_t$ from $t= t_1, .., t_n$, if we apply a shift of $u$, the new joint distribution $(S_{t_1+u}, S_{t_2+u}, ..., S_{t_n+u})$  should be independent of the shift u. 
+- Thus,  the process does not change statistically as it gets older i.e it is Stationary. Palm calculus applied to any stationary process.
+
+Now, If $X_t$ is jointly stationary with the simulation, the distribution of $X_t$ is, by definition, independent
+of $t$ and this is called the time stationary distribution of $X$. If $X_t$ is ergodic i.e we can deduce its properties through taking a sufficiently long sample of the process, then we can assert that for a discrete set of times $t$, the expectation of $X_t$ being bounded by a function $\phi$  can be estimated by the time units for which the value of $\phi$ is valid, if these are of a sufficiently large number
+
+$$\mathbb{E}(\phi(X_t)) = \frac{1}{T} \sum_{t=1}^T\phi(X_t)$$
+
+In other words, the probability of$X_t$  being in a set of state $W$ is proportional to the fraction of time $X_t$ spends in the states of $W$. In other words, the time stationary distribution of $X_t$ can be estimated by a time average.
+
+### Building up to Palm Formulas
+
+Now, if we condition the expectation and probability on a point process, like reaching a waypoint, we can get palm intensity and probability. In general, a random sequence of time instants $T_n$ can be defined as the times at which the simulation $S_t$ reaches a certain subset of the state-space or does a transition from some state $s$ to some state $s'$, where both of these states belong to the same set (Like the set of waypoints). NOw, if we assume that the time at which we are observing our simulation is 0, then we can say that 
+
+$$
+T_0 \leq 0 < T_1
+$$
+
+Thus, $T_0$ is the last time a transition occurred before time 0, and $T_1$ the next transition
+time starting from time 0. Now, we can define an intensity over this point process to be the probability of a transition to happen at a time point 
+
+$$\lambda = \mathbb{P}(T_0 = 0)$$
+
+In continuous-time, this would be the same as saying that the expectation over the number $N$ of transition in time-interval $[t, t+\tau]$ satisfied the above equation i.e 
+
+$$\mathbb{E}(N(t, t+\tau)) = \lambda \tau$$
+
+Thus, for our example of time points at which transitions occur, we could say that for a stationary process, the conditional expectation at time $t$ is independent of $t$ and is the same as the expectation at $t=0$, and so
+
+
+$$\mathbb{E}^0(X_t) = \mathbb{E}(X_0|Transition \,)$$
+
+This is called the palm expectation, and if our process is ergodic, we can apply the sam criteria to our palm distribution and say 
+
+$$\mathbb{E}^0(X_0) = \frac{1}{N} \sum_{n=1}^N X_{T_n}$$
+
+Thus, if $X_t$ is the speed and the transitions are departures from a waypoint, we are essentially saying 
+
+$$\mathbb{P}^0(X_t \in W) \sim \mathbb{P}^0(X_0 \in W)  $$
+
+and both of these probabilities are proportional to the fraction of transitions in which the speed of the node is in the set $W$.
+
+### Major Palm Formulas
+
+**Inversion Formula** : Gives the relation between the time-stationary expectations and palm expectations
+
+$$
+\begin{aligned}
+&\mathbb{E}(X_t) = \mathbb{E}(X_0) = \lambda \mathbb{E}^0 (\sum_{s=1}^{T_1} X_s) = \lambda \mathbb{E}^0 (\sum_{s=0}^{T_1 - 1} X_s) \\
+&\mathbb{E}(X_t) = \mathbb{E}(X_0) =  \lambda \mathbb{E}^0 (\int_0^{T_1} X_s ds)
+\end{aligned}
+$$
+
+**Intensity Formula:**  The average number of selected transitions per time unit $\lambda$ satisfies
+
+$$
+\frac{1}{\lambda} = \mathbb{E}^0 (T_1 - T_0) = \mathbb{E}^0 (T_1)
+$$
+
+
+### Feller's Paradox
+
+Assume at a bus stop there pass in average $\lambda$ buses per hour. If an inspector is measuring the time between the buses, then they would measure an estimate of  
+
+$$
+\mathbb{E}^0(T_1 - T_0) = \frac{1}{\lambda}
+$$
+
+Now, if someone arrives at time $t$ and measures the event as the difference between the time until the next bus and the time since the last bus, they would estimate $\mathbb{E}(X_0) = \mathbb{E}(T_1 - T_0)$ and the above two quantities can be related as: 
+
+$$
+\begin{aligned}
+&\mathbb{E}(T_1 - T_0) =\lambda \mathbb{E}^0(\int_0^{T_1}X_t dt) \\
+\implies &\mathbb{E}(T_1 - T_0) =\lambda \mathbb{E}^0(\int_0^{T_1}(+t - (-t))dt) \\ 
+\implies &\mathbb{E}(T_1 - T_0) =\lambda \mathbb{E}^0(T^2) \\
+\implies &\mathbb{E}(T_1 - T_0) =\frac{1}{\lambda} + \lambda var^0(T_1 - T_0) \\
+\therefore \,\,\, &\mathbb{E}(T_1 - T_0) = \mathbb{E}^0(T_1 - T_0) + \lambda var^0(T_1 - T_0)
+\end{aligned}
+$$
+
+This means that the estimate of the time that the person would have is  $\lambda var^0(T_1 - T_0)$ bigger than the inspector's estimate, even though both of them sample the same system. This is called the Feller's paradox. Intuitively, this occurs because a stationary observer (Joe) is more likely to fall in a large interval. Thus, Palm calculus gives us a way to relate distributions that have been sampled differently. So, in the case of RWP, this means that Palm calculus allows us to reconcile the issues we saw with the RWP models where we see decay in speed when sampled over the averages of particles in transitions, and the average speed when sampled over the averages
+
+### Back to RWP
+
+The $\frac{1}{\lambda}$ value that we get from the intensity formula can be related to the palm distribution of hte speed as follows:
+
+$$
+\frac{1}{\lambda} = \mathbb{E}^0(D1)\mathbb{E}^0(\frac{1}{V_0}) = \bar{\Delta}\int_0^{\infty} \frac{1}{v} f^0_V(v) dv
+$$
+
+Here, $\bar{\Delta}$ is the average distance between 2 points in teh Area selected and $f_V^0$ is the density function that represents the palm distribution of the speed. When we apply Palm distributions to RWP, we get:
+
+1. **Selecting Speeds:** the time stationary distribution of the speed has a density proportional to $\frac{1}{v} f^0_V(v)$ . thus if we want our process to have a time distribution that is stationary, we need to choose this function very carefully. Some examples are: $f^0_V(v) = Cv1_{v_{min} < v < v_{max}}$, $f^0_V(v) = C\frac{v - v_{min}}{v_{max} - v_{min}}$, and $f^0_V(v) = C (v_{min} + v(v_{max} - v_{min}))$. The key is to get a function that when divided by $v$ would give a function that more-or-less is stable
+2. **Selecting Mobile Positions:** Just like Feller's paradox, we do not have a closed-form solution for different mobile positions. Thus, we can't generate the directly from the distributions as in the case of velocity. However, we can apply heuristics to get around it. One heuristic is Choosing endpoints such that joint probability density proportional to the distance between them. So, if $Prev(t)$ is the previous waypoint before or at time $t$, and $Next(t)$ is the next waypoint after time $t$, then for the triplet $(Prev(t), M(t), Next(t))$ we need have the following conditions met: (1) $(Prev(t), Next(t))$ has a joint density over $A \times A$ given by $f_{Prev(t),Next(t)}(p,n) = K||p - n||$, and (2) The distribution $M(t)$ which we get from $Prev(t) = p, Next(t) = n$ should be uniform in the segment $[p,n]$
+
+If we choose the initial speed and locations in to satisfy these conditions, then we can ensure a stationary distribution in time and palm spaces for RWP and eliminate the ergodic degreaing problem. This, would allow us to effectively compare the processes in different settings and thus, make the RWP model more useful.
+
+
+
+
+
+<!-- %%% -->
+# MobMod: Random Mobility
+As with any analysis, the basics start from idealized scenarios. In terms of modeling, this would be random mobility. The historical viewpoint on this comes from Brownian Motion, which is the model of the movement of particles suspended in a liquid or gas caused by collisions with molecules of the surrounding medium. Of course, this is not the most realistic since vehicles don't just move randomly and hit each other, and so, our most basic models in random mobility come from a movement that is random to a certain extent but obeys tunable constraints. The two most basic models of random mobility are:
+
+- **Random Walk:** For every new interval *t*, each node randomly and uniformly chooses its new direction $\theta(t)$ from an interval $[0, 2\pi]$. The new speed follows a Gaussian distribution in $[0, V_{max}]$. Therefore, during a time interval t, the node moves with the velocity vector $[v(t)\cos(θ(t)),v(t)\sin(θ(t))]$. If the node moves according to the above rules and reaches the boundary of a simulation field, the leaving node is bounced back to the simulation field with the angle of $\pi−\theta(t)$ or $\theta(t)$, respectively. This effect is called the border effect.
+- **Random Waypoint:** We first choose a rectangular area of size $X_{max} \times Y_{max}$, and the total number of nodes N in this area. We then choose a random initial location $(x, y)$ for each node, where $x$ is uniformly distributed over $[X_{min}, X_{max}]$  and $y$ is uniformly distributed over $[Y_{min}, Y_{max}]$. Every node is then assigned a destination $(x', y')$ also uniformly distributed over the two-dimensional area, and a speed $v$, which is uniformly distributed over $[V_{min}, V_{max}]$, where $V_{max}$ is the user-assigned maximum allowed speed. A node will then start traveling toward the destination on a straight line at the chosen speed $v$. Upon reaching the destination $(x_0, y_0)$, the node stays there for some pause time, either constant or randomly chosen from a certain distribution. Upon expiration of the pause time, the next destination and speed are again chosen in the same way and the process repeats until the simulation ends.
+
+<img width=300 height=200 src="static/MobMod/rwm-rwp.png">
+
+#### Limitations of the Random Waypoint and Walk models
+These models are not able to capture a lot of realistic scenarios, the major ones listed as follows:
+
+1. **Temporal Dependency of Velocity:** In these models, the velocity of the mobile node is a memoryless random process since the values at each epoch are independent of the previous one. Thus, sudden mobility behaviors are possible in these models, including sharp turns, sudden acceleration, or sudden stop. However, in real situations, these values change smoothly.
+2. **Spatial Dependency of Velocity:** In these models, each node moves independently of all the other nodes. However, in real scenarios, like battlefield communication or museum touring, these values may be correlated in different ways, which is not taken into account in these models
+3. **Geographic Restriction of Movement:** In these models, the mobile nodes are allowed to move freely without any restrictions, but this might not be the case in real-life scenarios, like driving for instance, where the agents are contained in their movement by the roads, obstacles, etc.
+
+## More Realistic Models
+#### Manhattan Model
+This model addresses the drawback of Geographic restriction on movement. The general idea is that initially, the nodes are placed randomly on the edges of the graph. Then for each node, a destination is randomly chosen and the node moves towards this destination through the shortest path along the edges. Upon arrival, the node pauses for T time and again chooses a new destination for the next movement. This procedure is repeated until the end of the simulation. In the Manhattan Model, these edges are in the form of a grid. Thus, this is just an extension of the Random Waypoint idea, but with added constraints on movement
+
+<img width=300 height=200 src="static/MobMod/Mahattan-model.png">
+
+#### Reference-point Group Mobility Model (RPGM)
+
+This model addresses the drawback of spatial dependency of the velocity in the random models. Nodes are categorized into groups. Each group has a center, which is either a logical center or a group leader node. For the sake of simplicity, we assume that the center is the group leader. Thus, each group is composed of one leader and many members. The movement of the group leader determines the mobility behavior of the entire group. The movement of group leader at time t can be represented by motion vector V^t_{Group}. This motion vector can be either randomly chosen or carefully designed based on certain predefined paths. Each member of this group deviates from this general motion vector to some degree, for example, each mobile node could be randomly placed in the neighborhood of the leader. The velocity of each member can be expressed as V^t_{Group} + R_i , where R_i is the deviation of each member from the group leader's velocity.
+
+<img width=300 height=200 src="static/MobMod/Ref-pt-model.png">
+
+#### Gauss-Markov Model
+This model **addresses the correlation of velocities**. In this model, the velocity of the mobile node is assumed to be correlated over time and modeled as a Gauss-Markov stochastic process:
+
+$$R_t = \bar{\alpha}R(t-1) + (1-\bar{\alpha})R + \sqrt{1- \bar{\alpha}^2}\bar{X}_{t-1}$$
+
+Here, $R(t)$  can be either speed or direction of movement, which is shown to be dependent on an autocorrelation function sampled from a Gaussian distribution $\bar{X} \thicksim \mathcal{N}(0, \sigma)$. The value of R at any time point is correlated to a certain extent with its value at time $t-1$ , and this is modeled through the parameter $\bar{\alpha} = e^{-\beta} \in [0,1]$. When $\bar{\alpha} = 0$, this equation decomposes to Brownian motion since the moton at any two points only depends on its current value and the Gaussian Noise $\bar{X}$,  while at $\bar{\alpha} = 1$ this represents a linear motion since the new variable perfectly depends on the previous variable, without any added noise. By tuning this $\bar{\alpha}$, this model is capable of duplicating different kinds of mobility behaviors lying on the spectrum of Linear and Brownian motion.
+
+#### Smooth Motion Model
+Another mobility model considering the temporal dependency of velocity over various time slots is the Smooth Random Mobility Model. Here, **instead of the sharp turns and accelerations as proposed in the Random Waypoint Model, these values are changed smoothly**. It is observed that mobile nodes in real life tend to move at certain preferred speeds, rather than at speeds purely uniformly distributed in the range. Therefore, in the Smooth Random Mobility model, the speed within the set of preferred speed values has a high probability, while a uniform distribution is assumed on the remaining part of the entire interval
+
+$$V^{pref} \thicksim [V_1, V_2, ..., V_n] $$
+
+The frequency of speed change is assumed to be a Poisson process. Upon an event of speed change, a new target speed is chosen according to the probability distribution function of speed above and the speed of the mobile node is changed incrementally from the current speed to the targeted new speed by acceleration or deceleration $a(t)$ . The probability distribution function of acceleration or deceleration a(t) is uniformly distributed among $[0, a_{max}]$ and $[a_{min}, 0]$, respectively. The new speed depends on the previous speed:
+
+$$V_t = V_{t-1} + a(t)(V_t - V_{t-1})$$
+
+A similar approach is followed for the direction update with angular accelerations.
+
+## Problem of Unsteady Values
+One of the most important factors that play a role in the analysis of the various parameters associated with these networks is the stability of values. In the evolution of network states, there is usually an initial phase where the process variables change over time, and this phase is called a **Transient Phase**. During this transient phase, analyzing these variables is not possible as any value that they predict for the system is not a good indicator. As this phase passes, these values start to stabilize and as they stop varying over time units on an average, a **Steady State** is reached. This is the point at which a feasible network analysis starts becoming possible. In case the network transitions into something else over time, another steady state is reached after an intermediate transient state. The problem comes when these transient states start lasting longer or start happening more frequently since then stable analysis of the system becomes increasingly difficult. Thus, one of the major areas of research had been in figuring out a way to effectively predict these steady-state values and use them in analyzing the models. The seminal work on this was done by J-Y Le Boudec at EPFL, where the team developed a method called **Palm Calculus** and used it to predict the steady-state distributions of all major random mobility models.
+
+## Outlook on Random Mobility Models
+1. Random Mobility Models are very powerful solutions to obtain the fast and controllable output. They are easily configurable and reproducible, and there are various models on different geometric data. Moreover, after the issues removed through palm calculus, they are able to offer decent steady-state characteristics
+2. Random Models have to be well understood and analyzed for them to make sense. If not carefully modeled, as in the case of RWP with the initial selection of speed and mobility, they may never generate stable steady-state characteristics. Thus, we might not get expected mobility patterns, which is a bummer for routing protocols.
+3. While Random models provide good statistics, they are not able to provide low scale mobility patterns like slow increase/decrease of speeds, the interaction between vehicles, etc.
+
+
+
+<!-- %%% -->
+# MobMod: Introduction to Mobility Modelling
+
+The fundamental abstraction that is needed to understand inter-connected phenomena is a way to describe the different relationships between the various participating entities. For example, imagine a scenario where a disaster management Mobile Ad-hoc network of drones is deployed to triangulate sensitive points, the key to successful execution lies in how these drones interact and share knowledge. Thus, the **Network** that is shared between these drones - or, **Nodes** - would have a certain way of establishing communication and its performance can be analyzed through multiple metrics. One way to analyze this network would be by simulating how these nodes might move and what kind of impact they might have on the network. It is exactly for this kind of analysis and understanding that we create **Mobility Models**: They allow mimicking the behavior of mobile nodes when network performance is simulated. The simulation results are strongly correlated with the mobility model.
+
+### Case of Connected Cars
+
+The way this analysis fits into the driving scenario is in terms of modeling the uncertainty in the traffic scenario. In the case of autonomous driving, the limitation for an individual agent is more from the side of the sensors. Usually, we would use cameras and Radars to work stuff out, but Radars can only see around 10m. So, how would this agent work in a highly uncertain scenario? Imagine a car driving on an Indian road in a 2-tier city, with pedestrians walking on all sides and multiple vehicles going in all directions.
+
+<img width=600 height=400 src="static/MobMod/Indian-road.png">
+
+One way to approach this solution would be to shift a bit of the load from the individual agent to the network. This could be done if the cars are connected through a network based on 4G/5G technologies. Thus, in this case, we could view the cars as nodes communicating with each other and moving in some way. For each car, the regular functions - movement, mapping, obstacle detection, and avoidance, etc. - would be performed on the edge of this network while the coordinating function could be performed either centrally or in a distributed manner. Thus, the issue of modeling the Mobility and/or Modeling of the traffic flow, especially in the case of more uncertain scenarios, becomes extremely important.
+
+#### Need for Modelling
+1. The performance evaluation of such a large-scale network is bounded by simulation: Raw analytical analysis is too complex while conducting experiments is too expensive
+2. Real-world traces are hard to find, either because they do not exist or are not publicly available (E.g City-Data).
+3. Trivial representations of mobility might **bias** the simulation results. The available traces might not represent real-world situations very effectively and might have a lot of residual effects that can render them useful in very specific conditions, and thus, not generalizable.
+
+#### The safe and sustainable mobility conundrum
+Now if we were to go about this modeling, one of the central issues that would come up is that of optimality. The optimization here would be maximizing the usage of the road capacity while putting constraints in the form of driving rules and the safety of the driver and pedestrian. To better understand this, imagine we implement a model where a car is made to drive slow to increase safety. Now, this is fine for the individual driver, since the car always maintains a safe distance from another car in front of it. However, two problems come-up:
+
+1. If the safe distance is too large, then a pedestrian might walk-in between leading to the car to halt
+2. The speed of the car is slow and so, the general traffic speed is also slow. This might create problems on traffic bottlenecks, like a 7 lane highway leading to a 2 lane road, etc.
+
+If we use the same policy on high-volume traffic conditions, then slow speeds and sudden halts can easily lead to shockwave propagation and Ghost Jams. Let us formalize this by looking at traffic in terms of flow
+
+$$Flow = Density \times Speed$$
+
+Thus, looking at this model we can see some safe directions to analyze this situation would be by controlling this flow through either reducing the speed or maybe keeping it and reducing the flow through density control. But more importantly, if we were to model the mobility by simulating this condition, we could develop interesting ways of cooperative navigation.
+
+#### Vehicular Models
+To analyze this network, we start looking at vehicles as nodes. Thus, the traffic becomes a MANET and our methods of simulation enable us to better understand this network.
+
+<img width=1000 height=400 src="static/MobMod/car-node.png">
+
+The impact of mobility is even more pronounced in the case of vehicular networks. The three factors that differentiate these networks from other networks are:
+
+1. The speed of each node is not bounded in small intervals and is not smooth. It is highly variable
+2. The movement is far from random. Thus, we cannot directly sample variables from standard distributions in realistic scenarios.
+3. The nodes do not move independently, and in fact, have strong reciprocal dependencies
+
+Consequently, the abstractions that this network viewpoint offers can be on three levels:
+
+1. **Vehicular Traffic Model:** Abstraction of the large scale trajectories employed by the vehicles
+2. **Vehicular Flow Model:** Abstractions of the physical inter-dependencies
+3. **Vehicular Driver Model:** Abstractions of the actions of individual nodes, like breaks, turns, etc.
+
+### History of Modeling 
+
+- **Random Mobility Models:** These models come from the field of Computer Science and Telecommunications. The key idea is to think of Mobility as a perturbation in a system of particles and use stochastic analysis to create models. Thus, we would have models for how the particles move under constraints imposed by tunable hyperparameters, and we determine the stability and other related metrics of this system. A significant feature of these models is the need for the system to be at a steady-state, which is something that is not very realistic since if the system models something like traffic, it is very difficult to define what a steady-state would mean in this scenario. This will be discussed further below.
+- **Flow Theory:** This model comes from the field of transport engineering and vehicle manufacturing where the view is to see mobility as flows between junctions i.e vehicles on a lane going from one street to another is a flow and thus, we can use metrics like speed and density to model this. one key distinguishing factor is that here we are interested in the exact opposite of Random Models - the transient phase - and we try to work with it. The issue with flow theory is the rules that it applies to the whole flow, which prevents it from being able to explain erratic behavior like accidents.
+- **Behavioral Theory:** This comes from Traffic Telematics engineers, and the view here is to not have specific rules for the whole mass of movement as flow theory does but to look at mobility as a network of agents, with each agent behaving according to certain behavioral constraints. Thus, this view tries to bridge the gap between Flow theory and realism and is also able to explain stuff like accidents.
+
 
 <!-- %%% -->
 # MALIS: Gradients
@@ -2399,119 +2646,6 @@ The limitations of this approach are:
 - Managing the state is relatively complex
 - Higher latency due to increased calls
 - Vendor lock-in due to control shifted to the providers, but this might change as more providers enter the market.
-
-<!-- %%% -->
-# MobMod: Vehicular Flow Modelling
-
-<!-- %%% -->
-# MobMod: Palm Calculus
-Palm calculus is a way to reconsile differences in metrics that arise from sampling differences. To simply explain this, the rudimentary example is that of a cyclist going through the
-
-
-<!-- %%% -->
-# MobMod: Random Mobility
-As with any analysis, the basics start from idealized scenarios. In terms of modeling, this would be random mobility. The historical viewpoint on this comes from Brownian Motion, which is the model of the movement of particles suspended in a liquid or gas caused by collisions with molecules of the surrounding medium. The two most basic models of random mobility are:
-- **Random Walk :** For every new interval $t$, each node randomly and uniformly chooses its new direction $\theta(t)$ from $(0, 2\pi]$. The new speed follows a uniform distribution or a Guassian distribution from $[0, V_{max}]$. Therefore, during time interval t, the node moves with the velocity vector $(v(t)cos(\theta(t)),v(t)sin(\theta(t)))$. If the node moves according to the above rules and reaches the boundary of simulation field, the leaving node is bounced back to the simulation field with the angle of $\pi - \theta(t)$ or $\theta(t)$, respectively. This effect is called border effect.
-- **Random Waypoint :** As the simulation starts, each mobile node randomly selects one location in the simulation field as the destination, which can be bounded $[-X^{max},+X^{max}],[-Y^{max},+Y^{max}]$. It then travels towards this destination with constant velocity chosen uniformly and randomly from $[0,V_{max}]$. The velocity and direction of a node are chosen independently of other nodes, and the direction is also sampled uniformly and randomly from $[0,2\pi]$. Upon reaching the destination, the node stops for a duration defined by the ‘pause time’ parameter. If $T_{pause} =0$, this leads to continuous mobility.
-
-
-<img width=300 height=200 src="static/MobMod/rwm-rwp.png">
-
-#### Limitations of the Random Waypoint and Walk models
-These models are not able to capture a lot of realistic scenarios, the major ones listed as follows:
-1. **Temporal Dependency of Velocity :** In these models the velocity of the mobile node is a memoryless random process since the values at each epoch are independent of the previous one. Thus, sudden mobility behaviors are possible in these models, including sharp turns, sudden acceleration, or sudden stop. However, in real situations, these values change smoothly
-2. **Spatial Dependency of Velocity :** in these models, each node moves independently of all the other nodes. However, in real scenarios, like battlefield communication or museum touring, these values may be correlated in different ways, which is not taken into account in these models
-3. **Geographic Restriction of Movement :** In these models the mobile nodes are allowed to move freely without any restrictions, but this might not be the case in real life scenarios, like driving for instance, where the agents are contained in their movement by the roads, obstacles, etc.
-
-## More Realistic Models
-#### Manhattan Model
-This model addresses the drawback of Geographic restriction on movement. The general idea is that initially, the nodes are placed randomly on the edges of the graph. Then for each node, a destination is randomly chosen and the node moves towards this destination through the shortest path along the edges. Upon arrival, the node pauses for T time and again chooses a new destination for the next movement. This procedure is repeated until the end of the simulation. In the Manhattan Model, these edges are in the form of a grid. Thus, this is just an extension of the Random Waypoint idea, but with added constraints on movement
-
-<img width=300 height=200 src="static/MobMod/Mahattan-model.png">
-
-#### Reference-point Group Mobility Model (RPGM)
-
-This model addresses the drawback of spatial dependency of the velocity in the random models. Nodes are categorized into groups. Each group has a center, which is either a logical center or a group leader node. For the sake of simplicity, we assume that the center is the group leader. Thus, each group is composed of one leader and many members. The movement of the group leader determines the mobility behavior of the entire group. The movement of group leader at time t can be represented by motion vector $V^{t}_{group}$. The motion vector can be randomly chosen or carefully designed based on certain predefined paths. Each member of this group deviates from this general motion vector to some degree, for example, each mobile node could be randomly placed in the neighborhood of the leader. The velocity of each member can be expressed as $V^{t}_{group} + R_i$, where the second term is the deviation of each member, indexed by i, from the group leader's velocity.
-
-<img width=300 height=200 src="static/MobMod/Ref-pt-model.png">
-
-#### Gauss-Markov Model
-This model addresses the correlation of velocities. In this model, the velocity of mobile node is assumed to be correlated over time and modeled as a Gauss-Markov stochastic process:
-$$
-\begin{aligned}
-R(t) = \bar{\alpha}.R(t-1) + (1-\bar{\alpha}).R + \sqrt{1 -  \bar{\alpha}^2 }.\bar{X}_{t-1}\\
-
-& R(t) \rightarrow speed/direction\\
-&\bar{X} \text{\textasciitilde} I.I.D Gaussian (0, \sigma)\\
-&\bar{\alpha} = e^{-\beta} \text{\textasciitilde} [0,1]\\
-&\bar{\alpha} = 0 \rightarrow Brownian Motion \\
-&\bar{\alpha} = 1 \rightarrow Linear Motion \\
-\end{aligned}
-$$
-
-Based on these equations, we observe that the velocity mobile node at time slot $t$ is dependent on the velocity-time slot $t-1$. Therefore, the Gauss-Markov model is a temporally dependent mobility model where the degree of dependency is determined by the memory level parameter $\bar{\alpha}$, a parameter to reflect the randomness of the Gauss-Markov process. By tuning this parameter, this model is capable of duplicating different kinds of mobility behaviors lying on the spectrum of Linear and Brownian motion.
-
-#### Smooth Motion Model
-Another mobility model considering the temporal dependency of velocity over various time slots is the Smooth Random Mobility Model. Here, instead of the sharp turns and accelerations as proposed in the Random Waypoint Model, these values are changed smoothly. It is observed that mobile nodes in real life tend to move at certain preferred speeds, rather than at speeds purely
-uniformly distributed in the range. Therefore, in Smooth Random
-Mobility model, the speed within the set of preferred speed values has a high probability, while a uniform distribution is assumed on the remaining part of the entire interval
-$$
-V^{pref} = Random(V_1, V_2, .... , V_n)
-$$
-The frequency of speed change is assumed to be a Poisson process. Upon an event of speed change, a new target speed is chosen according to the probability distribution function of speed above and the speed of the mobile node is changed
-incrementally from the current speed to the targeted new speed
-by acceleration or deceleration a(t). The probability distribution function of acceleration or deceleration a(t) is uniformly distributed among $[0, a_{max}]$ and $[a_{min} ,0]$, respectively. The new speed depends on the previous speed:
-$$
-V_t = V_{t-1} + a(t)(V_t - V_{t-1})
-$$
-
-A similar approach is followed for the direction update with angular accelerations
-
-## Problem of Unsteady Values
-One of the most important factors that play a role in the analysis of the various parameters associated with these networks is the stability of values. In the evolution of network states, there is usually an initial phase where the process variables change over time, and this phase is called a **Transient Phase**. During this transient phase, analyzing these variables is not possible as any value that they predict for the system is not a good indicator. As this phase passes, these values start to stabilize and as they stop varying over time units on an average, a **Steady State** is reached. This is the point at which a feasible network analysis starts becoming possible. in case the network transitions into something else over time, another steady state is reached after an intermediate transient state. The problem comes when these transient states start lasting longer or start happening more frequently since then stable analysis of the system becomes increasingly difficult. Thus, one of the major areas of research had been in figuring out a way to effectively predict these steady-state values and use them in analyzing the models. The seminal work on this was done by J-Y Le Boudec at EPFL, where the team developed a method called **Palm Calculus** and used it to predict the steady-state distributions of all major random mobility models.
-
-# MobMod: Introduction to Mobility Modelling
-The fundamental abstraction that is needed to understand inter-connected phenomena is a way to describe the different relationships between the various participating entities. For example, imagine a scenario where a disaster management Mobile Ad-hoc network of drones is deployed to triangulate sensitive points, the key to successful execution lies in how these various drones interact and share knowledge. Thus, the **Network** that is shared between these drones - or, **Nodes** - would have a certain way of establishing communication and its performance can be analyzed in terms of various performance parameters. One central aspect of analyzing this network would be the simulating how these nodes might move and what kind of impact that might have on the network. It is exactly for this kind of analysis and understanding that we create **Mobility Models**: They allow mimicking the behavior of mobile nodes when network performance is simulated. The simulation results are strongly correlated with the mobility model.
-
-#### Case of Connected Cars
-The way this analysis fits into the driving scenario is in terms of modeling the uncertainty in the traffic scenario. In the case of autonomous driving, the limitation for an individual agent is more from the side of the sensors. Usually, we would use cameras and Radars to work stuff out, but Radars can only see around 10m. So, how would this agent work in a highly uncertain scenario? Imagine a car driving on an Indian road in a 2-tier city, with pedestrians walking on all sides and multiple vehicles going in all directions.
-
-<img width=600 height=400 src="static/MobMod/Indian-road.png">
-
-One way to approach this solution would be to shift a bit of the load from the individual agent to the network. This could be done if the cars are connected through a network based on 4G/5G. Thus, in this case, we could view the cars as nodes communicating with each other and moving in some way. For each car, the regular functions - movement, mapping, obstacle detection, and avoidance, etc. - would be performed on the edge of this network while the co-ordinating function would be performed on the network. Thus, the issue of modeling the Mobility becomes important in this case. Modeling of the traffic flow, especially in the case of more uncertain scenarios, becomes extremely important.
-
-#### Need for Modelling
-1. The performance evaluation of such a large-scale network is bounded by simulation: Raw analytical analysis is too complex while conducting experiments is too expensive
-2. Real-world traces are hard to find, either because they do not exist or are not publicly available (E.g City-Data).
-3. Trivial representations of mobility might bias the simulation results. The available races might not represent real-world situations very effectively, and might have a lot of residual effects that might render them useful to represent only specific conditions, and thus, not generalizable.
-
-#### The safe and sustainable mobility conundrum
-Now if we were to go about this modeling, one of the central issues that would come up is that of optimality. The optimization here would be in terms of maximizing the usage of the road capacity and the driver and pedestrian safety. To better understand this, imagine we implement a model where a car is made to drive slow to increase safety. Now, this is fine for the individual driver, since the car always maintains a safe distance from the car in front of it. However, two problems come-up here:
-1. If the safe distance is too large, then a pedestrian might walk-in between leading to the car to halt
-2. The speed of the car is slow and so, the general traffic speed is also slow. This might create problems on traffic bottlenecks, like a 7 lane highway leading to a 2 lane road, etc.
-
-If we use the same policy on high-volume traffic conditions, then slow speeds nad sudden halts can easily lead to shockwave propagation and Ghost Jams. Let us formalize this by looking at traffic in terms of flow
-
-$$
-Flow = Density . Speed
-$$
-
-Thus, looking at this model we can see some safe directions to analyze this situation would be by controlling this flow through either reducing the speed or maybe keeping it and reducing the flow through density control. But more importantly, if we were to model the mobility by simulating this condition, we could develop interesting ways of cooperative navigation.
-
-#### Vehicular Models
-To analyze this network, we start looking at vehicles as nodes. Thus, the traffic becomes a MANET and our methods of simulation enable us to better understand this network.
-
-<img width=1000 height=400 src="static/MobMod/car-node.png">
-
-The impact of mobility is even more pronounced in the case of vehicular networks. The three factors that differentiate these networks from other networks are:
-1. The speed of each node is not bounded in small intervals, and is not smooth. It is highly variable
-2. The movement is far from random. Thus, we cannot directly sample from standard distributions in realistic scenarios
-3. The nodes do not move independently, and in  fact, have strong reciprocal dependencies
-
-Consequently, the abstractions that this network viewpoint offers can be on three levels:
-1. Vehicular Traffic Model: Abstraction of the large scale trajectories employed by the vehicles
-2. Vehicular Flow Model: Abstractions of the physical inter-dependencies
-3. Vehicular Driver Model: Abstractions of the actions of individual nodes, like breaks, turns, etc.
 
 
 <!-- %%% -->
