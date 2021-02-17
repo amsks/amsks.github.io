@@ -27,9 +27,10 @@
 - **Deep Learning :** Pytorch, Keras, Tensorflow
 
 
-#### Work Reports
-[Plan-Based Reward-Shaping for Goal-Focused Exploration in Reinforcement Learning](CV/LIS_Internship_Report.pdf)
+#### Projects and Work Reports
 
+- [Plan-Based Reward-Shaping for Goal-Focused Exploration in Reinforcement Learning](CV/LIS_Internship_Report.pdf)
+- [Pulmonary Embolism Detection](CV/MALIS_Final_Report.pdf)
 
 #### Zettelkasten
 
