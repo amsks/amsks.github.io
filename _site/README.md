@@ -34,7 +34,200 @@
 #### Zettelkasten
 
 <!-- %%% -->
-# MobMod: Vehicular Flow Modelling
+# RTR: Conjuring Magic
+
+An interesting thing that I recently read in [The Road to Reality](https://en.wikipedia.org/wiki/The_Road_to_Reality) was the power of abstraction in Mathematics. We traditionally learn numbers as being present and the set as being a natural extension of these numbers. Now, an interesting way to look at the power of the abstraction that the set theory allows us is to try and build the natural number system through empty sets! To do this, let us first consider the null set 
+
+$$
+\Phi = \{ \}
+$$
+
+Now, if we take the set of $\Phi$, we would get 
+
+$$
+\bm{1} = \{ \Phi \}
+$$
+
+Here, I have used the boldface to represent the number of elements in the set, and in this case it is 1. Now, let's take a collection of this new set and the empty set to make a second set with 2 elements: 
+
+$$
+\bm{2} = \{ \Phi, \{ \Phi \} \}
+$$
+
+If we again repeat this procedure to three and four elements, we get: 
+
+$$
+\begin{aligned}
+\bm{3} = \{ \Phi, \{ \Phi \}, \{ \Phi, \{ \Phi \} \} \} \\
+\bm{4} = \{ \Phi, \{ \Phi \}, \{ \Phi, \{ \Phi \} \}, \{ \Phi, \{ \Phi \}, \{ \Phi, \{ \Phi \} \} \} \}
+\end{aligned}
+$$
+
+The interesting thing is, these are all valid sets! We have essentially used the null set to create 4 sets that are non-empty, by recursively using the null set. If we repeat this procedure infinitely, we see a clear isomorphism between the natural number line and this series of sets. Thus, we have somehow created numbers out of nothing!
+
+## Broader Outlook 
+
+We get an infinite sequence sequence of abstract mathematical entities—sets containing, respectively, zero, one,
+two, three, etc., elements, one set for each of the natural numbers, quite independently of the actual physical nature of the universe. This just reminds me of Plato's belief in a world of abstract forms, independent of the world we live in. While we don't need to religiously believe in such a world, what seems interesting to me is that this 'abstraction' of mathematics allows us to somehow break the barriers of the physical world and develop some really cool and interesting stuff that might not even be discovered in our times. Moreover, as we have seen in the history of hte sciences somehow this formal 'imagination' (If we must) goes hand-in-hand with our attempt to understand reality through physics. Roger Penrose, beautifully summarizes this through his adaptation of M.C Escher's Penrose stairs as shown in the diagram below 
+
+<img width=500 height=450 src="static/RTR/Screenshot from 2021-02-16 00-57-02.png">
+
+
+<!-- %%% -->
+# MobMod: Vehicular Flow Modeling 
+
+The key principle in flow modeling is to treat the vehicles as a liquid flowing through sections. We then put some numbers to this and get the car-following models. The major classification of the Vehicular Flow Models is shown below:
+
+<img height=500 width=900 src="static/MobMod/Flow/flow-1.png">
+
+The models are fundamentally differentiated on the basis of the level of precision that they go into, which is inversely related to the cost of modeling, and this gives us the 3 categories: 
+
+- **Macroscopic:** Here, we model vehicle traffic as a flow as a segment of the road, and thus, our fluid is the cars entering/exiting that segment and the density of the number of cars in that segment. All the cars in this segment will have the same speed. Thus, we can have the relationship :
+
+$$flow = speed \times density$$
+
+- **Microscopic:** Here, we measure the position of each vehicle and have the speed of each vehicle as different. Thus, we have individual entities with aggregated models.
+- **Mesoscopic:** This is a hybrid between the above two, where we get to keep the individual speeds of vehicles and yet analyze flows. Thus, we can say stuff like while all vehicles will have the same speed in a section, we can still control individual vehicles. This also allows us to look into mixed flows.
+
+## Macroscopic Models
+
+### Lighthill-Whitman-Richard (LWR) Model
+
+In this model, we directly model the traffic as a fluid. Thus, we take the flow $m$, the density $\rho$  and the speed $v$ over a segment $[x,\Delta x]$ and apply the fluid lagrangian equation to it to get
+
+$$m(x,t) = \rho(x,t)v(x,t) \\
+\frac{\partial \rho(x,t)}{\partial t} + \frac{\partial m(x,t)}{\partial x} =  0
+$$
+
+These are the basic constraints that tell us that the flow in this section is conserved and any discrepancy is happening due to friction or heat, which can be modeled as abrupt changes and leaving cars respectively. However, we have two equations  and 3 unknowns, and so for the vehicular model we impose the third condition which says that the speed and density are related
+
+$$v(x,t) = f(\rho(x,t))$$
+
+This relation is intuitive since the more density we have, the slower is the speed. Now, the way we model this speed function determines how we solve the problem and this is what gets us to apply this model.
+
+### Fundamental Diagram
+
+The solution of macroscopic models results in the fundamental diagram, which is something that is common in macroscopic and mesoscopic models.
+
+<img height=400 width=1000 src="static/MobMod/Flow/flow-2.png">
+
+The diagram above is called the flow-density diagram. It accurately represents a highway phenomenon. Initially, we have a free highway and so, the more vehicles we add to this, the more is the speed of the vehicles until a certain point at which there are enough cars so that each car cannot move as fast as it wants. This is the region on bounded flow where the speeds of the cars are correlated. This happens till a maximum density that gives us a positive flow $\rho_{critical}$ after which we cannot add any more vehicles to the road without reducing the flow. Thus, our ideal is to stay at this density and try to play around this value. if w go beyond this flow, the speed goes down according to the strong correlation between vehicle speeds. This downward curve depends on the region in which we are. If we are on a highway, it is easier to have a straight line than in an urban environment. This result happens till a certain point after which we enter a traffic jam. This density is the $\rho_{jam}$ and is the starting of the region of traffic jam. In this region, the cars may be moving very slow till a density called $\rho_{max}$ at which the cars halt.
+
+### Traffic Stream Model
+
+This model is initially a macroscopic model since the whole model is characterized by macroscopic quantities, but to be able to implement this in a simulator, we need to discretize it. thus, we end up with individually modeled vehicles, but they all move according to macroscopic quantities i.e all vehicles traveling on the same road segment will have identical speed/acceleration. 
+
+#### Fluid Traffic Model
+
+This model exploits the inverse proportionality in the speed/density relationship → The speed is inversely related to the density of cars on a road :
+
+$$v_i(t+ \Delta t) = max [v_{min}, v_{max}(1 - \frac{\rho(x,t)}{\rho_{jam}})]$$
+
+As we can see, this is nothing but the velocity constraint needed to solve the lagrangian.
+
+## Mesoscopic Models
+
+### Queuing Model
+
+In this model, each road is seen as a FIFO queue of length (size) $C$. Thus, the travel time is a function of $C$, but: 
+
+1. At max, only $L$ cars can leave the queue
+2. A car cannot leave until another queue accepts it
+3. A queue can accept at mos  $C$  cars
+
+<img height=350 width=900 src="static/MobMod/Flow/flow-3.png">
+
+## Microscopic Models
+
+Now, each vehicle has its own speed and we can have a lot of interesting things in this like leader-follower models, overtaking, etc., which is either not possible in macroscopic models, or is too complicated to model. All the three kinds of models are used for different kinds of applications: 
+
+1. For **traffic safety**, we need fine granularity of vehicle representation since the communication range is short. Thus, we use Microscopic Models
+2. For **Navigation,** we need to have a notikn of large scal  mobiltiy and Aggregated Metrics like average spped and time. Moreover, we need the capability of re-routing, and the precise position may not be that useful. Thus, while we can apply bot microscopic and mesoscopic models, the **mesoscopic models are preferred**
+3. For Traffic monitoring, we just need a notion of aggregated metrics on a very large scale and need to see stuff like how the whole bunch of cars are populating a highwar. Thus, we need macroscopic modelling
+
+### Single Lane Models
+
+#### Stochastic Model
+
+These are equivalent to Random models liek RWP, but tailored to a graph:
+
+- We choose the location and speed, but can only move on a graph
+- Each vehicle is completely independent of the other
+
+The modelling is shown below:
+
+<img height=400 width=900 src="static/MobMod/Flow/flow-4.png">
+
+Here, we have the reference car in teh middle lane indexed by $i$ and has :
+
+- Position → $x_i(t)$
+- Speed → $v_i(t)$
+- The cars in the lanes to the sides are indexed by $j, k$
+- Distance between 2 cars - bumper to bumper distance - is calculated as
+
+    $$\Delta x_i(t) = x_{i+1}(t) + x_i(t)$$
+
+
+#### Constant Speed Model
+
+This is an example of a stochastic model where we apply RWP on a graph. 
+
+<img height=300 width=600 src="static/MobMod/Flow/flow-5.png">
+
+
+The movement of each vehicle is structures in trips, and we choose the spped as
+
+$$v_i = v_{min} + \eta(v_{max} - v_{min})$$
+
+Where $v_{min}, v_{max}$ are the bounds on speed and $\eta \in [0,1]$ is a random variable. The key aspect is tuning this $\eta$ to get a good speed estimate. An example of this being applied to urban scenarios is called **Urban CSM** where we represent roads on a city as nodes and edges and we can set $v_{max}$ depending on the speed limits on the road. We can add optimizations to this, like uniformly sampling speed around max:
+
+$$v_i \sim U(v_{max} + \epsilon , v_{max} - \epsilon )$$
+
+
+#### Manhattan Model
+
+This is basically the same as the Urban CSM, but we become more realistic in sampling speed :
+
+- We update speed based on acceleration 
+
+    $$v_i (t + \Delta t) = v_i(t) + \eta a \Delta t  $$
+
+- Then we ensure that this speed is bounded between $[v_{min}, v_{max}]$ 
+
+    $$v_i (t + \Delta t) = \min\{\max\{v_i (t + \Delta t), v_{min}, v_{max} \}$$
+
+- We then add a speed reduction if the bumper-to-bumper distance is lesser than a safety metric to implement car-car interaction and collision avoidance
+
+    $$v_i (t+ \Delta t) = v_{i+t} - \frac{a}{2}, \,\,\,\,\, if \Delta x_i(t) \leq \Delta x_{safe}$$
+
+### Car Following Models
+
+In these models we follow the leader-follower approach. Thus, the speed of a car depennds on the cars nearby and on an absolute relative speed of surrounding vehicles.. In orther words, the movemet of each vehicle is strongly correlated with other vehicles.
+
+### Intelligent Driver Model
+
+The objective of this model is to represent the **interaction** between two vehicles in the most realistic way. Interaction in microscopic models means either **acceleration** or **speed**. The idea is that our car should accelerate based on its current speed and its vicinity, and this is modeled as follows :
+
+- The resulting acceleration depends on the maximum acceleration  $(a)$, the ratio of the current speed to the maximum speed $\frac{v_i(t)}{v_{max}}$, and the ratio of the desired inter-distance between the car ad the bumper-to-bumper distance $\frac{\Delta x_{dex}(t)}{\Delta x_i(t)}$ as follows:
+
+    $$\frac{d v_i(t)}{dt} = a \bigg[1 - \bigg(\frac{v_i(t)}{v_{max}} \bigg)^4 - \bigg(\frac{\Delta x_{des}(t)}{\Delta x_i(t)}\bigg)^2 \bigg]$$
+
+- The desired inter-distance between the cars, in turn, depends on a safe distance, a safety headway time, the current velocity and the maximum acceleration (a) and deceleration (b
+
+    $$\Delta x_{des}(t) = \Delta x_{safe} + \big[v_i(t) \Delta t_{safe} - \frac{v_i(t) \Delta v_i(t) }{2 \sqrt{ab}} \big]$$
+
+- The major idea here is that the desired distance between the car should at-least be a safety distance $\Delta x_{safe}$ and then to this safety distance we add a headway distance calculated by multiplying the headway time $\Delta t_{safe}$, which is the elapsed time between the front of the lead vehicle passing a point on the roadway and the front of the following vehicle passing the same point and is usually something like 2 seconds,  with the current velocity. This means that we are essentially adding a leeway to the minimal safety distance by seeing how fast we are moving and multiplying it by the headway time. Thus, if these two were the only factors in consideration, then we would have a model where when our car is at rest, $\Delta x_{safe}$ is the desired distance and in case our car is moving, then we add a velocity-based factor to it to take into account how fast the car is moving. We also subtract the minimal distance by $\frac{v_i(t) \Delta v_i(t) }{2 \sqrt{ab}}$ to account for the difference in the velocity of the car and the next car and normalize it by the breaking capability $2 \sqrt{ab}$. This factor takes into account the relative speeds w.r.t to the car model the driver adapting to the difference in speeds.
+
+This model is used in SUMO, VANET MobiSIM etc.
+
+
+
+
+
+
+
+
+
 
 <!-- %%% -->
 # MobMod: Palm Calculus
