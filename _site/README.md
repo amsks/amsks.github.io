@@ -34,6 +34,498 @@
 
 #### Zettelkasten
 
+
+<!-- %%% -->
+# GT: Topological Manifolds
+
+We can define a Topological Manifold as a Paracompact and Hausdorff topological space $(M,O)$  in which every point $p \in M$  has a neighborhood $p \in U \in O$ and there exists a homomorphism:
+
+$$x : U \rightarrow x(u) \in \R^d$$
+
+In other words, we can say that a topological space is a Manifold if it behaves like $\R^d$ locally. This manifold, as obvious, is $d$-dimensional. For example, a circle and a square are homeomorphic and represent the $S^2$ manifold. 
+
+### Sub-Manifold
+
+We can also extend this notion to the subsets of our topological space → So, if we have a space $N \subseteq M$, then we call it a sub-manifold of $M$  if it is a manifold in its own right. All we need to check, thus, is the induced topology $(N, O|_N)$ and see if it is a manifold or not. So, a circle can be considered a sub-manifold of the $\R^2$ , but two circles touching each other at exactly one point might not satisfy this since the point at which they touch is locally behaving like $\R, \R$  which is not the same as $\R^2$. 
+
+### Product Manifolds
+
+We can also define a product manifold by taking two manifolds $(M, O_M), (N, O_N)$ and defining a topological manifold $(M \times N , O_{M \times N})$, which will have a dimension of $dim(M) + dim(N)$ . For example, a Toroid is a product of two circles and can be written as $T^2 = S^1 \times S^1$, while a cylinder is $C = \mathbb{S}^1 \times \R$
+
+<img width=500 height=300 src="static/GT/TopMan/TopMan-1.png">
+
+A Mobius strip is a curious case since it cannot be written as a product Manifold, even though locally it looks like a product Manifold. To describe this, we need to define something new, called a Bundle .
+
+## Bundles
+
+These are pretty central concepts to a lot of things. A bundle of topological Manifolds can formally be defined as a triplet $(E, \pi, M)$  where:
+
+- $E$ → Total Space
+- $M$ → Base Space
+- $\pi$ → A continuous surjective map from the Base space to the total space a.k.a a projection
+
+For a point $p \in M$ , the pre-image of the set only containing $p$ under the map $\pi$ is called a Fibre:
+
+$$F := preim_\pi (\{ p\}) \,\,\,\,\, \exists  p \in M  $$
+
+For example, let's take a product Manifold. For a Fibre Bundle $F$ and a base space $M$ , we can define the total space as: 
+
+$$
+\begin{aligned}
+E = M \times F \\
+\pi : M \times F \rightarrow M 
+\end{aligned}
+$$
+
+So, a Mobius strip can be through of a Bundle constructed by taking a rectangle and identifying sides going in opposite direction and then projecting the points on to the center.
+
+<img width=700 height=300 src="static/GT/TopMan/TopMan-2.png">
+
+We find that even though it is not a product Manifold, we can say that the pre-image of every point maps to the interval $[-1, 1]$ and this makes it a bundle of $\mathbb{S}^1$. We can see that bundles are essentially a generalization of the idea of taking a product, by intuitively understanding that to make a bundle we basically take a base space and attach fibers in a certain way. However, the definition does not really mention any notion of the total space being built out of the base space, and this is the generalization bit. 
+
+### Fiber Bundle
+
+We can be a bit more restricted in our notion of a bundle and yet be more general than a simple product space, To better elucidate this, we can say that in a bundle the fiber for multiple points need not be the same for all points → We are only interested in the existence of some fiber as per its definition. So, if we restrict the points to having the same fiber 
+
+$$
+F := preim_\pi (\{ p\}) \,\,\,\,\, \forall  p \in M  
+$$
+
+Then we call $E \rightarrow^\pi M$ a Fiber Bundle with the Typical Fiber $F$. We  often write the map as 
+
+$$
+F \rightarrow E \rightarrow^{\pi} M 
+$$
+
+Thus, fiber bundles are between Product Manifolds and General Bundles.  
+
+### Section
+
+Once we have a fiber bundle, we can further define a section of the bundle as a map $\sigma : M \rightarrow E$ such that if we make a point $p \in M$  and map it to some point $q \in E$, and then use $\pi : E \rightarrow  M$ to map it $q$ back to $M$, then the projection of $q$ will be the same point:
+
+$$\pi * \sigma = \bm{I}_M$$
+
+<img width=450 height=300 src="static/GT/TopMan/TopMan-3.png">
+
+A very good example of this is in quantum Mechanics → The wave function $\Psi$ is a section of the complex line $\mathbb{C}$-line bundle, over some physical space, such as $\R^3$. This goes as from the physical space to the complex space
+
+### Sub-Bundles
+
+We can use the same logic of Sub-manifolds to create sub-bundles. We take a bundle $E \rightarrow ^\pi M$  and then define another bundle  $E' \rightarrow^{\pi '} M'$ . Now, this new bundle will be a sub-bundle if it meets the following three conditions: 
+
+1. $E' \subset E$
+2. $M' \subset M$
+3. $\pi |_{M'} = \pi$  → When we restrict the projection map of our parent bundle to the base space of the other bundle, then we should essentially get the projection map of the other bundle
+
+### Isomorphism in Bundles
+
+If we have two  bundles: 
+
+$$E \rightarrow^{\pi_E} M \\
+F \rightarrow^{\pi_F} N $$
+
+And we have two maps:
+
+$$\varphi:   E \rightarrow F \\
+f : M \rightarrow N 
+$$
+
+Then, we call this a bundle morphism. This can essentially be seen as true if the map below commutes.
+
+<img width=250 height=250 src="static/GT/TopMan/TopMan-4.png">
+
+Now, if we also have $(\varphi^{-1}, f^{-1})$  as another bundle morphism such that
+
+$$\varphi^{-1} : F \rightarrow E \\
+f^{-1} : N \rightarrow M $$
+
+Then, the above two bundles are called isomorphic, since they clearly have the same fiber, and these isomorphic bundles are the structure-preserving maps. The essence of bundles, thus, not only lies in the topology of the manifolds but also in the projection → We can have topological spaces that are homeomorphic to each other but if the projection does not create an inverse mapping, then they won't be isomorphic as bundles. Bundles can also be **locally isomorphic** if we restrict the mapping and they still maintain the relationship
+
+### Common Terminology on Bundles
+
+- **Trivial bundle** → A bundle that is isomorphic to a product bundle
+- **Locally Trivial** → A bundle that is locally isomorphic to a product bundle. E.g Cylinder is a trivial and so, locally trivial bundle, while a Mobius strip is locally trivial, but not a trivial bundle. Locally, any section of a bundle can be represented as a map from the base space to a Fibre. Thus, in Quantum Mechanics, it is okay to talk about $\Psi$ locally as a function, but there might be spaces in the space where we cannot do so.
+- **Pull-Back Bundle** → A fiber bundle that is induced by a map of its base-space. It allows us to create a sort of yellow-data from the white data. For example, if we have $M' \rightarrow^{f} M$  and $E \rightarrow^\pi M$ , then we can find the pullback-bundle $E' \rightarrow^{\pi '} M'$  as:
+
+    $$E' := \big \{(m', e) \in M \times E \,\, \big | \pi(e) = f(m') \big \}$$
+
+## Viewing Manifolds from Atlases
+
+Let $(M,O)$  be a topological Manifold of dimension $d$. Then a pair $(U, x)$  where 
+
+$$U  \in O \\
+x: U \rightarrow \R^d$$
+
+ is called a chart of the manifold. This is just a terminology formalizing the notion that the neighborhood of a point in a manifold that maps to some subset of $\R^d$ be called a chart. However, since $x$ maps to $\R^d = \R \times \R \times ...$ , we can now say that the components of $x$  are essentially coordinates of a point $p \in U$  w.r.t the chart  $(U,x)$. This is crucial to understand, since now we are realizing that on any topological manifold, we can only define coordinates based on a chart, and we can have different such charts.  Thus, there has to  exist a set of charts such that every point is covered i.e 
+
+$$\cup_{(U,x) \in A} U = M $$
+
+Thus, there will be many-empty charts that overlap, and the collection of such charts is called an **Atlas.** 
+
+### Compatibility in Charts
+
+Two chard $(U,x)$  and $(V,x)$  are called $C^0$-compatible if either fo the following conditions are met: 
+
+1. $U \cap V = \Phi$
+2. $U\cap V \neq \Phi$, but $y \circ x^{-1}$ exists
+
+Now, this is essentially the case when we are looking at manifolds. However, as we can see, compatibility allows us to traverse between two charts without really worrying about the underlying manifold. For example, in physics, we are transforming between coordinate systems - which are the charts in this case - but we are working with the fundamental assumption that this transformation does not change the trajectory of the particle. In other words, we can see the trajectory as a curve on a manifold and the co-ordinate systems of measurement as the charts that are $C^0$-compatible. When these charts are pairwise compatible in an Atlas, then we get a $C^0$-Atlas.
+
+
+
+<!-- %%% -->
+# GT: Topology
+
+Topology is the study of properties of spaces that do not change under smooth deformations. This is called invariance. The way I like to think of this is by imagining the surfaces to be made of clay. we can change the shapes of these surfaces, under certain rules, and the interest of the field of topology is in general properties shared by all these deformations. Thus, topologically all the shapes that belong to a certain class and can be interchanged through deformation are topologically equivalent. A standard joke is the topological equivalence of a coffee cup and a donut → Both have one hole! These kinds of relationships are called homeomorphisms in Topology
+
+<img width=500 height=300 src="static/GT/Topology/Top-1.png">
+
+The main idea starts by classifying sets and then figure out a way to stack structures on top of it and this is the essence of spaces. A recurring theme, then, is figuring out a way to preserve structures while transforming a set. In other words, we first need to define a way to give structure to a set. Let u define two things here:
+
+1. **Space** → We take a set and add some kind of structure to it to form a space. This structure is defined by a topology on a set, or a group structure, etc. Thus, a set is basically space where the structure is Null
+2. **Map →**  A map between two sets $\phi: A \rightarrow B$ is ar elation such that $\forall  a \in A$ there exists exactly one $b \in B$ such that $\phi(a,b)$, and we can say $b = \phi(a)$ 
+
+Now, we can define this recurring theme as essentially the classification of spaces based on structure-preserving maps between those spaces.
+
+## Topological Spaces
+
+In vanilla calculus, we define a function as
+
+$$
+f:  \R^n \rightarrow \R^m \iff \forall x \rightarrow x' \in \R^m \implies f(x) \rightarrow f(x')
+$$
+
+We call $\R^n$ as the Domain of this function and $\R^m$ as the co-domain of this function. Now, if we are to generalize this notion, we are essentially generalizing the domain and the co-domain to arbitrary sets on which this function can be defined i.e 
+
+$$
+f: X \rightarrow Y \iff \forall x \in X \rightarrow y \in Y \implies f(x) \rightarrow f(y)
+$$
+
+However, we need to define what it means when we say $x \rightarrow y$. One way to do this is through the **Metric Space** where we say that the idea of $x$ approaching a value $y$ implies that a certain notion of distance between these points tends to reduce towards zero. This distance can be defined through any kind of metric and we basically have a way to define function over this space. However, there are certain issues with this: 
+
+- The distance function contains extra path information that is probably not required if we are only interested in the notion of  $x \rightarrow y$ . In other words,  if I am on a contract or expand the geometry of my set $X$, given that this operation is continuous, the notion of $x \rightarrow y$ still holds. However, the change that I have applied changes all distances that can be measured. So, in a sense, the distance is extra information if we are interested in continuity
+- Metric spaces are not general enough to express point-wise convergence → Suppose we have a sequence of functions - $f_n$ - that  share the same domain and co-domain, then the sequence converges point-wise to $f$ if these sequences converge to the function int eh limit of infinity. Now, if I am  to compare the $f_n$ sequence's individual members, there is a not a clear notion of distance that the Metric space can provide to do this.
+    $$\lim_{n \rightarrow \infty} f_n(x) = f(x)$$
+
+
+Thus, we export some notions from calculus to  get the topological notions to get this generalization: 
+
+- We take the notion of $\epsilon$  enclosing region and extend it to define an $\epsilon$ -ball around $x \in \R^n$ as
+
+    $$B_\epsilon(x) = \big\{ x' \big| \,\, ||x - x'|| < \epsilon \big \}$$
+
+- We use this notion of the $\epsilon$-ball to define an Open set $S \subseteq \R^n$ as the set for which we can find an $\epsilon$-ball for all points inside this set, for $\epsilon > 0$. In other words, we can call $S$ a union of $\epsilon$-balls that can be contained inside $S$. Thus, an open set is defined as a subset containing a neighborhood for each of its points.
+- We define the Neighborhood of some $x \in \R^n$ as the $\epsilon$-ball around $x$
+
+To understand the topological spaces, we first need to understand what does it mean to endow a set with a topology. The core idea is to take a set and stack some extra information on it. This extra information on the set is called topology, and it helps us define notions of continuous deformation of subspaces, continuity, etc. The vanilla calculus that we learn on the Euclidean Space, and in general any kind of metric space, is essentially taking the set $\R^n$ and applying a metric onto it that helps us do calculus on this set. In the general sense, we define this topology through open sets, defined previously. Thus, we can now define a topological space as a set $X$ and a collection $O$ of open subsets, such that the following 3 criteria are met: 
+
+1. $\Phi, X \in O$ 
+2. $U,V \in O \implies  \cap \{ U, V \} \in O$  → elements, which are defined through open sets, are closed under finite intersection
+3. $U,V \in O \implies  \cup \{ U, V \} \in O$ → elements are closed under arbitrary unions
+
+This collection of subsets $O$ is called a **topology** on $X$, and the pair $(X, O)$ is called a topological space. We can define many different topologies on the same set, and each of these topologies helps us define the notions of continuity and convergence on this set, which helps us do calculus on this space. So, we can use the notion of the topological spaces to define continuity → For topological space $X, Y$ , we can say that $f: X \rightarrow Y$ is continuous if for any open set $V \subseteq Y$ we have  
+
+$$
+f^{-1} (v) = \{ x \in X | f(x) \in V\}
+$$
+
+which is open in $Y$. Thus, we are essentially defining continuity as open sets mapping to open sets by saying that any function that produces a value in an open set of $X$ will have an inverse image as also an open set in $X$; and we can now say that for a given $\epsilon > 0$  , we can find a $\delta > 0$ such that: 
+
+$$
+|x - x'| < \delta \implies |f(x) - f(x')| < \epsilon  
+$$
+
+Some common kinds of topology are: 
+
+1. Chaotic Topology →  The topology defined by $O = \{M, \Phi\}$  i.e none of the elements in M are open sets
+2. Discrete Topology → Defined by $O = \Rho(M)$ i.e each and every element of M is an open set 
+3. Standard topology → Defined by taking the $\epsilon$-ball around each point and asserting that for all points in $M$, we can construct a ball with radius $\epsilon$ that is entirely inside M. This also highlights the importance of defining open Sets. If we were to take the boundaries of the set into its definition, thereby making it a closed set, then all the boundary points essentially violate the standard topology condition.
+4. Metric Topology → The one applicable to metric spaces, where we define the $\epsilon$-ball as a distance measure i.e it has to obey the properties of being greater than zero, commutativity and triangle inequality
+
+    $$B_\epsilon(x) = \big\{ x' \big| \,\, d(x, x) < \epsilon \big \}$$
+
+
+## Constructing New topologies on a given Topology
+
+Once we have a topological space, then we can create topologies on it. Let $(M,O)$ be a topological space. Then for a subset $N \subset M$, we define a new topology: 
+
+$$O|_N := \big \{ U \cap N \,\,\, \big |  \,\,\, U \in O  \big \} \subseteq \Rho(N)$$
+
+This new topology $O|_{N}$ is called an **induced (subset) topology** on $N$ which created by intersecting open sets that define the topology on the superset $M$ with the subset $N$, which leads to the new smaller collection of open sets being in the power set of $N$. we easily see why by testing the 3 criteria of $O|_{N}$ being a topology as defined above. A cool thing that induced topologies help us with is defining a topology on non-open subsets of $M$. For example, we can take the set $\R$ and add the standard topology on it to get $(R, O_{std})$ and take the subset $N = [-1, 1]$. Now if we are to consider the set $(0,1]$ and see that clearly, it does not belong to $O_{std}$ since it is not open. However, it can easily be written as $(0,1] = (0,2) \cap[-1,1]$  and this make it a set in the induced topology $O_{std}|_N$. Thus, 
+
+### Convergence
+
+To define convergence, we take a sequence and define it as a map from $\N$ to the set $M$  
+
+$$q: \N \rightarrow M $$
+
+which essentially means that we have a sequence of number in $\N$  that uniquely map to points in $M$. Now, let's take a point $a \in M$ . Let a belong to a subset  of the topology i.e $a \in U \in O$ , then we can say that the sequence $q$ is convergent to this limit point $a$ if :
+
+$$\forall U \in O : \exists N \in \N : \forall n > N : q(n) \in U$$
+
+In other words, we can say that $q$ is convergent to $a$ if, for any open set in the topology to which this point can belong, there exists a point $N$ in the set $\N$  beyond which the sequence always maps to this subset. If this were not happening, the sequence would never converge. For standard topology, these subsets would be the $\epsilon$-balls, and thus the notion of convergence would be that beyond $N$ the sequence should always map to a point within this $\epsilon$-ball. Hence, this is a generalized notion of our vanilla notion of convergence, extended to any kind of topology. 
+
+### Continuity
+
+For continuity, let's take two topological spaces  $(M, O_M)$ and $(N, O_N)$ and take a map between these spaces as $\phi: M \rightarrow N$ . Now, we can call this map continuous if
+
+$$\forall U  \in O_N : \exists V \in O_m : \phi(v \in V) = u \in U$$
+
+In other words we are saying that for all open subsets of $N$ -  $U \in O_N$ - the pre-image of U - $\big \{ m \in M \big | \phi(m) \in U \big \}$ exists in $O_M$
+
+### Homeomorphism
+
+Let $\phi: M \rightarrow N$  be a bijection. Now, if we equip these sets with topologies $(M, O_M) \,\,\,\, (N, O_N)$, then we say that $\phi$ is a homeomorphism if : 
+
+1. $\phi: M \rightarrow N$  is continuous 
+2. $\phi ^ {-1}: M \rightarrow N$  is continuous
+
+Thus, we have essentially used the notion of continuity provided by topological spaces to define a map between two topologies that preserves the structure. This is why we can see that the non-geometrical essence of a toroid and a cup are the same since this homeomorphism exists. This homomorphism is providing a one-one pairing of the open sets of $M$ and $N$. And if such homeomorphisms exist, then we can say that  $M$ and $N$ are isomorphic in the topological sense
+
+$$M \cong_{top} N$$
+
+
+## Topological Properties
+
+### Separation Properties
+
+- **T1** → A topological space $(M,O)$ is called T1 if for any two distinct points $p \ne q$
+
+    $$
+    \exists U \in O : p \in U: q \notin U 
+    $$
+
+- **Hausdorff or T2** → A topological space $(M,O)$ is T2 if for $p \ne q$
+
+    $$
+    \begin{aligned}
+    &\exists U \in O : p \in U \\
+    &\exists V \in O : q \in V \\
+    &U \cap V = \Phi
+    \end{aligned}
+    $$
+
+T1 is a weaker argument than T2 since we are not applying the neighborhood condition on both points. Any topology that is Hausdorff will by extension be T1, but not the other way round. We can have multiple such properties for separation, depending on how we decide to separate our points, but the core idea remains the same. 
+
+### Compactness
+
+Compactness generalizes the notion of boundedness and closed sets in Euclidean space. Ideally, we can construct properties that are only valid for finite sets and become invalid for infinite sets. These essentially are: 
+
+1. Boundedness of function → If $f: X \rightarrow \R$ we always have $f(x) \leq K$
+2. All functions attain a maximum → There is some $x_0$ such that $f(x) < f( x_0) \,\,\,\,\, \forall  x \in X$ 
+
+The first statement is essentially saying that if we can bound our function locally, then we can also boost this boundedness globally, while the second statement is asserting that the perturbations of our function are bounded some maximum value. it is easy to see why there is no guarantee that this might be the case if $X$ is an infinite set. Now, when we endow our domain with additional structure, to create the topological space $(M,O)$, then it turns out that some kinds of sets start exhibiting properties similar to finite sets, even though they may technically be infinite. We call these spaces compact. 
+
+To understand this, we need to first generalize what it means to be closed or bounded in the topological sense, and we do this through is **Covers →** We can call a set $C$ a cover of  our topological space $(M, O)$ if it satisfied the following conditions: 
+
+1. $C \subseteq O$  → $C$ is a collection of open sets
+2. $\cup C = M$   → The union of the elements of $C$ give rise to $M$
+
+Since $C$ solely comprises open sets, we also call it the **Open Cover** of $M$.  Now any such open cover $C'$ that can be formed and is a subset of $C$ will be called a subcover of $M$. Now, we can use these covers to define compactness → Any topological space $(M,O)$ is compact if every cover $C$ of $M$ has a finite subcover $C'$. 
+
+- The need for including subcovers in this definition is because there is no finiteness guarantee for covers. For example, let's think of $\R$ as our topological space, and let's consider the set $(0,1)$. For every element of this set, we can create a partition $(0,\frac{1}{n})$ and $(\frac{1}{n}, 1)$ such that it will fall in any one of the two and thus, we can't say that there exists a subcover that is finite. However, if we include the endpoint to get the interval $[0,1]$, then we can see that $0$ and $1$ might not fall in these partitions and so there has to exist a finite sub-cover. Hence, the subcover is allowing us to essentially understand what it means to be small in a purely mathematical sense. Also, this process of including end-points is called compactification
+
+This notion of compactness also extends to subspaces and homeomorphic spaces of a topological space $(M,O)$. The **Heine-Borel Theorem** says that for a metric space, every closed and bounded subset is compact. 
+
+#### Paracompactness
+
+Paracompactness is a weaker notion than compactness. To understand it, we will define a refinement on a cover $C$ as a subset $C' \subseteq C$  such that  
+
+$$
+\forall U \in C : \exists U' \in C' : U' \subseteq  U 
+$$
+
+Now, we can call our topological space $(M,O)$  paracompact if every open cover has an open refinement that is locally finite. We can call a refinement locally finite if every point of the space has a neighborhood that intersects only finitely many sets in the cover. Thus, we are saying that our space locally behaves in a certain bounded manner. This is important for defining manifolds. It can be seen that compactness implies paracompactness, and thus, the **Stone Theorem** says that every metrizable space is paracompact.
+
+### Connectedness
+
+The idea behind connectedness in topological spaces is to be able to define the notion of a 'whole'. Put simply, if we can express our topological space as the union of two or more disjoint non-empty open subsets, then essentially our space is a composite of those two spaces. Thus, define a topological space $(M,O)$  as connected if the following condition does not hold.
+
+$$
+\exists A,B \in O : M = \ A \cup B
+$$
+
+Here, we are not defining the notion of a 'how' $A$ and $B$  connect. All we are saying is that we can create $M$ through the union of $A$ and $B$. To explore these kinds of connections, we formalize the notion of a path from a point $p$ to a point $q$ as a continuous function $\gamma$ such that  : 
+
+$$
+\begin{aligned}
+&\gamma : [0,1] \rightarrow M \\
+&\gamma (0) = p \\
+&\gamma (1) = q 
+\end{aligned}
+$$
+
+Thus, if tis condition holds for every pair $p,q \in M$ , then we call our topology **Path-Connected**
+
+## Homotopic Curves and the fundamental Group
+
+The idea of Homotopy is to deform the paths between two points in a topological space into one another. We are essentially saying that if two points $p,q \in M$  are connected by two paths $\gamma, \delta$ such that: 
+
+$$
+\begin{aligned}
+&\gamma (0) = \delta(0) = p \\
+&\gamma (1) = \delta(1) = q
+\end{aligned}
+$$
+
+Then we can talk about a function on all such paths between $p$  and $q$ : 
+
+$$
+\begin{aligned}
+h: [0,1] \times [0,1] \rightarrow M  \\
+h(0, \lambda) = \gamma(\lambda) \\
+h(1, \lambda) = \delta(\lambda)
+\end{aligned}
+$$
+
+And if this function exists, then $\gamma$ and $\delta$ are homotopic. Thus, we are essentially saying that all the paths between $p$ and $q$ that satisfy the requirements of $h$ are deformable into one-another. This is an interesting visualization, shown below:
+
+<img width=300 height=300 src="static/GT/Topology/Top-2.png">
+
+We can now define loops as essentially paths that start and end at the same point i.e
+
+$$
+L_p : \big \{ \gamma: [0,1] \rightarrow M \big| \gamma(0) = \gamma(1)      \big \}
+$$
+
+
+<!-- %%% -->
+# GT: Intuitive Introduction to Geometry
+
+Euclidean geometry rests on Euclid's 5 postulates, which are basically the set of rules for doing anything in Euclidean space: 
+
+1. Draw a straight line from any point to any point.
+2. Produce a finite straight line continuously in a straight line
+3. Describe a circle with any center and distance
+4. All right angles are equal to one another
+5. if a straight line falling on two straight lines makes the interior angles on the same side less than two right angles, the two straight lines, if produced indefinitely, meet on that side on which are the angles less than the two right angles.
+
+The fifth postulate, also known as the parallel postulate, was what was violated to create variants of geometry as follows: 
+
+- **Spherical/Elliptical Geometry**  → This assumes that the parallel lines converge, for example, to the poles of a sphere. So, imagine two parallel lines start from somewhere in the equator and converging on the poles of a sphere. If we hold this sphere from the poles and pull it, we get a surface that is not equally curved at all points - an ellipse - and the similar idea of converging lines applies to it too. The rules that govern this 'world' would then need to be changed, like the interior angles of a triangle on this surface which would no longer be $\pi$ radians, but something like $\pi(1+4f)$ where $f$ is the fraction of the sphere's surface that is enclosed by the triangle
+- **Hyperbolic Geometry** → Here we violate the fifth postulate by assuming a scenario where the parallel lines diverge. An example surface that obeys rules for this geometry could be the shape of the pringles chips - hyperbolic paraboloid - and we can easily produce 2 parallel lines and see that they diverge along the surface.
+
+To go abstract, we want to understand how we can generalize to any kind of surface geometry → Abstract and define the ideas that are central to these geometries. So, we start with understanding some properties of the spherical and hyperbolic geometry.
+
+## Nature of the Curvature
+
+If we draw concentric latitudes around the pole, we would see that taking the radius of the circles as the length from the center of the sphere and then measuring the circumference, we would see that it would actually be the same as the standard circle formula  → it would be somewhat lesser for all points not at the equator: 
+
+$$
+\begin{aligned}
+&C = 2 \pi R \sin(\frac{r}{R}) \\
+\implies &C < 2 \pi R
+\end{aligned}
+$$
+
+This is like saying that that the sphere is tending to curve towards the horizontal origin - the pole. For the saddle - the pringles - on the other hand, we would see that the curvature is actually not tending towards anything. To make this notion more precise, we can take the second derivative of the surface at each point by defining a vector that is normal to the surface at each point, and classify the curvature:
+
+- **Positive Curvature** → Curvature has a tendency to curve in the same direction as the tangent i.e the second derivative is negative
+- **Negative Curvature** → Curvature that tends away from the tangent i.e the second derivative is negative
+- **Zero Curvature** → The notion of flat
+
+This is somewhat similar to how we would define the points of maxima and minima for functions, and a 2D equivalent is shown below:
+
+<img width=800 height=450 src="static/GT/Intuitive/Intuitive-1.png">
+
+Thus, now we have a notion that allows us to say that the spherical curvature is positive, while the hyperbolic curvature is negative. The Euclidean curvature is, of course, flat. Another way to think of this would be that there is a notion of finiteness associated with the positive curvature of spherical geometry, which is what relates to the parallel lines focusing on one point when produced further, while there is a notion of infinity associated with negative curvature that makes the parallel lines diverge in the hyperbolic case. Since the Euclidean plane is flat, this means that the parallel lines would keep going-on till infinity without ever meeting. 
+
+<img width=400 height=500 src="static/GT/Intuitive/Intuitive-2.png">
+
+## Generalizing Geometry
+
+- The first step to creating a general notion of geometry is to understand the point of view when we are talking about surfaces. The classical way of looking at geometry is through a higher dimensional space in which it is embedded. So, When I am looking at a place, I exist in $\R^3$ in which there is a surface in $\R^2$ that I can see and then comment on its properties like curvature, etc. This is an **Extrinsic View,** and so the curvature is the Extrinsic Curvature of the surface. However, this might not be the most ideal way to go about looking at curvature since we always need a higher dimensional space to be able to study any space. 
+- Another view to studying geometry is the Intrinsic view, where we study the space from the perspective of the space itself. This is the same as saying we take a space, get some 'rulers' to measure something like a distance on this space, and 'protractors' to measure something like an angle. Using these tools, we create a system that allows us to understand the curvature of our space in and of itself. This curvature would be called the **Intrinsic Curvature**
+- To demonstrate this, consider the figure shown below. One way to think of it would be to consider a Euclidean space that has been 'waved' a bit. The extrinsic picture from 3D is pretty clear. However, if we think from the point-of-view of a creature bound to this 2D space → To the creature this is still a flat surface.
+
+<img width=800 height=400 src="static/GT/Intuitive/Intuitive-3.png">
+
+To understand why we need to use vectors. Let's take the simple example of a sphere. At any point we can define two vectors: 
+
+- **Normal Vector** → That protrudes outwards from the sphere and so is coming out into the 3D space
+- **Tangential Vector** → This is tangent to the surface at every point, so remains in the tangent plane
+
+We can use Normal vectors to define the extrinsic curvature → Consider a Normal Vector at a point $A$ on a sphere. If we parallel transport this vector to a point B i.e take this vector and put it at point B through some path while keeping its original orientation intact, we can then compare this vector with the normal vector at B and the difference between these vectors would define the extrinsic curvature of the surface
+
+<img width=550 height=500 src="static/GT/Intuitive/Intuitive-4.png">
+
+We can use Tangential vectors to study the intrinsic curvature of this surface → If we take a tangential vector at point A on this sphere and then make it go a loop around this sphere and then compare how it has changed, this should be proportional to the curvature of the region enclosed by the loop. For example, in the figure below, if we take the tangential vector, and then transport it through the upper hemisphere to the other end and then come back to the original point through the equator, we will actually get a $\pi$ radian shift.
+
+<img width=550 height=500 src="static/GT/Intuitive/Intuitive-5.png">
+
+This would not be the case if this vector was parallel transporting on a Euclidean space since in any loop we would get the same vector. If we use this procedure on the wavy surface, we can see that both the tangential vector would not change in a loop but the normal vector would. Hence, we say that the surface is extrinsically curved but intrinsically flat.
+
+## Riemann's Geometry
+
+We can use the ideas above to create some notions around any curved surface we want. to do this we first need to assume that the surfaces are smooth i.e the there are no abrupt changes. This idea if formalized further in Topology into the notion of a manifold. For now, let's go with the notion that if we are to zoom into this smooth surface, we would end up encountering an Euclidean space, similar to how the earth seems flat but in actuality it is curved (Flatearthers ?). Thus, if we zoom a good eough anoumt, we could get an infinitesimally small Euclidean space. O this space, we would not need to define the notion of a distance which comes from the L2 norm i.e the pythagoras theorem:
+
+$$
+ds^2 = dx_1 ^2 + dx_2^2 
+$$
+
+If we were to scale $x_1,x_2$ by som constants $a_1, a_2$ and then change the right angle to an angle $\theta$ between $a_1x_1$ and $a_2x_2$, then our equation would be modified to:
+
+$$
+ds^2 = a_1^2dx_1 ^2 + a_2^2dx_2^2 + 2a_1a_2dx_1dx_2\cos(\theta)
+$$
+
+This is called a **Metric Tensor.** We can express this in a general matrix form to make it extendable to more dimensions and more information that might be required for the surface oto characterize it
+
+$$\begin{bmatrix}
+   g_{11} & g_{12} \\
+   g_{21} & g_{22} 
+\end{bmatrix} = 
+\begin{bmatrix}
+   a_1^2 & a_1a_2\cos(\theta) \\
+   a_1a_2\cos(\theta) & a_2^2 
+\end{bmatrix} \\
+$$
+
+Thus, in general we can write: 
+
+$$
+ds^2 = g_{ij}dx^idx^j
+$$
+
+We can use this Metric tensor to measure distances between any two point by adding all the small distances $ds$ along the way : 
+
+$$
+S = \int_a^b \sqrt{g_{ij}dx^idx^j}  ds
+$$
+
+This distance can be along any path between the two points. If we consider the set of all paths that connect two points, we can then be interested in the shortest path out of this set. This is called a **Geodesic.** These points are given by the Euler-Lagrange formulations for an Energy function $E$ defined as: 
+
+$$
+E = \frac{1}{2} \int_a^b g_{ij}dx^idx^j ds \,\,\,\,\,\,\,\,\, s.t \,\,\,\,\,\,\,\,\, S^2 \leq 2(b-a)E 
+$$
+
+And the final equation for the geodesic comes out to be:
+
+$$
+dt^n + \Gamma_{mr}^nt^rdx^m = 0 
+$$
+
+Where $\Gamma_{mr}^n$ is called the Christoffel symbol and is defined as: 
+
+$$
+\Gamma_{mr}^n = \frac{g^{np}}{2}\bigg[ \frac{\partial g_{pm}}{\partial x^r} + \frac{\partial g_{pr}}{\partial x^m} - \frac{\partial g_{mr}}{\partial x^p}\bigg]
+$$
+
+Now, as we discussed with parallel transport previously, Riemann formalized that idea through the Riemann tensor → Take a vector $V_s$ and pass it through a loop on a curved surface back to its original point to get a vector $V_p$. This change is denoted by a vector $D_rV_s$ which characterizes the curvature and can be written as 
+
+$$
+D_rV_s = \partial_rV_s - \Gamma_{rs}^p V_p
+$$
+
+This characterizes the curvature of the surface and the general form of the curvature tensor is:
+
+$$
+R^t_{srn} = \partial_r \Gamma_{sn}^t - \partial_s \Gamma_{rn}^t + \Gamma_{sn}^p \Gamma_{pr}^t  - \Gamma_{rm}^p \Gamma_{ps}^t  
+$$
+
+Thus, we just need to specify a point and 2 basis vectors along which the loop needs to move ie a total of 3 vectors and we get the curvature at this point computed by Riemann Curvature Tensor. Since it exists for all points, we can also say that this is a field i.e the metric takes a value for each point and based on where the points are, we can have values for the metric. If we extend this idea further, then we see that for a collection of 2 points we will always have values pertaining to paths between these points. We can call this a connection field. This connection, as we saw before, comes from the Metric tensor. Thus, we can say that the Metric gives the connection between two points and the connection gives the curvature. Each path may have a different curvature depending on the nature of the surface.
+
+
 <!-- %%% -->
 # RTR: Conjuring Magic
 
@@ -2850,382 +3342,344 @@ While prediction is all about estimating the value function in an environment fo
 
 <!-- %%% -->
 # RL: Model-Free Prediction
-One of the problems with DP is that it assumes a full knowledge of the MDP, and consequently, the environment. While this holds true for a lot of applications, it might not hold true for all cases. In fact, the upper limit does turn out to be the ability to be accurate about the underlying MDP. Thus, if we don't know the true MDP behind a process, the next best thing would be to try to approximate them. One of the ways to go about this is **Model-Free RL**. 
+One of the problems with DP is that it assumes full knowledge of the MDP, and consequently, the environment. While this holds true for a lot of applications, it might not hold true for all cases. In fact, the upper limit does turn out to be the ability to be accurate about the underlying MDP. Thus, if we don't know the true MDP behind a process, the next best thing would be to try to approximate them. One of the ways to go about this is **Model-Free RL**.
 
 ## Monte-Carlo Methods
-The first that comes to my mind when someone speaks fo approximation is Monte-carlo methods. The core idea behind the monte-carlo approach, which has its root in gambling, is to use probaility to approximate quantities. suppose we have to approximate the area of a circle relative to a rectangle inside which it is inscribed (This is a classic exmaple and an easy experiment too), the experiment-based approach would be to make a board and randomly throw some balls on it. In a true random throw, let's call the creation of a spot on the board as a simulation ( experiment, whatever!), after each simulation, record the number of sots inside the circular area and he total number of spots including the circular area and the the recangluar area. A ratio of these two quantities would give us an estimate of the relative area of the circle and the rectangle. Now as we conduct more such experiments, this estimate would actually get better since the underlying probability of a spot appearing inside the circle is proportional to the amount of area that the circle occupies inside the rectangle. Thus, in the infinity limit, we could get the exact value of this ratio. 
+The core idea behind the Monte-Carlo approach, which has its root in gambling, is to use probability to approximate quantities. Suppose we have to approximate the area of a circle relative to a rectangle inside which it is inscribed (This is a classic example and an easy experiment), the experiment-based approach would be to make a board and randomly throw some balls on it. In a true random throw, let's call the creation of a spot on the board a simulation ( experiment, whatever!). After each simulation, we record the number of spots inside the circular area and the total number of spots including the circular area and the rectangular area. A ratio of these two quantities would give us an estimate of the relative area of the circle and the rectangle. Now as we conduct more such experiments, this estimate would actually get better since the underlying probability of a spot appearing inside the circle is proportional to the amount of area that the circle occupies inside the rectangle. Hence, if we keep doing this our approximation gets increasingly closer to the true value.
 
 ### Applying MC idea to RL
-Another way to put the monte-carlo approach would be to say that Monte-Carlo methods only require experience. In the case of RL, this would translate to sample sequences of states, actions, and rewards from actual or simulated interaction with an environment. An experiment in this sense would be a full rollout of an episode which will create a sequence of states and reqards. when multiple such experiments are conducted, we get better approximations of our MDP. To be specific, our goal here would be to learn $v_{\pi}$ from episodes of experience under policy $\pi$. The value function is the expectation fo reward
+Another way to put the Monte-Carlo approach would be to say that Monte-Carlo methods only require experience. In the case of RL, this would translate to sampling sequences of states, actions, and rewards from actual or simulated interaction with an environment. An experiment in this sense would be a full rollout of an episode which will create a sequence of states and rewards. When multiple such experiments are conducted, we get better approximations of our MDP. To be specific, our goal here would be to learn $v_{\pi}$ from the episodes under policy $\pi$. The value function is the expected reward:
 
-$$
-v_{\pi}(s) = E_{\pi}[G_t | S_t = s]
-$$
+$$v_{\pi}(s)= \mathbb{E}_{\pi}[G_t∣S_t=s]$$
 
-So, all we have to do is estimate this expectation using the empirical mean of the returns for the experiments. 
+So, all we have to do is estimate this expectation using the empirical mean of the returns for the experiments
 
 ### First-Visit MC Evaluation
-To evaluate state s, at the first time-step t at which s is visited: 
-1. Increment counter $N(s) \gets  N(s) + 1$
-2. Increment total return $S(s) \gets S(s) + 1 $
-3. Estimate value by the mean return $V(s) = S(s)/N(s) $
+To evaluate state s, at the first time-step t at which s is visited:
 
-As we repreat more experiments and update the values at the  first visit, convergence to optimal values $V(s) \to  v_{\pi}$
-as $N(s) \to \infin$
+1. Increment counter:  $N(s) \leftarrow N(s) + 1$
+2. Increment total return: $S(s) \leftarrow S(s) + 1$
+3. Estimate value by the mean return: $V(s) = \frac{S(s)}{N(s)}$ 
+
+As we repeat more experiments and update the values at the first visit, we get convergence to optimal values i.e $V(s) \rightarrow v_{\pi}$ as $N(s) \rightarrow \infty$
 
 ### Every-Visit MC Evaluation
-This is same as first visit evaluation, excep  we update at every visit: 
-1. $N(s) \gets  N(s) + 1$
-2. $S(s) \gets S9(s) + 1 $
-3. $V(s) = S(s)/N(s) $
+This is same as first visit evaluation, except we update at every visit:
 
+1. $N(s) \gets N(s) + 1$ 
+2. $S(s) \gets S(s) + 1$
+3. $V(s) = \frac{S(s)}{N(s)}$
 
 ### Incremental MC updates
-The empirical mea can be expressed as an incremental update as follows: 
+The empirical mean can be expressed as an incremental update as follows:
 
 $$
-{\mu}_k = \frac{1}{k} \displaystyle\sum_{j=1}^n x_j = \frac{1}{k} (x_k + \displaystyle\sum_{j=1}^{k-1} x_j) = \frac{1}{k} (x_k + (k-1)\mu_{k-1})
+\begin{aligned}
+\mu_k &= \frac{1}{k} \sum_{j=1}^n x_j \\
+&= \frac{1}{k} (x_k + \sum_{j=1}^{k-1} x_j) \\
+&= \frac{1}{k} (x_k + (k-1)\mu_{k-1})
+\end{aligned}
 $$
 
-Thus, for the state updates, we can follow a similar pattern and for each state $S_t$ and return $G_t$ express it as: 
+Thus, for the state updates, we can follow a similar pattern, and for each state $S_t$ and return $G_t$, express it as:
+
 1. $N(S_t) \gets N(S_t) + 1$
-2. $V(S_t) = V(S_t) + \frac{1}{N(S_t)}(G_t - V(S_t))$
+2. $(S_t) = V(S_t) + \frac{1}{N(S_t)}(G_t - V(S_t))$
 
-An another useful way would be to track a running mean: 
+Another useful way would be to track a running mean:
 
-$$
-V(S_t) \gets V(S_t) + \alpha (G_t - V(S_t)
-$$
+$$V(S_t) \gets V(S_t) + \alpha (G_t - V(S_t)$$
 
 
 
 ## Temporal-Difference (TD) Learning
-The MC method of learning needs an episode to terminate in order to work its way backward. In TD, the idea is work the way forwrad by replacing the remainder of the states with an estimate. This is one method that is considered central adn novel to RL (According to Sutton adn Barto). Like MC methods, TD methods can learn directly from raw experience and like DP, TD methods update estimates based in part on other learned estimates, without waiting for a final outcome, something which is called Bootstrapping - updating a guess towards aguess (I know!).
+The MC method of learning needs an episode to terminate in order to work its way backward. In TD, the idea is to work the way forward by replacing the remainder of the states with an estimate. This is one method that is considered central and novel to RL (According to Sutton and Barto). Like MC methods, TD methods can learn directly from raw experience, and like DP, TD methods update estimates based in part on other learned estimates, without waiting for a final outcome, something which is called Bootstrapping - updating a guess towards a guess (meta-guess-update?).
 
 ### Concept of Target and Error
-If we look at the previous equation of Incremental MC, the general form that can be extrapolated is 
+If we look at the previous equation of Incremental MC, the general form that can be extrapolated is
 
-$$
-V(S_t) \gets V(S_t) + \alpha (T - V(S_t)
-$$
+$$V(S_t) \gets V(S_t) + \alpha (T - V(S_t)$$
 
-Here, the quantity $T$ is called the **Target** and the quantity $T - V(S_t)$ is called the **error**. Now, in the MC version, the target is the return $G_t$, means the MC method has to wait for this return to be propagated backwards to then see the error if its current value function from this return, and improve. This is where TD methods show their magic; At time t+1 they immediately form a target and make a useful update using the observed reward and the current estimate of the value function. The simplest TD method, TD(0), thus has the following form 
+Here, the quantity $T$ is called the **Target** and the quantity $T - V(S_t)$ is called the **error**. In the MC version, the target is the return $G_t$, which means that the MC method has to wait for this return to be propagated backward to see the error of its current value function from this return, and improve. This is where TD methods show their magic; At time $t+1$, they can immediately form a target and make a useful update using the observed reward and the current estimate of the value function. The simplest TD method, $TD(0)$, thus has the following form:
 
-$$
-V(S_t) \gets V(S_t) + \alpha (R_{t+1} + \gamma V(S_{t+1}) - V(S_t)
-$$
+$$V(S_t) \gets V(S_t) + \alpha (R_{t+1} + \gamma V(S_{t+1}) - V(S_t)$$
 
-This is why bootstrapping is a guess of guess, since the TD method bases its update in part on an existing estimate. 
+This is why bootstrapping is a guess of guess, since the TD method bases its update in part on an existing estimate.
 
 ## Comparing TD, MC and DP
-Another way to look these algorithms would be through the bellman optimality equation:
+Another way to look at these algorithms would be through the Bellman optimality equation:
 
-$$
-v_{\pi}(s) = E [ R_{t+1} + \gamma v_{\pi}(S_{t+1})| S_t = s]
-$$
+$$v_{\pi}(s) = E [ R_{t+1} + \gamma v_{\pi}(S_{t+1})| S_t = s]$$
 
-The MC method is an estimate because it does not have a model of the environment and thus, needs to sample in order to get an estimate of the mean. The DP method is an estimate because it does not know the future values of states and thus, uses the current state value estimate in its place. The TD method is an estimate because it does both of these things. Hence, it is combination of both. However, unlike DP, MC and TD do not require a model of the environment. Moreover, the online nature of these algorithms is something that allows them to work with samples of backups, whereas DP requires full backup.TD and MC can be differentiated in the nature of the samples that they work with: TD requires shallow backups since it is inherently online in nature, while MC requires deep backups due to the  nature of its search. Another way to look at the inherent difference is to realize that DP inherently dies a breadth first search, while MC does a depth first search. TD(0) only looks one step ahead and forms a guess. David silver summarizes the differences on the following spectrum, which I find really helpful: 
+which allows us to see why certain methods are estimates:
+
+- The MC method is an estimate because it does not have a model of the environment and thus, needs to sample in order to get an estimate of the mean.
+- The DP method is an estimate because it does not know the future values of states and thus, uses the current state value estimate in its place.
+- The TD method is an estimate because it does both of these things. Hence, it is a combination of both. However, unlike DP, MC and TD do not require a model of the environment. Moreover, the online nature of these algorithms is something that allows them to work with samples of backups, whereas DP requires full backup.
+
+TD and MC can further be differentiated based on the nature of the samples that they work with: 
+
+- TD requires shallow backups since it is inherently online in nature
+- MC requires deep backups due to the nature of its search.
+
+Another way to look at the inherent difference is to realize that DP inherently does a breadth-first search, while MC does a depth-first search. TD(0) only looks one step ahead and forms a guess. These differences can be summarized on the following spectrum by David Silver, which I find really helpful:
 
 <img width=600 height=500 src="static/Reinforcement Learning/TD-MC-DP.png">
 
 ## Extending TD to n-steps 
 
-The next natural step for something like TD, would be to extend it to further steps. For this, we generalize the target and define the it as follows:
+The next natural step for something like TD would be to extend it to further steps. For this, we generalize the target and define it as follows:
 
-$$
-G^{(n)}_t = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+ n} + \gamma^n V(S_{t+n})
-$$
+$$G^{(n)}_t = R_{t+1} + \gamma R_{t+2} + ... + \gamma^{n-1} R_{t+ n} + \gamma^n V(S_{t+n})$$
 
-And so the equation again follows the same format:
+And so, the equation again follows the same format:
 
-$$
-V(S_t) \gets V(S_t) + \alpha (G^{(n)}_t - V(S_t)
-$$
+$$V(S_t) \gets V(S_t) + \alpha (G^{(n)}_t - V(S_t)$$
 
-One interesting thing to note here is that if n is increased all the way till the terminal state, then we essentially get the same equation as MC methods! 
+One interesting thing to note here is that if the value of $n$ is increased all the way to the terminal state, then we essentially get the same equation as MC methods!
 
 ### Averaging over n returns 
-To get the best out of all n's, one improvement could be to avergae teh returns over certain number of states. For example, we could combine 2-step and 4-step returns and take teh average :
+To get the best out of all the $n$ steps, one improvement could be to average the returns over a certain number of states. For example, we could combine 2-step and 4-step returns and take the average :
 
-$$
-G_avg = \frac{1}{2} [ G^{(2)} + G^{(4)} ]
-$$
+$$G_{avg} = \frac{1}{2} [ G^{(2)} + G^{(4)} ]$$
 
-This has been shown to work  better in many cases, but only incrementally.
+This has been shown to work better in many cases, but only incrementally.
 
-### $\lambda$-Return
+### $\lambda$-Return → Forward View
 
 This is a method to combine the returns from all the n-steps:
 
-$$
-G^{(\lambda)}_t = (1 - \lambda ) \displaystyle\sum_{n=1}^{\infin} \lambda^{n-1} G^{(n)}_t
+$$G^{(\lambda)}_t = (1 - \lambda ) \displaystyle\sum_{n=1}^{\infin} \lambda^{n-1} G^{(n)}_t$$
 
-$$
-
-And ths, is als called **Forward-view TD($\lambda$)**
+And this, is also called **Forward-view $TD(\lambda)$.**
 
 ### Backward View 
 
 To understand the backward view, we need a way to see how we are going to judge the causal relationships between events and outcomes (Returns). There are two heuristics:
-1. **Frequency Heuristic :** Assign credit to the most frequent states
-2. **Recency Heuristic :** Assign credit to the most recent states.
 
-The way we keep track of how each states fares on these two heuristic is through **Eligibility Traces** :
+1. **Frequency Heuristic →** Assign credit to the most frequent states
+2. **Recency Heuristic →** Assign credit to the most recent states.
 
-$$
-E_t(s) = \gamma \lambda E_{t-1}(s) + \bold{1}(S_t = s)
-$$
+The way we keep track of how each states fares on these two heuristics is through **Eligibility Traces**:
 
-These traces accumulate as the frequency increases, and are higher for more recent states. If the frequency drops, they also drop. This is evident in the figure below:
+$$E_t(s) = \gamma \lambda E_{t-1}(s) + \bold{1}(S_t = s)$$
+
+These traces accumulate as the frequency increases and are higher for more recent states. If the frequency drops, they also drop. This is evident in the figure below:
 
 <img width=300 height=100 src="static/Reinforcement Learning/ET.png">
 
 So, all we need to do it scale the TD-error $\delta_t$ according to the trace function:
 
-$$
-V(S) \gets  V(S) + \alpha \delta_t E_t(s)
-$$
+$$V(S) \gets V(S) + \alpha \delta_t E_t(s)$$
 
-Thus, when $\lambda = 0$, we get TD(0) and when $\lambda = 1$, the credit is deferred to the end of the episode nand we get MC
+Thus, when $\lambda = 0$, we get the equation for $TD(0)$ , and when $\lambda =1$, the credit is deferred to the end of the episode and we get MC equation.
 
 
 <!-- %%% -->
 # RL: Planning and Dynamic Programming
 
-Dynamic programming (DP) is a method that solves a problem by breaking it down into sub-problems and then solving each sub-problem individually, and then combining them into a solution. A godo example is the standard fibonacci sequence calculation problem, where traditionally the way to solve ti would be through recursion
+Dynamic programming (DP) is a method that solves a problem by breaking it down into sub-problems and then solving each sub-problem individually, after which it combining them into a solution. A good example is the standard Fibonacci sequence calculation problem, where traditionally the way to solve it would be through recursion
 
 ```cpp
-int fib(int x)
-{
-    if (x < 2)
-        return 1;
+int fib(int *x*) {
+	
+	if (x < 2) {
+		return 1;
+	}
+	return fib(x-1) + fib(x-2);	
 
-    return fib(x-1) + fib(x-2);
 }
-
 ```
-However, the way DP would go about this would be to cache the variables after teh first call, so that the same call is not made again, making the program more efficient:
+
+However, the way DP would go about this would be to cache the variables after the first call, so that the same call is not made again, making the program more efficient:
 
 ```cpp
-int fib(int x)
-{
-    static vector<int> cache(N, -1);
+int fib(int *x*) {
 
-    int& result = cache[x];
-
-    if (result == -1)
-    {
-        if (x < 2)
-            result = 1;
-        else
-            result = fib(x-1) + fib(x-2);
-    }
-
-    return result;
+	static vector<int> cache(N, -1);
+	int& result = cache[x];
+	
+	if (result == -1) {
+	
+		if (x < 2) result = 1;
+	
+		else result = fib(x-1) + fib(x-2);
+	}
+	
+	return result;
 }
-
 ```
 
-The 2 characteristics that a problems need to have fo DP to solve it are: 
-1. **Optimal Substructure :** Any problem has optimal substructure property if its overall optimal solution can be constructed from the optimal solutions of its subproblems i.e the property $Fib(n) = Fib(n-1) + Fib(n-2)$ in fibonacci numbers
-2. **Over-lapping Sub-problems :** The problem involves sub-problems which need to be solved recursively many tiimes
+The 2 characteristics that a problems need to have fo DP to solve it are:
 
-Now, in teh case of an MDP, we have already seen that these properties are fulfilled: 
-1. The Bellman equation gives a recursive relation that satisfies the overlap requirement
-2. The valu function is able to store and re-use the solutions from each state-visit, and thus, the we can exploit it as an optimal substructure
+1. ****Optimal Substructure :**** Any problem has optimal substructure property if its overall optimal solution can be constructed from the optimal solutions of its subproblems i.e the property $Fib(n) = Fib(n-1) + Fib(n-2)$ in fibonacci numbers
+2. ****Overlapping Sub-problems:**** The problem involves sub-problems that need to be solved recursively many times
 
-Hence, DP can be used for making solutions to MDPs more tractable, and thus, is a good tool to solve the planning problem in an MDP. The plannign problem, as discussed before, is of two types: 
-1. **Predicton Problem :** **How do we evaluate a policy ?** or, Using the MDP tuple as an input, the output is a value function $V_{\pi}$ and/or a policy $\pi$
-2. **Control Problem :** **How do we optimie the policy ?** Using the MDP tuple as an input, the output is a an optimal value function $V_{*}$ and/or a policy $\pi_{*}$ 
+Now, in the case of an MDP, we have already seen that these properties are fulfilled:
+
+1. The Bellman equation gives a recursive relation that satisfies the overlapping sub-problems requirement
+2. The value function is able to store and re-use the solutions from each state-visit, and thus, we can exploit it as an optimal substructure
+
+Hence, DP can be used for making solutions to MDPs more tractable, and thus, is a good tool to solve the planning problem in an MDP. The planning problem, as discussed before, is of two types:
+
+1. ****Prediction Problem:**** ****How do we evaluate a policy ?**** or, Using the MDP tuple as an input, the output is a value function $v_{\pi}$ and/or a policy $\pi$
+2. ****Control Problem:**** ****How do we optimize the policy ?**** Using the MDP tuple as an input, the output is an optimal value function $v_*$ and/or a policy $\pi_*$
 
 ## Iterative Policy Evaluation
 
-The most basic way is to iteratively apply the bellman equation, using hte old values to calculate a new estimate, and then using this new estimate to calculate new values. IN the bellman equation for the state-value function 
+The most basic way is to iteratively apply the Bellman equation, using the old values to calculate a new estimate, and then using this new estimate to calculate new values. In the Bellman equation for the state-value function
 
-$$
-v_{\pi}(s) = \sum_{\substack{a \in A}} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s) ]
-$$
+$$v_{\pi}(s) = \sum_{a \in A} \pi (a|s) \big[ R^{a}s  +  \gamma \sum{s' \in S} P^{a}{ss'} v{\pi}(s) \big]$$
 
-As long as either $\gamma < 1$ or eventual termination is guaranteed from all states under the policy $\pi$, the uniqueness of the value function is guaranteed. Thus, we can consider a sequence of approximation functions $v_0, v_1, v_2, ...$ each mapping states to Real numbers, start with an arbitrary estimate of $v_0$, and obstain successive approximations using bellman equation, as follows: 
+As long as either $\gamma < 1$ or the eventual termination is guaranteed from all states under the policy $\pi$, the uniqueness of the value function is guaranteed. Thus, we can consider a sequence of approximation functions $v_0, v_1, v_2, ...$  each mapping states to Real numbers, start with an arbitrary estimate of $v_0$, and obtain successive approximations using Bellman equation, as follows:
 
-$$
-v_{k+1}(s) = \sum_{\substack{a \in A}} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{k} (s') ]
-$$
+$$v_{k+1}(s) = \sum_{a \in A} \pi (a|s) \big[ R^{a}_s  +  \gamma \sum_{s' \in S} P^{a}_{ss'} v_{k} (s') \big]$$
 
-The sequence $v_k$ can be shown to converge as $ k \rightarrow \infin $
-
-the process, is basically a propogation towards the root of the decision tree from the roots.
+The sequence $v_k$ can be shown to converge as $k \rightarrow \infty$. The process is basically a propagation towards the root of the decision tree from the roots.
 
 <img width=300 height=200 src="static/Reinforcement Learning/It-pol-eval.png">
 
-This update operation is applied to each state in the MDP at each step, and so, is called **Full-Backup**, ad so in a computer program we would have two cache arrays - one for $v_k(s)$ and one for $v_{k+1}(s)$
+This update operation is applied to each state in the MDP at each step, and so, is called ****Full-Backup**.** Thus, in a computer program, we would have two cached arrays - one for $v_k(s)$ and one for $v_{k+1}(s)$
 
 ## Policy Improvement
-Once we have a policy, the next question is do we follow this policy or shift to a new improved policy ? one way to answer this problem is to take an action that this policy does not suggest and then evluate the smae policy after that action. If the returns are higher than the we can say that taking that action is better than following the current policy. The way we evaluate the action is throught the action value function: 
+Once we have a policy, the next question is do we follow this policy or shift to a new improved policy? one way to answer this problem is to take any action that this policy does not suggest and then evaluate the same policy after that action. If the returns are higher then we can say that taking that action is better than following the current policy. The way we evaluate the action is through the action-value function:
 
-$$
-q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s')
-$$
+$$q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s')$$
 
-If this value is greater than the value function of a state S, then that means that it is better to select this action than follow the policy $\pi$, and by extension, it would mean that anytime we encounter state S, we would like to take this action. So, let's call the schema of taking action a everytime we encounter s as a new policy ${\pi}'$, and so, we can now say 
+If this value is greater than the value function of a state S, then that essentially means that it is better to select this action than follow the policy $\pi$ , and by extension, it would mean that anytime we encounter state $S$, we would like to take this action. So, let's call the schema of taking action $a$ every time we encounter $S$ as a new policy $\pi'$, and so, we can now say
 
-$$
-q_{\pi}(s,{\pi}'(s)) \geqslant v_{\pi}(s)
-$$
+$$q_{\pi}(s,{\pi}'(s)) \geq v_{\pi}(s)$$
 
+This implies that the policy $\pi'$ must be **at-least** as good as the policy $\pi$
 
-This implies that the policy ${\pi}'$ must be at-least as good as the policy $\pi$
+$$v_{{\pi}'} \geq v_{\pi}$$
 
-$$
-v_{{\pi}'} \geqslant v_{\pi}
-$$
+Thus, if we extend this idea to multiple possible actions at any state $S$,  the net incentive is to go full greedy on it and select the best out of all those possible actions:
 
-Thus, if we extend this idea to multiple possible actions at any state s,  the net incentive is to go full greedy on it and select best out of all those possible actions: 
+$${\pi}'(s) = \argmax_a q_{\pi}(s,a)$$
 
-$$
-{\pi}'(s) = \argmax_a q_{\pi}(s,a)
-$$
-
-The greedy policy, thus, takes the action that looks best in the short term i.e after one step of lookahead. The point at which the new policy stops becoming better than the old one, is the conveergence point, and we can conclude that optimality has been reached. This idea also applies in the general case of stochastic policies, with the addition tha in the case of multiple actions with the maximum value, a portion of the stochastic probabiltiy can be given to each.
+The greedy policy, thus, takes the action that looks best in the short term i.e after one step of lookahead. The point at which the new policy stops becoming better than the old one is the convergence point, and we can conclude that optimality has been reached. This idea also applies in the general case of stochastic policies, with the addition that in the case of multiple actions with the maximum value, a portion of the stochastic probability can be given to each.
 
 ## Policy Iteration
 
-Following the greedy policy improvement process, we can bstain a sequency of policies: 
+Following the greedy policy improvement process, we can obtain a sequence of policies:
 
-$$
-{\pi}_0 \rightarrow v_{\pi_0} \rightarrow {\pi_1} \rightarrow v_{\pi_1} .... \rightarrow {\pi}_* \rightarrow v_{{\pi}_*}
-$$
+$${\pi}_0 \rightarrow v_{\pi_0} \rightarrow {\pi_1} \rightarrow v_{\pi_1} .... \rightarrow {\pi}_* \rightarrow v_{{\pi}_*}$$
 
-Since a finite MDP has a finite number of policies, this process must converge at some point to an optimal value. This process is called **Policy Iteration**. The algorithm, thus, follows the process: 
-1. **Evaluate** the policy using the Bellman equation
-2. **Improve** the policy using greedy policy improvement.
+Since a finite MDP has a finite number of policies, this process must converge at some point to an optimal value. This process is called ****Policy Iteration****. The algorithm, thus, follows the process:
 
-A natural question that comes up at this point is that do we actually need to follow this optimiztaion procedure till the end ? It does sound like a lot of work, and in fact, as  seen in the Gridworld example (Sutton and Barto), the workably optimal policy is actually reached much before the final iteration step, where basically teh final three steps actualy are redundant. Thus, we can include stopping conditions to tackle this: 
+1. ****Evaluate**** the policy using the Bellman equation
+2. ****Improve**** the policy using greedy policy improvement.
+
+A natural question that comes up at this point is that do we actually need to follow this optimization procedure all the way to the end? It does sound like a lot of work, and in a lot of cases, a workably optimal policy is actually reached much before the final iteration step, where the steps after achieving this policy add minimal improvement and thus, are somewhat redundant. Thus, we can include stopping conditions to tackle this, as follows:
+
 1. $\epsilon$-convergence
-2. Stop after k iteratiokns
+2. Stop after $k$ iteratiokns
 3. Value Iteration
 
 
 ## Value Iteration
 
-in this algorithm, the evaluation is truncated to one sweep, or one backup of each state. to understand this, the first step is to understand something called the **Principle of Optimality**. The basic idea is that an optimal policy can be subdivided into two parts:
+In this algorithm, the evaluation is truncated to one sweep → one backup of each state. To understand this, the first step is to understand something called the **Principle of Optimality**. The idea is that an optimal policy can be subdivided into two parts:
+
 - An optimal first action $A_*$
-- An optimal policy from the successor state S'
+- An optimal policy from the successor state $S'$
 
-So, if we know the the solution to $v_*(s')$ for all s' succeeding a state, s , then the solution can be found with just a one-step lookahead
+So, if we know the solution to $v_*(s')$ for all $s'$ succeeding the state $s$, then the solution can be found with just a one-step lookahead
 
-$$
-v_*(s) \gets \max_{a \isin A} R^a_s + \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{*} (s')
-$$
+$$v_*(s) \gets \max_{a \isin A} R^a_s + \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{*} (s')$$
 
-The intuition is to start from teh final reward and work your way backward. There is no explicit update of policy, only values. This also opens up the possibility that the intermediate values might not correspond to any policies, and so interpreting anything midway will have some residue in addition to the greedy policy.  In practice, we stop once the value function changes by only a small amount in a sweep. A  summary of synchronous methods for DP is given by David Silverman:
+The intuition is to start from the final reward and work your way backward. There is no explicit update of policy, only values. This also opens up the possibility that the intermediate values might not correspond to any policy, and so interpreting anything midway will have some residue in addition to the greedy policy.  In practice, we stop once the value function changes by only a small amount in a sweep. A summary of synchronous methods for DP is given by David Silverman:
 
-
-<img width=500 height=150 src="static/Reinforcement Learning/sync_DP_summary.png">
+<img width=500 height=200 src="static/Reinforcement Learning/sync-DP-summary.png">
 
 <!-- %%% -->
 # RL: Markov Processes
 These are random processes indexed by time and are used to model systems that have limited memory of the past. The fundamental intuition behind Markov processes is the property that the future is independent of the past, given the present. In a general scenario, we might say that to determine the state of an agent at any time instant, we only have to condition it on a limited number of previous states, and not the whole history of its states or actions. The size of this window determines the order of the Markov process.
 
-To better explain this, one primary point that needs to be addressed is that the complexity of a Markov process greatly depends on whether the time axis is discrete or topological. When this space is discrete, then the Markov process is a Markov Chain. A basic level understanding of how these processes play out in the domain of reinforcement learning is very clear when analyzing these chains. Moreover, the starting point of analysis can be further simplified by limiting the order of Markov Processes to first-order. This means that at any time instant, the agent only needs to see its previous state to determine its current state, or its current state to determine its future state. This is called the **Markov Property**
+To better explain this, one primary point that needs to be addressed is that the complexity of a Markov process greatly depends on whether the time axis is discrete or topological. When this space is discrete, then the Markov process is a Markov Chain. A basic level understanding of how these processes play out in the domain of reinforcement learning is very clear when analyzing these chains. Moreover, the starting point of analysis can be further simplified by limiting the order of Markov Processes to first-order. This means that at any time instant, the agent only needs to see its previous state to determine its current state, or its current state to determine its future state. This is called the ****Markov Property****
 
-$$
-\Rho(S_{t+1}|S_t) = \Rho(S_{t+1}|S_1, ..., S_t) )
-$$
+$$\mathbb{P}(S_{t+1}|S_t) = \mathbb{P}(S_{t+1}|S_1, ..., S_t) )$$
 
 ## Markov Process
-tthe simplest process is a tuple $<S,P>$ of states and Transitions. The transitions can be represented in the form of a Matrix $P = [P_{ij}]$, mapping the states from which the transition originates, the i index, and the states to which the transition goes, the j index.
+The simplest process is a tuple $<S,P>$ of states and Transitions. The transitions can be represented as a Matrix $P = [P_{ij}]$, mapping the states - i - from which the transition originates,  to the states - j - to which the transition goes.
 
-$$
-\begin{bmatrix}
-  P_{11} & . & . & . & P_{1n}\\
-  . & . & . & . & . \\ 
-  . & . & . & . & . \\
-  . & . & . & . & . \\
-  P_{n1} & . & . & . & P_{nn}
-\end{bmatrix}
-$$
+$$\begin{bmatrix}
+P_{11} & . & . & . & P_{1n}\\
+. & . & . & . & . \\
+. & . & . & . & . \\
+. & . & . & . & . \\
+P_{n1} & . & . & . & P_{nn}
+\end{bmatrix}$$
 
-Another way to visualize this would be in the form of a graph, as shown below, courtsey David Silver. 
+Another way to visualize this would be in the form of a graph, as shown below, courtesy of David Silver.
 
 <img width=800 height=500 src="static/Reinforcement Learning/MP.png">
 
 This is a basic chain that represents the actions a student can take in the class, with associated probabilities of taking those actions. Thus, in the state - Class 1 - the student has an equal chance of going to the next class or browsing Facebook. Once they start browsing Facebook, then they have a 90% chance of continuing to browse since it is addictive. Similarly, other states can be seen too. 
 
 ## Markov Reward Process
-Now if we add another parameter of rewards to the Markov processes, then the scenario changes to the one in which entering each state have an associated expected immediate reward. This, now, becomes a Markov Reward Process. 
+Now if we add another parameter of rewards to the Markov processes, then the scenario changes to the one in which entering each state has an associated expected immediate reward. This, now, becomes a Markov Reward Process. 
 
 <img width=800 height=500 src="static/Reinforcement Learning/MRP.png">
 
-To fully formalize this, one more thing needs to be added - the discounting factor $\gamma$. This is a hyperparameter that intuitively represents the amount of weightage we give to future rewards. The use of Gamma can be seen in computing the return $G_t$ on a state:
+To fully formalize this, one more thing that needs to be added is the discounting factor $\gamma$. This is a hyperparameter that represents the amount of importance we give to future rewards, something like a 'shadow of the future'. The use of Gamma can be seen in computing the return $G_t$ on a state:
 
-$$
-G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ... 
-$$
+$$G_t = R_{t+1} + \gamma R_{t+2} + \gamma^2 R_{t+3} + ...$$
 
+The reasons for adding this discounting are:
 
+- To account for uncertainty in the future, and thus, better balance our current decisions → The larger the value, the more weightage we give to the 'shadow of the future'
+- To make the math more convenient → only when we discount the successive terms, we can get convergence on an infinite GP
+- To avoid Infinite returns, which might be possible in loops within the reward chain
+- This is similar to how biological systems behave, and so in a certain sense, we are emulating nature.
 
+Thus, the reward process can now be characterized by the tuple $<S, P, R, \gamma >$ . To better analyze the Markov chain, we will also define a way to estimate the value of a state - ****Value function**** - as an expectation of the Return on that state. Thus,
 
-The reasons for discounting are as follows:
-- To account for uncertainty in the future, and thus, better balance our current decisions. The larger the value, the more weightage we give to the 'shadow of the future'
-- To make the math more convenient, since only when we discount the successive terms, we can get convergence on an infinite GP
-- Avoid Infinite returns, which might be possible in loops within the reward chain
-- This is similar to how biological systems behave 
+$$V(S) = \mathbb{E} [ G_t| S_t = s ]$$
 
-Thus, the reward process becomes can be characterized by the tuple $<S, P, R, \gamma >$ . Now, to better analyze this chain, we will also define a way to estimate the value of a state - **Value function** - as an expectation of the Return on that state. Thus,
+An intuitive way to think about this is in terms of betting. Each state is basically a bet that our agent needs to make. Thus, the process of accumulating the rewards represents the agent's understanding of each of these bets, and to qualify them, the agent has to think in terms of the potential returns that these bets can give. This is what we qualify here as the expectation. But the magic comes when we apply it recursively, and this is called the ****Bellman Equation****
 
-$$
-V(S) = E[ G_t| S_t = s ]
-$$
+$$V(S) = \mathbb{E} [R_{t+1} + \gamma V(S_{t+1}| S_t = s]$$
 
-An intuitive way to think of this is in terms of betting. Each state is basically a bet that our agent needs to make. Thus, the reward process represents the agent's understanding of each of these bets, and to qualify them, the agent has to think in terms of the potential returns that these bets can give. This is what we qualify here as the expectation. But the magic comes when we apply it recursively, and this is called the **Bellman Equation**
+This equation signifies that the value of the current state can be seen in terms of the value of the next state and so on, and thus, we can have a correlated relationship between states. To better see how this translates to the whole chain, we can also express this as a Matrix Operation:
 
-$$
-V(S) = E[R_{t+1} + \gamma V(S_{t+1}| S_t = s]
-$$
-
-This basically means that the value of the current state can be seen in terms of the value of the next state and so on, and thus, we can have a correlated relationship between states. To better see how this translates to the whole MDP, we can also express this as a Matrix Operation
-
-$$
-\begin{bmatrix} 
-   V_1 \\
-   .  \\
-   .  \\
-   V_n
-\end{bmatrix} 
-= 
-\begin{bmatrix} 
-   R_1 \\
-   .  \\
-   .  \\
-   R_n
-\end{bmatrix} 
-+ 
-\begin{bmatrix}
-  P_{11} & . & . & P_{1n}\\
-  . & . & . & . \\ 
-  . & . & . & . \\
-  P_{n1} & . & . & P_{nn}
+$$\begin{bmatrix}
+V_1 \\
+.  \\
+.  \\
+V_n
 \end{bmatrix}
-\begin{bmatrix} 
-   V_1 \\
-   .  \\
-   .  \\
-   V_n
-\end{bmatrix} 
-$$
+=
+\begin{bmatrix}
+R_1 \\
+.  \\
+.  \\
+R_n
+\end{bmatrix}
+
+\begin{bmatrix}
+P_{11} & . & . & P_{1n}\\
+. & . & . & . \\
+. & . & . & . \\
+P_{n1} & . & . & P_{nn}
+\end{bmatrix}
+\begin{bmatrix}
+V_1 \\
+.  \\
+.  \\
+V_n
+\end{bmatrix}$$
 
 And so, the numerical way to solve this would be to invert the matrix (assuming it is invertible) and the solution, then would be:
-$$
-\bar{V} = (1 - \gamma \bar{P})^{-1} \bar{R}
-$$
 
-However, as anyone familiar with large dimensions knows, this becomes intractable pretty easily. Hence, the whole of RL is based on figuring out ways to make this tractable, using majorly three kinds of methods: 
+$$\bm{\bar{V}} = (1 - \gamma \bm{\bar{P}})^{-1} \bm{\bar{R}}$$
+
+However, as anyone familiar with large dimensions knows, this becomes intractable pretty easily. Hence, the whole of RL is based on figuring out ways to make this tractable, using majorly three kinds of methods:
+
 1. Dynamic Programming
 2. Monte-Carlo Methods
 3. Temporal Difference Learning
-
-We will delve deeper into these in the next parts! 
 
 ## Markov Decision Process
 
@@ -3237,64 +3691,57 @@ Thus, the MDP can be summarized by the tuple $<S, A, P, R, \gamma >$. Here, we c
 
 $$
 \begin{aligned}
-R^{a}_{s} = E[ R_{t+1} | S_t=s, A_t=a ] \\
-P^{a}_{ss'} = P[ S_{t+1}=s'| S_t=s, A_t=a ]
+R^{a}_s &= \mathbb{E}[ R{t+1} | S_t=s, A_t=a ] \\
+P^{a}_{ss'} &= \mathbb{P}[ S{t+1}=s'| S_t=s, A_t=a ]
 \end{aligned}
 $$
 
-Now, the important thing is how should the agent make these decisions. The schema that the agent follows for this is called a **Policy**, which can be seen as the probability of taking an action, given the state: 
+Now, the important thing is how the agent makes these decisions. The schema that the agent follows for this is called a ****Policy****, which can be seen as the probability of taking an action, given the state:
 
 $$
-\pi (a|s) = P [ A_t = a | S_t = s ] 
+\pi (a|s) = \mathbb{P} [ A_t = a | S_t = s ]
 $$
 
 Under a particular policy $\pi$, the Markov chain that results is nothing but an MRP, since we don't consider the actions that the agent did not take. This can be characterized by $<S, P^{\pi}, R^{\pi}, \gamma>$, and the respective transitions and rewards can be described as:
 
 $$
 \begin{aligned}
-R^{\pi} = \sum_{\substack{a \in A}} \pi (a|s) R^{a}_{s}\\
-P^{\pi}_{ss'} = \sum_{\substack{a \in A}} \pi (a|s) P^{a}_{ss'}
+R^{\pi}_{s} &= \sum_{\substack{a \in A}} \pi (a|s) R^{a}_{s}\\
+P^{\pi}_{ss'} &= \sum_{a \in A} \pi (a|s) P^{a}_{ss'}
 \end{aligned}
 $$
 
-Another important thing that would need to be distinguished here is the value function, which can be defined for both states and actions: 
-- **State-Value Function ($v_{\pi}$):** Values for states when policy $\pi$ is followed 
+Another important thing that needs to be distinguished here is the value function, which can be defined for both states and actions:
 
-$$
-v_{\pi}(s) = E_{\pi}[G_t | S_t = s]
-$$
+- **State-Value Function ($v_{\pi}$):** Values for states when policy $\pi$ is followed
 
-- **Action-Value Function ($q_{\pi}$):** Expected return onj starting from state s, following policy $\pi$ and taking action a
+    $$v_{\pi}(s) = \mathbb{E}_{\pi}[G_t | S_t = s]$$
 
-$$
-q_{\pi}(s, a) = E_{\pi}[G_t | S_t = s, A_t = a] 
-$$
+- **Action-Value Function ($q_{\pi}$):** Expected return on starting from state $s$, following policy $\pi$, and taking action $a$
+
+    $$q_{\pi}(s, a) = \mathbb{E}_{\pi}[G_t | S_t = s, A_t = a]$$
 
 
 ### Bellman Equation for MDPs
 We can extend the bellman formulation to recursively define the qualities of state and actions:
 
-$$
-\begin{aligned}
-v_{\pi}(s) = E_{\pi} [R_{t+1} + \gamma v_{\pi}(s')| S_t = s, S_{t+1} = s'] \\
+$$\begin{aligned}
+&v_{\pi}(s) = \mathbb{E}_{\pi} \big[R_{t+1} + \gamma v_{\pi}(s')| S_t = s, S_{t+1} = s'\big] \\
+&q_{\pi}(s, a) = \mathbb{E}_{\pi} \big[R_{t+1} + \gamma q_{\pi}(s', a')| S_t = s, S_{t+1} = s', A_t = a, A_{t+1} = a' \big]
+\end{aligned}$$
 
-q_{\pi}(s, a) = E_{\pi} [R_{t+1} + \gamma q_{\pi}(s', a')| S_t = s, S_{t+1} = s', A_t = a, A_{t+1} = a']
-
-\end{aligned}
-$$
-
-However, a better way is to look at the inter-dependencies of these two value functions. The value of the state can be viewed as the sum of the value of the actions that can be taken from this state, which can in-turn be viewed as the weigted sum of values of the states that can result from each action.
+However, a better way is to look at the inter-dependencies of these two value functions. The value of the state can be viewed as the sum of the value of the actions that can be taken from this state, which can, in turn, be viewed as the weighted sum of values of the states that can result from each action.
 
 #### Bellman Expectation in second recursive form
 
-The expectation for the value of states is the sum of the values of the actions that can result from that state
+The expectation for the value of the states is the sum of the values of the actions that can result from that state
 
 <img width=400 height=200 src="static/Reinforcement Learning/sve.png">
 
 Thus, under the policy $\pi$ this value is the sum of the q-values of the actions: 
 
 $$
-v_{\pi}(s) = \sum_{\substack{a \in A}} \pi (a|s) q_{\pi} (s,a)
+v_{\pi}(s) = \sum_{a \in A} \pi (a|s) q_{\pi} (s,a)
 $$
 
 Now, the action can be viewed in a similar manner as a sum over the value fo the states that can result from it
@@ -3304,13 +3751,13 @@ Now, the action can be viewed in a similar manner as a sum over the value fo the
 and written in the same manner
 
 $$
-q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s)
+q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{s' \in S} P^{a}_{ss'} v_{\pi} (s)
 $$
 
-And, if we put these equations together, we can get a self-recursive formulation of the bellman expectation. So, for the state this would be
+And, if we put these equations together, we can get a self-recursive formulation of the bellman expectation equation. Thus, for the state this would be
 
 $$
-v_{\pi}(s) = \sum_{\substack{a \in A}} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{\pi} (s) ]
+v_{\pi}(s) = \sum_{a \in A} \pi (a|s) [ R^{a}_s  +  \gamma \sum_{s' \in S} P^{a}_{ss'} v_{\pi} (s) ]
 $$
 
 A Visualization for this would basically be a combination of the above two trees
@@ -3320,7 +3767,7 @@ A Visualization for this would basically be a combination of the above two trees
 A similar process can be done for the action value function, and the result comes out to be
 
 $$
-q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} \sum_{\substack{a' \in A}} \pi (a'|s') q_{\pi} (s',a')
+q_{\pi}(s,a) = R^{a}_s  +  \gamma \sum_{s' \in S} P^{a}_{ss'} \sum_{a' \in A} \pi (a'|s') q_{\pi} (s',a')
 $$
 
 <img width=300 height=200 src="static/Reinforcement Learning/avesve.png">
@@ -3328,61 +3775,60 @@ $$
 
 #### Bellman Optimality Equation
 
-With the recursive forms, the question really comes on how do we go about creating a closed-loop optimality criterion. Here, the key point that needs to be taken into account is **The agent is free to choose the action that it can take in each state, but it can't choose the state that results from that action**. This means, we start from a state, and maximize the result by choosing the action with the maximum action value. This is the first step of lookahead. Now, each of those actions has the associated action value that needs to be determined. In the case where the action can only lead to one state, it's all well and good. However, in the case where multiple states can result out of the action, the value of the action can be determined by basically rolling a dice and seeing which state the action leads to. Thus, the value of the state that the action leads to determines the value of the action. This happens for all the possible action from our first state, and thus, the value of the state is determined. Hence, with this **Two-step lookahead**, we can formulate the decision as maximizing the action values.
+With the recursive forms, the question really comes on how do we go about creating a closed-loop optimality criterion. Here, the key point that needs to be taken into account is **The agent is free to choose the action that it can take in each state, but it can't choose the state that results from that action**. This means, we start from a state, and maximize the result by choosing the action with the maximum action value. This is the first step of lookahead. Now, each of those actions has the associated action value that needs to be determined. In the case where the action can only lead to one state, it's all well and good. However, in the case where multiple states can result out of the action, the value of the action can be determined by basically rolling a dice and seeing which state the action leads to. Thus, the value of the state that the action leads to determines the value of the action. This happens for all the possible actions from our first state, and thus, the value of the state is determined. Hence, with this ****Two-step lookahead****, we can formulate the decision as maximizing the action values.
 
-$$
-v_{*}(s) = \max_{\substack{a}} [ R^{a}_s + \gamma \sum_{\substack{s' \in S}} P^{a}_{ss'} v_{*} (s)]
-$$
+$$v_{\pi}(s) = \max_{a} \{ R^{a}s + \gamma \sum_{s' \in S} P^{a}_{ss'} v{} (s) \}$$
 
 Now, the question arises as to how can this equation be solved. The thing to note here is the fact that it is not linear. Thus, in general, there exists no closed-form solution. However, a lot of work has been done in developing iterative solutions to this, and the primary methods are:
-- **Value Iteration :** Here methods solve the equation by iterating on the value function, going through episodes, and recursively working backward on value updates
-- **Policy iteration :** Here, the big idea is that the agent randomly selects a policy and finds value function corresponding to it. Then it finds a new and improved policy based on the previous value function, and so on.
-- **Q Learning :** This is a model-free way in which the agent is guided through the quality of actions that it takes, wit the aim of selecting the best ones
-- **SARSA :** Here the idea is to iteratively try to close the loop by selecting a **S**tate, **A**ction, and **R**eward and then seeing the **S**tate and **A**ction that follows.
+
+- **Value Iteration:** Here methods solve the equation by iterating on the value function, going through episodes, and recursively working backward on value updates
+- **Policy Iteration:** Here, the big idea is that the agent randomly selects a policy and finds a value function corresponding to it. Then it finds a new and improved policy based on the previous value function, and so on.
+- **Q Learning:** This is a model-free way in which the agent is guided through the quality of actions that it takes, wit the aim of selecting the best ones
+- **SARSA:** Here the idea is to iteratively try to close the loop by selecting a **S**tate, **A**ction, and **R**eward and then seeing the **S**tate and **A**ction that follows.
 
 ## Extensions to MDP
 
-MDPS, as a concept, has been extended to make them applicable to multiple other kinds of problems that could be tackled. Some of these extensions are: 
-1. **Infinite and Continuous MDPs :** In this extension, the MDP concept is applied to infinite sets, mainly countably infinite state or action spaces, Continuous Spaces (LQR), continuous-time et. al  
-2. **Partially Observable MDPs (POMDP) :** A lot of scenarios exist where there are limits on the agent's ability to fully observe the world. These are called Partially-Observable cases. Here, the state is formalized in terms of the belief distribution over the possible observations and encoded through the history of the states. The computations become intractable in theory, but many interesting methods have been devised to get them working. Eg. DESPOT
-3. **Undiscounted and Average Reward MDP :** These are used to tackle ergodic MDPs - where there is a possibility that each state can be visited an infinite number of times ( Recurrence), or there is no particular pattern in which the agent visits the states (Aperiodicity) - and to tackle this, the rewards are looked at as moving averages that can be worked with on instants of time.
+MDPS, as a concept, has been extended to make them applicable to multiple other kinds of problems that could be tackled. Some of these extensions are:
+
+1. **Infinite and Continuous MDPs:** In this extension, the MDP concept is applied to infinite sets, mainly countably infinite state or action spaces, Continuous Spaces (LQR), continuous-time et. al
+2. **Partially Observable MDPs (POMDP):** A lot of scenarios exist where there are limits on the agent's ability to fully observe the world. These are called Partially-Observable cases. Here, the state is formalized in terms of the belief distribution over the possible observations and encoded through the history of the states. The computations become intractable in theory, but many interesting methods have been devised to get them working. Eg. DESPOT
+3. **Undiscounted and Average Reward MDP:** These are used to tackle ergodic MDPs - where there is a possibility that each state can be visited an infinite number of times ( Recurrence), or there is no particular pattern in which the agent visits the states (Aperiodicity) - and to tackle this, the rewards are looked at as moving averages that can be worked with on instants of time.
 
 
 <!-- %%% -->
 # RL: Introduction to Reinforcement learning
-The way I like to think about Reinforcement learning is by imagining myself as a ring-master who has to train a certain creature. One of the reasons why I like this visualization is because RL has historical roots in trial and error and the psychology of animal learning. So, let's say I want to train this creature to perform some tricks around a hula-hoop, one of the ways I might go about this is by creating a scheme where the creature would be punished for not jumping through the hoop. As the training goes on, the punishment guides it to go to places where it does not receive punishment, and over time, it learns to jump through the hoop.
-
-A similar thing happens in RL. The thing that I need to train is called an **Agent**. My language of communication with this agent is through numbers, encoded in processes that I create for it to understand and interact with the world around it. The way this agent interacts with the world around it is through **Actions (A)** and the way it understands the world is through **Observations (O)**. Now, my task is to define these actions and observations and train this agent to achieve a certain task by creating a closed-loop control of feedback for the actions it takes. This feedback is the **reward (R)** that agent receives for each of its actions. So, the key is to devise a method to guide the agent in such a way that it 'learns' to reach the goal by selecting actions with the highest **Expected Rewards (G)**, updating these values by observing the environment after taking that action. Thus, the agent first takes random actions and updates its reward values, and slowly, it starts to favor actions with higher rewards, which eventually lead to the goal.
+One way to look at the behavior of an organism is by looking at how it interacts with its environment, and how this interaction allows it to behave differently over time through the process of learning. In this view, the behavior of the organism can be modeled in a closed-loop manner through a fundamental description of the action and sensation loop. It receives input - sensation - from the environment through sensors, acts on the environment through actuators, and observes the impact of its action on its understanding of the environment through a mechanism of quantification in the form of the rewards it receives for its action. A similar thing happens in RL. The thing that we need to train is called an Agent. The language of communication with this agent is through numbers, encoded in processes that we create for it to understand and interact with the world around it. The way this agent interacts with the world around it is through Actions (A) and the way it understands the world is through Observations (O). Now, our task is to define these actions and observations and train this agent to achieve a certain task by creating a closed-loop control of feedback for the actions it takes. This feedback is the Reward (R) that agent receives for each of its actions. So, the key is to devise a method to guide the agent in such a way that it 'learns' to reach the goal by selecting actions with the highest Expected Rewards (G), updating these values by observing the environment after taking that action. Thus, the agent first takes random actions and updates its reward values, and slowly, it starts to favor actions with higher rewards, which eventually lead to the goal.
 
 <img width=800 height=500 src="static/Reinforcement Learning/agent-env.svg">
 
-The way I define observations is through formalizing it as a **State (S)** in which this agent exists, or can exist. This state can either be the same as the observation, in case the agent can see everything about its environment, for example, in an extreme case imagine if you were able to see all the atoms that constitute your surroundings, or the state can be defined in terms of **Beliefs (b)** that agent the might have based on its observation. More on this in the next sections!
+The way we define observations is through formalizing it as a **State (S)** in which this agent exists, or can exist. This state can either be the same as the observation, in case the agent can see everything about its environment, for example, in an extreme case imagine if you were able to see all the atoms that constitute your surroundings, or the state can be defined in terms of **Beliefs (b)** that agent the might have based on its observation. this distinction is important for problems of partial observability, a topic for the future. A standard testbed in RL is the Mountain Car scenario. As shown in the figure below, the car exists in a valley and the goal is at the top. The car needs to reach this goal by accelerating, but it is unable to reach the top by simply accelerating from the bottom. Thus, it must learn to leverage potential energy by driving up the opposite hill before the car is able to make it to the goal at the top of the rightmost hill.
 
-A standard testbed in RL, and an overly used example, is the Mountain Car scenario. As shown in the figure below, the car exists in a valley and the goal is at the top. The car needs to reach this goal by accelerating, but it is unable to reach the top by simply accelerating from the bottom. Thus, it must learn to leverage potential energy by driving up the opposite hill before the car is able to make it to the goal at the top of the rightmost hill.
-
-<!-- ![image](Reinforcement_Learning/Pics/mountain-car.jpg) -->
 <img width=700 height=400 src="static/Reinforcement Learning/mountain-car.jpg">
 
-One way to define the values for the agent - the car - would be to define the state as the (position, velocity) of the car, the actions as (Do nothing, Push the car left, Push the car right), and rewards as -1 for each step that leads to a position that is not the goal and 0 for reaching the goal.
+One way to define the values for the agent - the car - would be to define the state as the (position, velocity) of the car, the actions as (Do nothing, Push the car left, Push the car right), and rewards as -1 for each step that leads to a position that is not the goal and 0 for reaching the goal. To characterize the agent, the following components are used in the RL vocabulary:
 
-To characterize the agent, the following components are used in the RL vocabulary:
-- **Policy $(\pi : S \rightarrow A)$:** This is the behavior of the agent that i.e the schema it follows while navigating in the environment it observes by taking actions. Thus, it is a mapping from state to action
+- **Policy ($\pi: S \rightarrow A$):** This is the behavior of the agent that i.e the schema it follows while navigating in the environment it observes by taking actions. Thus, it is a mapping from state to action
 - **Value Function (V):** This is the agent's prediction of future rewards. The way this fits into the picture is that at each step the agent predicts the rewards that it can get in the future by following a certain set of actions under a policy. This expectation of reward is what determines which actions the agent should select.
-- **Model :** The agent might make a model of the world that it observes around itself. Then it can use this model to extract information that it can use to better decide the actions that the it can take. There are two types of models that are used, Reward Model and Transition
-- **Reward Model :** Model to predict the next immediate reward. This is defined in terms of Expectation fo reward conditioned on a state and action : $R^{a}_{s} = \Epsilon[ R | S=s, A=a ]$
-- **Transition Model :** Model to predict the next state using the dynamics of the environment. This is deinfed in terms of probability of a next state, conditioned on the current state and actions : $P^{a}_{ss'} = \Rho[ S'=s'| S=s, A=a ]$
+- **Model:** The agent might make a model of the world that it observes around itself. Then it can use this model to extract information that it can use to better decide the actions that it can take. There are two types of models that are used, Reward Model and Transition
+- **Reward Model:** Model to predict the next immediate reward. This is defined in terms of Expectation fo reward conditioned on a state and action :
+
+    $$R^{a}_{s} = \mathbb{E}[ R | S=s, A=a ]$$
+
+- **Transition Model:** Model to predict the next state using the dynamics of the environment. This is defined in terms of probability of a next state, conditioned on the current state and actions :
+
+    $$P^{a}_{ss'} = \mathbb{P}[ S'=s'| S=s, A=a ]$$
 
 Thus, using the above components learning can be classified into three kinds:
-1. **Value-Based RL :**  In this type, the agent uses a value function to track the quality of states and thus, follows trends in the value functions. For example, in a maze with discretized boxes as steps, the agent might assign values to each step and keep updating them as it learns, and thus, end up creating a pattern where a trend of following an increase int eh value would inevitably lead to the way out of the maze
-2. **Policy-Based RL:** In this case, the agent would directly work with the policy. So, in the case of the maze example, each step might be characterized by four directions in which the agent can traverse ( up, down, left, right) and for each box, the agent might assign a direction it will follow once it reaches that, and as it learns it can update these directions t create a clear path to the end of the maze
-3. **Actor-Critic :** If two ideas are well-established in the scientific community, in this case, the value-based, and policy-based approach, then the next best step could be to try and merge them to get the best of both worlds. This is what the actor-critic does; it tries to merge both these ideas by splitting the model into two parts. The actor takes the state as an input and outputs the best actions by following a learned optimal policy ( policy-based learning ). The critic generates the value for this action by evaluating the value function ( value-based learning ). These both compete in a game to improve their methods and overall the agent learns to perform better.
 
-The learning can also be distinguished based on whether the agent has a model of the world, in which case the learning is **Model-Based RL**, or whether the agent operates without a model of the world i.e **Model-Free RL**. This will be explored in more detail in the next sections.
+1. **Value-Based RL:**  In this type, the agent uses a value function to track the quality of states and thus, follows trends in the value functions. For example, in a maze with discretized boxes as steps, the agent might assign values to each step and keep updating them as it learns, and thus, end up creating a pattern where a trend of following an increase in the value would inevitably lead to the way out of the maze
+2. **Policy-Based RL:** In this case, the agent would directly work with the policy. So, in the case of the maze example, each step might be characterized by four directions in which the agent can traverse (up, down, left, right) and for each box, the agent might assign a direction it will follow once it reaches that, and as it learns it can update these directions t create a clear path to the end of the maze
+3. **Actor-Critic:** If two ideas are well-established in the scientific community, in this case, the value-based, and policy-based approach, then the next best step could be to try and merge them to get the best of both worlds. This is what the actor-critic does; it tries to merge both these ideas by splitting the model into two parts. The actor takes the state as an input and outputs the best actions by following a learned optimal policy (policy-based learning). The critic generates the value for this action by evaluating the value function ( value-based learning). These both compete in a game to improve their methods and overall the agent learns to perform better.
 
-Finally, certain paradigms are common in RL which recurs regularly and thus, it might be good to list them down:
-- **Learning and Planning :** In learning the rules of the game are unknown and are learned by putting the agent in the environment. For example, I remember some people once told me how some coaches teach the basics of swimming by asking the learner to directly jump into the semi-deep water and try to move their hands and legs in a way so that they can float. Irrespective of whether this actually happens or not, if someone learned this way I could think of it as a decent enough analogy. Planning, on the other hand, is driven by a model of the rules that need to be followed, which can be used by the agent to perform a look-ahead search on the actions that it can take.
-- **Exploration and Exploitation :** This is the central choice the agent needs to make every time it takes an action. At any step, it has certain information about the world and it can go on exploiting it to eventually reach a goal (maybe), but the problem is it might not know about the most optimal way to reach this goal if it just acts on the information it already has. Thus, to discover better ways of doing things, the agent can also decide to forego the path it 'knows' will get it the best reward according to its current knowledge and take a random action to see what kind of reward it gets. Thus, in doing so the agent might end up exploring other ways of solving a problem that it might not have known, which might lead to higher rewards than the path it already knows. Personally, the most tangible way I can visualize it is by thinking of a tree of decisions, and then imagining that the agent knows one way to reach the leaf nodes with the maximum reward. However, there might exist another portion of the tree that has higher rewards, but the agent might not ever go to if it greedily acts on its current rewards.
-- **Prediction and Control :** Prediction is just finding a path to the goal, while control is optimizing this path to the goal. Most of the algorithms in RL can be distinguished based on this.
+The learning can also be distinguished based on whether the agent has a model of the world, in which case the learning is ****Model-Based RL****, or whether the agent operates without a model of the world i.e ****Model-Free RL****. This will be explored in more detail in the next sections. Finally, certain paradigms are common in RL which recurs regularly, and thus, it might be good to list them down:
+
+- **Learning and Planning:** In learning the rules of the game are unknown and are learned by putting the agent in the environment. For example, I remember some people once told me how some coaches teach the basics of swimming by asking the learner to directly jump into the semi-deep water and try to move their hands and legs in a way so that they can float. Irrespective of whether this actually happens or not, if someone learned this way I could think of it as a decent enough analogy. Planning, on the other hand, is driven by a model of the rules that need to be followed, which can be used by the agent to perform a look-ahead search on the actions that it can take.
+- **Exploration and Exploitation:** This is the central choice the agent needs to make every time it takes an action. At any step, it has certain information about the world and it can go on exploiting it to eventually reach a goal (maybe), but the problem is it might not know about the most optimal way to reach this goal if it just acts on the information it already has. Thus, to discover better ways of doing things, the agent can also decide to forego the path it 'knows' will get the best reward according to its current knowledge and take a random action to see what kind of reward it gets. Thus, in doing so the agent might end up exploring other ways of solving a problem that it might not have known, which might lead to higher rewards than the path it already knows. Personally, the most tangible way I can visualize it is by thinking of a tree of decisions, and then imagining that the agent knows one way to reach the leaf nodes with the maximum reward. However, there might exist another portion of the tree that has higher rewards, but the agent might not ever go to if it greedily acts on its current rewards.
+- **Prediction and Control:** Prediction is just finding a path to the goal, while control is optimizing this path to the goal. Most of the algorithms in RL can be distinguished based on this.
 
 <!-- %%% -->
 # LIS: Setting up RAI on HPC
