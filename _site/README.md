@@ -1987,103 +1987,77 @@ We do the sam process, but this time we create gaussian distributions for the va
 
 One way to study the impact of different variables is to weight the different classes → weighted log-loss. Cross validation helps in determining which class has more impact
 
+
+<!-- %%% -->
+# MALIS: Logistic Regression
+
+
+
+
 <!-- %%% -->
 # MALIS: Maximum Likelihood Estimation
 
-Main Idea: 
+**Main Idea:** 
 
 1. Make an explicit assumption about what distribution the data was modeled from 
-2. Set the parameters of this distribution so that the data we observe is most likely i.e maximize the likelihood of our data 
+2. Set the parameters of this distribution so that the data we observe is most likely i.e **maximize the likelihood of our data**
 
-For  a simple example of coin toss, we can see this as maximizing the  probability of observing heads from a binomial distribution: 
+For  a simple example of a coin toss, we can see this as maximizing the probability of observing heads from a binomial distribution: 
 
-$$
-p(z_1, ..., z_n) = p(z_1 ...., z_n|\theta)
-$$
+$$p(z_1, ..., z_n) = p(z_1 ...., z_n|\theta)$$
 
-If we assume I.I.D condition, we should be able to break this down into:
+we assume I.I.D condition and so we should be able to break this down into :
 
-$$
-p(z_1|\theta)p(z_2|\theta)....p(z_n|\theta) 
-$$
+$$p(z_1|\theta)p(z_2|\theta)....p(z_n|\theta) $$
 
-Formally, let us define a likelihood function as:
+Formally, let us deinfe a likelihood function as:
 
-$$
-L(\theta) = \prod_{i=1}^N p(z_i|\theta)
-$$
+$$L(\theta) = \prod_{i=1}^N p(z_i|\theta)$$
 
 Now, our task it to find the $\hat{\theta}$ that maximizes this likelihood:
 
-$$
-\hat{\theta}_{MLE} = \argmax_{\theta}\prod_{i=1}^N p(z_i|\theta)
-$$
+$$\hat{\theta}_{MLE} = \argmax_{\theta}\prod_{i=1}^N p(z_i|\theta)$$
 
-Instead of maximizing a product, we can also view this problem as minimizing a sum if we take the log of all values:
+instead of maximizing a product, we can also view this problem as minimizing a sum if we take the log of all values:
 
-$$
-\hat{\theta}_{MLE} = \argmax_{\theta}\sum_{i=1}^N Log(p(z_i|\theta))
-$$
+$$\hat{\theta}_{MLE} = \argmax_{\theta}\sum_{i=1}^N Log(p(z_i|\theta))$$
 
-Let us use this idea for the regression problem. We assume that our outputs are distributed in a gaussian manner around the line w  have to find out. This basically means that our $\epsilon$  is a gaussian Noise that is messing up our outputs from the fundamental distribution, as shown below 
+Let us use this idea for the regression problem. We assume that our outputs are distributed in a Gaussian manner around the line w  have to find out. This basically means that our $\epsilon$  is a Gaussian Noise that is messing up our outputs from the fundamental distribution
 
 <img height=500 width=800 src="static/MALIS/MLE.png">
 
 Thus, our equation for getting this probability of our output would be :
 
-$$
-p(y_i|x_i; w_i, \sigma^2) = \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}
-$$
+$$p(y_i|x_i; w_i, \sigma^2) = \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}$$
 
-Our task, therefore, is to estimate $\hat{w}$ such that the likelihood of p is maximized. This, in other words, means find the value of $w$ that maximizes the above expression:
+Our task is to estimate $\hat{w}$ such that the likelihood of $p$ is maximized. This, in other words, means we need to find the value of $w$ that maximizes the above expression:
 
-$$
+$$\begin{aligned}
+& \hat{w} = \argmax_{w}\prod_{i=1}^N p(y_i|x_i; w_i, \sigma^2) \\
+\implies & \hat{w} = \argmax_{w}\prod_{i=1}^N \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}
+\end{aligned}$$
 
-\begin{aligned}
-&\hat{w} = \argmax_{w}\prod_{i=1}^N p(y_i|x_i; w_i, \sigma^2) \\
-\implies &\hat{w} = \argmax_{w}\prod_{i=1}^N \frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \} \\
-\end{aligned}
-$$
+we can again do the log trick to make this a sum maximization :
 
-we can again do the log trick to make this a sum maximization:
-
-$$
-\begin{aligned}
-&\hat{w} = \argmax_{w} \sum_{i=1}^N Log(\frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \})\\
+$$\begin{aligned}
+&\hat{w} = \argmax_{w} \sum_{i=1}^N Log(\frac{1} {\sigma \sqrt {2\pi } } exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}) \\
 \implies &\hat{w} = \argmax_{w} \{ \sum_{i=1}^N Log(\frac{1}{\sigma \sqrt {2\pi}}) + \sum_{i=1}^N  Log(exp\{ \frac{ - (y_i - x_iw)^2 }{2 \sigma^2} \}) \} \\
-\implies &\hat{w} = \argmax_w -\sum_{i=1}^N \frac{(y_i - x_iw)^2}{2 \sigma^2} \\
-\end{aligned}
-$$
+\implies &\hat{w} = \argmax_w -\sum_{i=1}^N \frac{(y_i - x_iw)^2}{2 \sigma^2}
+\end{aligned}$$
 
-This is basically the same as the normal expression we had, the only difference being the normalizing factor $\sigma$, if we change the negative maximization to minimization:
+This is basically the same as the normal expression we had, the only difference being the normalizing factor $\sigma$. If we change the negative maximization to minimization:
 
-$$
-\hat{w} = \frac{1}{2 \sigma^2} \argmin_w \sum_{i=1}^N (y_i - x_iw)^2
-$$
+$$\hat{w} = \frac{1}{2 \sigma^2} \argmin_w \sum_{i=1}^N (y_i - x_iw)^2$$
 
-Which is the same as minimizing:
+Which is the same as minimizing :
 
-$$
-\hat{w} = \argmin_w \sum_{i=1}^N (y_i - x_iw)^2
-$$
+$$\hat{w} = \argmin_w \sum_{i=1}^N (y_i - x_iw)^2$$
 
 and the solution is: 
 
-$$
-\bm{w} = (\bm{X}^T\bm{X})^{-1} \bm{X}^T\bm{y}
-$$
+$$\bm{w} = (\bm{X}^T\bm{X})^{-1} \bm{X}^T\bm{y}$$
 
 Surprise, Surprise!!
-
-
-
-
-
-
-
-
-
-
 
 
 <!-- %%% -->
