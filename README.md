@@ -10,7 +10,8 @@
 
 
 ### About Me
-- I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/). I am interested in exploring how systems infer patterns from empirical data and training them to learn a wide variety of skills from low-volume datasets. What excites me the most is the extent to which we can learn about our intelligence through the endeavor of creating one. I am currently working towards a specialization in Robotics and Reinforcement Learning.
+- I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/). I am interested in exploring how systems infer patterns from empirical data and training them to learn a wide variety of skills from low-volume datasets. What excites me the most is the extent to which we can learn about our intelligence through the endeavor of creating one. I have worked on problems at the intersection of Robotics, Reinforcement Learning and Meta-Learning on single-agent and Multi-Agent settings, and I have also dabbled with Evolutionary Algorithms and Optimization Literature. I am currently working on ad-hoc cooperation in the game of [Hanabi](https://arxiv.org/abs/1902.00506)
+
 
 - **Fun Fact :** I am a musician - multiinstrumentalist and singer - and can sing in around 8 languages so far. Checkout some of my song covers on my [instagram page](https://www.instagram.com/melodic.musings/)
 
@@ -32,10 +33,320 @@
 - [Plan-Based Reward-Shaping for Goal-Focused Exploration in Reinforcement Learning](CV/LIS_Internship_Report.pdf)
 - [Pulmonary Embolism Detection](CV/MALIS_Final_Report.pdf)
 
+
+
+
+<!-- --------------------------------- Notes ----------------------------------------- -->
 #### Zettelkasten
 
+# Meta: Non-Parametric Methods
+The optimization-based methods are very useful for model-agnosticism and expression with sufficiently deep networks. However, as we have seen the main bottleneck is the second-order optimization which ends up being compute and memory intensive. Thus, the natural question is whether we can embed a learning procedure without the second-order optimization? one answer to this lies in the regime of data when it comes to the test time → during the meta-test time our paradigm of few-shot learning is a low data regime. Thus, methods that are non-parametric and have been shown to work well in these cases can be applied here! Specifically,
+
+- We want to be parametric during hte trainng phase
+- We can apply a non-parametric way to compare classes during test time
+
+Thus, the question now becomes → Can we use parametric Learners to produce effective non-parametric learners? The straight answer to this would be something like K-Nearest Neighbors where we take a test sample and compare it against our training classes to see which one I the closest. However, now we have the issue of the notion of closeness! In the supervised case, we could simply use a L2-Norm, but this might not be the case for meta-learning strategies since direct comparison of low-level features might fail to take into account meta-information that might be relevant. Hence, we look to other approaches
+
+### Siamese Networks
+A siamese network is an architecture which was multiple sub-networks with identical configuration i.e same weights and hyperparameters. We train this architecture to output the similarity between two inputs using the feature vectors.
+
+<img width=700 height=400 src="static/Meta/Meta-1.png">
+
+In our case, we can train these networks to predict whether or not two images belong to the same class or not and thus, we have a black box similarity between our test data and our training classes. We can use this during the test to compare the input with all classes in our training set and output the class with the highest similarity.
+
+### Matching Networks
+
+The issue with the siamese network approach is that we are training the network on Binary classification but testing it on Multi-Class classification. [Matching Networks](https://arxiv.org/pdf/1606.04080.pdf) circumvent this problem by training the networks in such a way that the Nearest-Neighbors method produces good results in the learned embedding space.
+
+<img width=800 height=400 src="static/Meta/Meta-2.png">
+
+To do this, we learn an embedding space $g(\theta)$ for all input classes and also create an embedding space $h(\theta)$ for the test data. We then compare the $g(.)$  and $f(.)$  to predict each image class, which is then summed to create a test prediction. Each of the black dots in the above image corresponds to the comparison between training and test images, and our final prediction is the weighted sum of these individual labels
+
+$$\hat{y}^{ts} = \sum _{x_k, y_k \in \mathcal{D^{tr}}} f _\theta(x^{ts}, x_k) y_k$$
+
+This paper used a bi-directional LSTM to produce $g_\theta$ and a convolutional encoder to embed the images in $h_\theta$ and the model was trained end-end, with the training and test doing the same thing. The general algorithm for this is as follows:
+
+1. Sample Task $\mathcal{T}_i$ ( a sequential stream or mini-batches )
+2. Sample Disjoint Datasets $\mathcal{D^{tr}_i}$,$\mathcal{D^{test}_i}$ from $\mathcal{D}_i$
+3. Compute $\hat{y}^{ts} = \sum _{x_k, y_k \in \mathcal{D^{tr}}} f _\theta(x^{ts}, x_k) y_k$
+4. Update  $\theta$ using $\nabla_\theta\mathcal{L}(\hat{y}^{ts}, y^{ts})$
+
+### Prototypical Networks
+
+While Matching networks work well for one-shot meta-learning tasks, they do all this for only one class. If we had a problem of more than one shot prediction, then the matching network will do the same process for each class, and this might not be the most efficient method for this. [Prototypical Networks](https://arxiv.org/abs/1703.05175) alleviate this issue by aggregating class information to create a prototypical embedding → If we assume that for each class there exists an embedding in which points cluster around a single prototype representation, then we can train a classifier on this prototypical embedding space. This is achieved through learning a non-linear map from the input into an embedding space using a neural network and then taking a class’s prototype to be the mean of its support set in the embedding space.
+
+<img width=600 height=400 src="static/Meta/Meta-3.png">
+
+As shown in the figure above, the classes become seperable in this embedding space. 
+
+$$\bm{c}_k = \frac{1}{|\mathcal{D_i^{tr}}|} \sum_{(x,y) \in \mathcal{D_i^{tr}}} f_\theta(x)$$
+
+Now, if we have a metric on this space then all we have to do is find the near class cluster to a new query point and we can classify that point as belonging to this class by taking the softmax over the distances 
+
+$$p_\theta(y = k|x) = \frac{\exp \big(  -d (f_\theta(x), \bm{c}_k) \big)}{ \sum_{k'} \exp \big(  -d (f_\theta(x), \bm{c}_{k'}) \big)}$$
+
+If we want to reason more complex stuff about our data then we just need to create a good enough representation in the embedding space. Some approaches to do this are: 
+
+- [Relation Network](https://arxiv.org/abs/1711.06025) → This is an approach where they learn the relationship between embeddings i.e instead of taking $d(.)$  as a pre-determined distance measure, they learn it inherently for the data
+- [Infinite Mixture Prototypes](https://arxiv.org/pdf/1902.04552.pdf) → Instead of defining each class by a single cluster. they represent each class by a set of clusters. Thus, by inferring this number of clusters they are able to interpolate between nearest neighbors and the prototypical representations.
+- [Graph Neural Networks](https://arxiv.org/abs/1711.04043) →  They extend the Matching network perspective to view the few-shot problem as the propagation of label information from labeled samples towards the unlabeled query image, which is then formalized as a posterior inference over a graphical model.
+
+## Comparing Meta-Learning Methods
+
+### Computation Graph Perspective
+
+We can view these meta-learnin algorithms as computation graphs: 
+
+- Black-box adaptation is essentially a sequence of inputs and outputs on a computational graph
+- Optimization can be seen as a embedding an optimization routine into a computational graph
+- Non-parameteric methods can be seen as computational graphs working with the embedding spaces
+
+This viewpoint allows us to see how to mix-match these approaches to improve performance:
+
+- [CAML](https://openreview.net/forum?id=BJfOXnActQ) → Ths approach creates an embedding space, which is also a metric space, to capture inter-class dependencies. once this is done, they run gradient descent using this metric
+- [Latent Embedding Optimization (LEO)](https://arxiv.org/abs/1807.05960) → They learn a data-dependent latent generative representation of model parameters and then perform gradient-based meta-learning on this space. Thus, this approach decouples the need for GD on higher dimensional space by exploiting the topology of the data.
+
+### Algorithmic Properties Perspective
+
+We consider the following properties of the most importance for most tasks : 
+
+- **Expressive Power** → Ability of our learned function $f$ to represent a range of learning procedures. This is important for scalability and applicability to a range of domains.
+- **Consistency** → The learned learning procedure will asymptotically solve the task given enough data, regardless of the meta-training procedure. The main idea is to reduce the reliance on the meta-training and generate the ability to perform on Out-Of-Distribution (OOD) tasks
+- **Uncertainty Awareness** → Ability to reason about ambiguity during hte learning process. This is especially important for things like active learning, calibrated uncertainty, and RL.
+
+We can now say the following about the three approaches:
+
+- **Black-Box Adaptation** → Complete Expressive Power, but not consistent
+- **Optimization Approaches** → Consistent and expressive for sufficiently deep models, but fail in expressiveness for other kinds of tasks, especially in Meta-Reinforcement Learning.
+- **Non-parametric Approaches** → Expressive for most architectures and consistent under certain conditions
+
+
+
+
+
+
 <!-- %%% -->
-# HN: Algebra of Genetic Algorithms
+# Meta: Parametric Methods for Meta-Learning
+
+## Back-Box Adaptation
+
+These are a set of approaches that treat step 1 as an inference problem and thus, training a Neural Network to represent $p(\phi_i|\mathcal{D}^{tr}, \theta)$ i.e a way to estimate $\phi_i$ and then use that as a parameter to optimize for a new task. The deterministic way to go about it would be to take point estimates 
+
+$$\phi_i = f_\theta (\mathcal{D^{tr}_i})$$
+
+Thus, we can treat $f_\theta(.)$ as a neural network parameterized by $\theta$  which takes the training data as an input, sequential or batched, and outputs the task-specific parameters $\phi_i$ which are then used by another neural network $g_{\phi_i} (.)$ to predict the outputs on a new dataset. Thus, we can essentially treat this as a supervised learning problem with our optimization being 
+
+$$\begin{aligned}
+& \max_\theta \sum_{\mathcal{T_i}} \sum_{(x,y) \sim \mathcal{D_i}^{test}} \log g_{\phi_i} (y|x) \\
+= & \max_\theta \sum_{\mathcal{T_i}} \mathcal{L}(f_\theta(\mathcal{D^{tr}_i}), \mathcal{D_i^{test}})
+\end{aligned}$$
+
+To make this more tractable, $\phi$  can be replaced by a sufficient statistic $h_i$ instead of all the parameters. Some ANN architectures that work well with this approach are LSTMs, as shown in the work of [Santoro et. al](http://proceedings.mlr.press/v48/santoro16.pdf), feedforward networks with averaging as shown by [Ramalho et. al](https://arxiv.org/abs/1807.01613), Having inner task learners and outer meta-learners i.e [Meta-Networks byMukhdalai](https://arxiv.org/abs/1703.00837) e.t.c. I am personally fascinated by the use of transformer architectures in this domain. The advantage of this approach is that it is expressive and easy to combine with other techniques like supervised learning, reinforcement learning e.t.c. However, the optimization bit is challenging and not the best solution from the onset for every kind of problem. Thus, our step-by-step approach would be: 
+
+1. Sample Task $\mathcal{T}_i$ ( a sequential stream or mini-batches )
+2. Sample Disjoint Datasets $\mathcal{D^{tr}_i}$,$\mathcal{D^{test}_i}$ from $\mathcal{D}_i$
+3. Compute $\phi_i \leftarrow f_\theta(\mathcal{D^{tr}_i})$
+4. Update  $\theta$ using $\nabla_\theta\mathcal{L}(\phi_i, \mathcal{D^{test}_i})$
+
+## Optimization-Based Approaches
+
+This set treats the prediction of $\phi_i$  as an optimization procedure and then differentiates through that optimization process to get a $\phi_i$ that leads to good performance. The method can be summarized into the surrogates sums of maximization of observing the training data given $\phi_i$ and the maximization of getting $\phi_i$  given our model parameters $\theta$.
+
+$$\max_{\phi_i} \log p(\mathcal{D^{tr}_i} | \phi_i )  + \log p(\phi_i | \theta)$$
+
+The second part of the above summation is our prior and the first part is a likelihood. Thus, our next question is the form of this prior that might be useful. In deep learning, one good way to incorporate priors is through the initialization of hyperparameters, or fine-tuning. Thus, we can take $\theta$ as a pre-trained parameter and run gradient descent on it 
+
+$$\phi \leftarrow \theta - \alpha \nabla_\theta \mathcal{L} (\theta, \mathcal{D^{tr}})$$
+
+One popular way to do this for image classification is to have a feature extractor pre-trained on some datasets like ImageNet and then fine-tune its output to our problem. The aim in optimization-based approaches is to get to a sweet-spot in the multidimensional parameter space $\bm{\Phi}  = {\phi_1, \phi_2, .., \phi_n}$ such that our model becomes independent of the loss function and the training data, and this is called Model-Agnostic Meta-Learning. Thus, now our procedure becomes
+
+1. Sample Task $\mathcal{T}_i$ ( a sequential stream or mini-batches )
+2. Sample Disjoint Datasets $\mathcal{D^{tr}_i}$,$\mathcal{D^{test}_i}$ from $\mathcal{D}_i$
+3. Optimize $\phi_i \leftarrow f_\theta(\mathcal{D^{tr}_i})$
+4. Update  $\theta$ using $\nabla_\theta\mathcal{L}(\phi_i, \mathcal{D^{test}_i})$
+
+For our optimization process, let's define our final task specific parameter as
+
+$$\phi = u(\theta, \mathcal{D^{tr}}) $$
+
+And now, our optimization target becomes
+
+$$\begin{aligned}
+& \min_\theta  \mathcal{L}(\phi, \mathcal{D^{test}}) \\
+= & \min_\theta \mathcal{L} \big (u(\theta, \mathcal{D^{tr}}), \mathcal{D^{test}} \big)
+\end{aligned}$$
+
+This optimization can be achieved by differentiating our loss w.r.t our meta-parameters $\theta$ and then performing an inner differentiation w.r.t $\phi$:
+
+$$\frac{d\mathcal{L} (\phi, \mathcal{D^{test}} ) }{d \theta} = \nabla _{\bar{\phi}} \mathcal{L} (\bar{\phi}, \mathcal{D^{test}} )  \bigg |_{\bar{\phi} = u(\theta, \mathcal{D^{tr}})  }  d_\theta \big (   u(\theta, \mathcal{D^{tr}} ) \big )$$
+
+Now, if we use our optimization update for $u (.)$ then  we get:
+
+$$\begin{aligned}
+& u(\theta, \mathcal{D^{tr}} ) = \theta  - \alpha \,\, d_\theta \big( L(\theta, \mathcal{D^{tr}}) \big ) \\
+\implies & d_\theta \big (   u(\theta, \mathcal{D^{tr}} ) \big ) = \bm{1}  - \alpha \, d^2_\theta  \big (L(\theta, \mathcal{D^{tr}}) \big )
+\end{aligned}$$
+
+Thus, when we substitute the hessian in the derivative equation we get:
+
+$$\begin{aligned}
+\frac{d\mathcal{L} (\phi, \mathcal{D^{test}} ) }{d \theta} & = \bigg (\nabla _{\bar{\phi}} \mathcal{L} (\bar{\phi}, \mathcal{D^{test}} )  \bigg |_{\bar{\phi} = u(\theta, \mathcal{D^{tr}})  } \bigg ). \bigg ( \bm{1}  -  \alpha \, d^2_\theta  \big (L(\theta, \mathcal{D^{tr}}) \big ) \bigg ) \\
+& = \nabla _{\bar{\phi}} \mathcal{L} (\bar{\phi}, \mathcal{D^{test}} )  \bigg |_{\bar{\phi} = u(\theta, \mathcal{D^{tr}})  }
+
+-
+
+ \alpha\,\, \bigg( \nabla _{\bar{\phi}} \mathcal{L} (\bar{\phi}, \mathcal{D^{test}} )
+. d^2_\theta  \big (L(\theta, \mathcal{D^{tr}}) \big ) \bigg )
+\bigg |_{\bar{\phi} = u(\theta, \mathcal{D^{tr}})  } 
+\end{aligned}$$
+
+We now have a matrix product on the right which can be made more efficient and  turn out ot be easier to compute than the full hessian of the network. Thus, this process is tractable. one really interesting thing that comes out of this is that we can also view this model-agnostic approach and the optimization update as a computation graph! Thus, we can say
+
+$$\phi_i = \theta - f(\theta, \mathcal{D_i^{tr}}, \nabla_\theta \mathcal{L} )$$
+
+Now, we can train an ANN to output the gradient $f(.)$  , and thus, this allows us to mix the optimization procedure with the black-box adaptation process. Moreover, MAML approaches show a better performance on the omniglot dataset since they are optimizing for the model-agnostic points. It has been shown by [Finn and Levine](https://arxiv.org/abs/1710.11622) that MAML can approximate any function of $\mathcal{D_i^{tr}}$ and $x^{ts}$ give: 
+
+- Non-zero $\alpha$
+- Loss function gradient does not lose information about the label
+- Data-points in $\mathcal{D_i^{tr}}$  are unique
+
+Thus, MAML is able to inject inductive bias without losing expressivity. 
+
+### Inferece
+
+To better understand why MAML works well,  we need to look through probabilistic lenses again to say that the meta-parameters $\theta$  are inducing some kinds of prior knowledge into our system and so our learning objective would be to maximize the probability of observing the data $\mathcal{D}_i$, given our meta-parameters $\theta$ 
+
+$$\max_\theta \log  \prod_i p(\mathcal{D}_i| \theta )
+ $$
+
+This can be further written as the sum of the probabilities of $\mathcal{D_i}$ given our model-specific parameters $\phi_i$, and the probability of seeing each $\phi_i$ given our prior knowledge $\theta$ :
+
+$$\max _\theta \prod_i \int p(\mathcal{D_i} |\phi_i) p(\phi_i|\theta) d\phi_i$$
+
+ And now, we can estimate the probability of seeing each $\phi_i$ given our prior knowledge $\theta$ using a Maximum A-Posteriori (MAP) estimate $\hat{\phi}$, so that
+
+$$\max_\theta \log  \prod_i p(\mathcal{D}_i| \theta ) \approx \max_\theta \log  \prod_i p(\mathcal{D}_i|\hat{\phi}_i) p(\hat{\phi} | \theta)  
+$$
+
+[It has been shown](https://regijs.github.io/papers/laa96.pdf) that, for likelihoods that are Gaussian in $\phi_i$, gradient descent with early stopping corresponds exactly to maximum a-posteriori inference under a Gaussian prior with mean initial samples. This estimation is exact in the linear case, and the variance in non-linear cases is determined by the order of the derivative. Thus, by limiting the computation to second derivatives, MAML is able to maintain a fairly good MAP inference estimate and so, MAML approximates hierarchical Bayesian Inference. We can also use other kinds of priors like: 
+
+- [Explicit Gaussian Prior](https://arxiv.org/abs/1909.04630): $\phi \leftarrow \min_{\phi'} \mathcal{L} (\phi', \mathcal{D^{tr}})  + \frac{\lambda}{2} || \theta - \phi'||^2$
+- [Bayesian Linear Regression](https://arxiv.org/abs/1807.08912) on learned features
+- Convex optimization on learned features
+- Ridge or logistic regression
+- Support Vector Machines
+
+### Challenge 1: Choosing Architecture
+
+The major bottleneck in this process is the inner gradient step and so, we want to chosse an architecture that is effective for this inner step. One idea, called [Auto-Meta](https://arxiv.org/abs/1806.06927) is to adopt the progressive neural architecture search to find optimal architectures for meta-learners i.e combine AutoML with Gradient-Based Meta-Learning. The interesting results of this were: 
+
+- They found highlynon-standard architectures, both deep and narrow
+- They found architectures very different from the ones used for supervised learning
+
+### Challenge 2: Handling Instabilities
+
+Another challenge comes from the instability that can come from the complicated Bi-Level optimization procedure. One way of mitigating this is to learn the inner vector learning rate and then tune the outer learning rate : 
+
+- [Meta-Stochastic Gradient Descent](https://arxiv.org/abs/1707.09835) is a meta-learner that can learn initialization, learner update direction, and learning rate, all in a single closed-loop process
+- [AlphaMAML](https://arxiv.org/abs/1905.07435) incorporates an online hyperparameter adaptation scheme that eliminates the need to tune meta-learning and learning rates
+
+Another idea idea is to optimize only a subset of parameters in the innter loop: 
+
+- [DEML](https://arxiv.org/abs/1802.03596) jointly learns a concept generator, a meta-learner, and a concept discriminator. The concept generator abstracts representation of each instance of training data, the meta-learner performs few-shot learning on this instance and the concept discriminator recognizes the concept pertaining to each instance
+- [CAVIA](https://arxiv.org/abs/1810.03642) partitions the model parameters into context parameters that serve as additional input to the model and are adapted on individual tasks and shared parameters that are meta-trained and shared across tasks. Thus, during test time only the context parameters need to be updated, which is a lower-dimensional search problem compared to all the model parameters
+
+In [MAML++](https://arxiv.org/pdf/1810.09502.pdf) the authors ablate the various ideas and issues of MAML and then propose a new framework that addresses these issues. Some significant points were the de-coupling of the inner loop learning rate and the outer updates, the addition of batch normalization to each and every step and greedy  updates.
+
+### Challenge 3: Managing Compute and Memory
+
+The backpropagation through many inner-gradient steps adds computational and memory overhead that is hard to deal with. One idea to mitigate this is to approximate the derivative of $\phi_i$ w.r.t $\theta$. This is a crude approximation and works well for few-shot learning problem, but fails in more complex problems like imitation learning. Another direction is to try to not compute the gradient at all and use the [implicit function theorem](https://arxiv.org/abs/1909.04630)→ Let's take our function $\phi$ as the explicit gaussian representation :
+
+$$\phi = u(\theta, \mathcal{D^{tr}})  = \argmin_{\phi'} \mathcal{L}(\phi', \mathcal{D^{tr}}) + \frac{\lambda}{2} ||\phi' - \theta ||^2
+$$
+
+Let our optimization function be
+
+$$G(\phi', \theta ) = \mathcal{L}(\phi', \mathcal{D^{tr}}) + \frac{\lambda}{2} ||\phi' - \theta ||^2$$
+
+Finding the $\argmin$ of the this function implies that the gradient w.r.t $\phi$  is $0$ i.e
+
+$$\begin{aligned}
+& \nabla_{\phi'} G(\phi', \theta) \big|_{\phi' = \phi} = 0 \\
+\implies & \nabla_\phi L(\phi) + \lambda(\phi - \theta )  = 0 \\
+\implies & \phi = \theta - \frac{1}{\lambda} \nabla_\phi L(\phi)
+\end{aligned}$$
+
+Thus, our derivative now becomes
+
+$$\begin{aligned}
+ & \frac{d \phi}{d \theta } = \bm{1} -   \frac{1}{\lambda} \nabla_\phi^2 L(\phi) \frac{d \phi}{d \theta } \\
+\therefore\,\,\,& \frac{d \phi}{d \theta } = \bigg [\bm{1} + \frac{1}{\lambda} \nabla_\phi^2 L(\phi) \bigg ] ^{-1} 
+\end{aligned}$$
+
+Thus, we can compute this without going through the inner optimization process and it works only on the assumption that the out function $G(\phi', \theta)$  has an $\argmin$ , to begin with.
+
+<!-- %%% -->
+# Meta: Intro to Meta-Learning
+- Source : [Chelsea Finn's lectures](https://youtube.com/playlist?list=PLoROMvodv4rMC6zfYmnD7UG3LVvwaITY5)
+
+The motivating research that I personally find very interesting is a paper by Deepmind in 2018, that looks at the prefrontal cortex as a meta-reinforcement learning problem. The core idea here is that there seems to be an added function that dopamine serves: it is not just adjusting the 'weights' of the neurons in the brain, but also carrying some relevant information about the rules pertaining to the tasks that are being performed. This means that at the most fundamental level when given rewards for different kinds of tasks, it might be possible that there is an abstraction happening that allows learning underlying patterns between these tasks. Thus, if the tasks share some kind of commonalities in this meta-space, then it could be that the mind is formulating a meta-representation between these tasks which is allowing the person to treat any new task that shares some kind of underlying structure, no matter how unapparent that may be at a superficial level, as a problem of generalizing to new scenarios using priors from previous experiences. The core idea behind Meta-Learning is to develop a way for an agent to learn to generalize to new unseen tasks. One crucial way to see this, which I personally found very helpful, is to pit this notion against transfer learning or multi-task learning. A task like distinguishing between cats and birds, or riding a bicycle with trainer wheels is something that humans can learn with very few samples, while the traditional ML agent trained on a Neural Network approximation would require a great number of samples to be able to do this. 
+
+## Basic Formulation
+
+The intuition about what exactly is the meta-learning problem is very well seen through probabilistic lenses. Let's denote a dataset as $\mathcal{D} = \{ (\bm{x}, \bm{y})_k\}$ . In a standard supervised learning problem, we are essentially learning a loss function over this dataset for a function approximator that takes a vector $\bm{x}_i$ as input and produces some kind of an output  $y_i$. Let us denote these parameters by $\theta$  and so, we can say that our learning objective is
+
+$$\min_\theta \mathcal{L}(\theta, \mathcal{D})$$
+
+Depending on our requirement, we take take this loss function to be something like a negative log likelihood e.t.c. Now, given this loss function, we can define a task as
+
+$$\mathcal{T}_i := \{ p_i(\bm{x}), p_i(\bm{y}|\bm{x}), \mathcal{L}_i \} $$
+
+Thus, we are taking as a reference as data generating distribution and sampling from it with the indicated probability $p_i$ and our task is to predict the posterior distribution over labels given our inputs sampled from a prior distribution by minimizing a particular loss function. The way we go about this is to segregate our data into a training set $\mathcal{D}^{train}_i$ and a test set $\mathcal{D}_i^{test}$. 
+
+If our objective is to learn multiple tasks then we need to train our function approximator to work on multiple such tasks $\mathcal{T}_i$ for a total set of tasks $i = 1, 2, ..., T$. To do this, we figure out a way to inculcate a task descriptor $\bm{z}_i$ into our function approximation so that the approximator can adjust its output based on the task, and then we essentially minimize over a sum fo multiple such losses to get the following formulation
+
+$$\min_\theta \sum_{i=1}^T \mathcal{L}_i (\theta, \mathcal{D}_i)$$
+
+If our objective is to learn something meta, then we can view this parameter $\theta$  as a prior that is being used by our approximator to learn an optimal set of parameters $\phi$  and predict the posterior distribution over $\bm{y}$ a given set of inputs $\bm{x}$ for a dataset $\mathcal{D}$. A good way to understand this is to say that we have some metadata for training $\mathcal{D}_{meta-train}$ that we are using along with the inputs from a dataset to get our posterior prediction, and $\theta$  is essentially parameterizing this meta training data to give us some meta-parameters that we can use for our training. This can be mathematically formulated as
+
+$$\begin{aligned}
+& \theta^* = \argmax_\theta \{\log p(\theta|\mathcal{D}_{meta-train} \} \\
+& \phi^* = \argmax_{\phi} \{ \log p(\phi | \mathcal{D}^{tr}, \theta^*) \} \\
+  & \,\,\,\,\,\,\,\,\,\ \therefore \,\,\,\phi^* = f_{\theta^*}(\mathcal{D}^{tr})
+
+\end{aligned}$$
+
+Thus, we can see this learning as two problems: 
+
+1. Meta-learning problem → Understand the model agnostic parameters $\theta^*$ 
+2. Adaptation Problem → Use the meta-parameters to adapt your learning curve and get the test-specific parameters $\phi^*$
+
+### Mechanistic Formulation of Meta-Learning Problem
+
+In supervised learning, an instance of meta-learning is a **few-shot classification,** where our task is to train the approximator on different datasets so that it learns to classify totally new and unseen data with only a few shots. The way we implement this is by having test data for each training dataset so that the approximator can be tested for each abstraction that it is learning. These are also called support set $S$ and prediction set $B$ 
+
+$$\mathcal{D} = \big < S, B\big >$$
+
+For a support set that contains $k$ labeled examples for $N$ classes, we call this a $k$-shot-$N$-classification task. Thus, a 5-shot-2-classification task on images would consist of datasets that have a total of 10 example images divided into one or the other class equally, and our classifier needs to learn to classify images in an unseen dataset with unseen classes but having the same configuration.  We consider data  over which w  need to do the prediction as $\mathcal{D}_i = \{ (\bm{x}, \bm{y} )_j \}$ and the meta-data as a set of these datasets $\mathcal{D}_{meta-train} = \{\mathcal{D}_i \}$. Our training data contains $K$ input-output pairs and so can be written as 
+
+$$\mathcal{D}^{tr} =  \{ (\bm{x}, \bm{y} )_{1:K}\} $$
+
+This is a $K$-shot prediction problem on a test input $\bm{x}_{test}$ and thus our problem is to predict $\bm{y}_{test}$ using these inputs, training datasets, and parameters
+
+$$\bm{y}_{test} = f (\mathcal{D}^{tr}, \bm{x}_{test}; \theta ) $$
+
+This translates the problem of meta-learning as a design and optimization problem, similar to how we would go about 
+
+Thus, the general way to go about solving the meta-learning problem is: 
+
+1. Choose a function to output task-specific parameters $p(\phi_i | \mathcal{D}_i^{tr}, \theta)$
+2. Use the training data $\mathcal{D}_{meta-train}$ to create a max-likelihood objective that can then be used to optimize $\theta$
+
+
+
+
+<!-- %%% -->
+# Evo: Algebra of Genetic Algorithms
 
 ## Formalizing genetic Algorithm Search
 
@@ -1705,7 +2016,7 @@ Now, we can create a boundary in this new higher dimensional plane and just map 
 
 ## Math of SVM
 
-### Hard MArgin SVM
+### Hard Margin SVM
 
 For a set of training data $\{x_i, y_i\}$, with $x \in \R^M$  and $y \in \{-1,+1\}$ with the classifications being -1 and + 1 and $i = 1, ...., N$  , let us apply a transformation first
 
