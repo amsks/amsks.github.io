@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Explanations of Key Terms used in Reinforcement Learning Vocabulary | amsks.github.io</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Explanations of Key Terms used in Reinforcement Learning Vocabulary" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Code and contents of my website, format taken from bollu.github.io" />
+<meta property="og:description" content="Code and contents of my website, format taken from bollu.github.io" />
+<link rel="canonical" href="http://localhost:4000/Key_Terms_in_RL.html" />
+<meta property="og:url" content="http://localhost:4000/Key_Terms_in_RL.html" />
+<meta property="og:site_name" content="amsks.github.io" />
+<script type="application/ld+json">
+{"@type":"WebPage","headline":"Explanations of Key Terms used in Reinforcement Learning Vocabulary","url":"http://localhost:4000/Key_Terms_in_RL.html","description":"Code and contents of my website, format taken from bollu.github.io","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/assets/css/style.css?v=e30830e8765661f4de05c391fd58fd825468fdbc">
+    <!--[if lt IE 9]>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1><a href="http://localhost:4000/">amsks.github.io</a></h1>
+        
+        
+
+        <p>Code and contents of my website, format taken from bollu.github.io</p>
+
+        
+        <p class="view"><a href="https://github.com/amsks/amsks.github.io">View the Project on GitHub <small>amsks/amsks.github.io</small></a></p>
+        
+
+        
+
+        
+      </header>
+      <section>
+
+      <h1 id="explanations-of-key-terms-used-in-reinforcement-learning-vocabulary">Explanations of Key Terms used in Reinforcement Learning Vocabulary</h1>
+
+<h2 id="mdp">MDP</h2>
+<p>A <strong>Markov Decision Process (MDP)</strong> is a way to model decision making in discrete, stochastic and/or sequential processes. The key here is the markov property, which basically states that the probability of enbtering a certain state, when conditioned upon the previous state is same as the probability of entering that state when conditioned on all the history of states. The significance here is that if we had state A and state B and A precedes B, then we can assume that all the states that preceded B in an episode can be  ignored, and A can just be conditioned on B because of the way that B is linked to all previous states. So, we don’t really need to look at all the history since the sequence of transitions makes sure that there would be a particular way to reach B, and thus, A. If we assume this about the environment, then we can create a map of transitions between states as our model of the environment and then use that to assign rewards for reaching a state. This is a markov reward process.</p>
+
+<h2 id="markov-chain-monte-carlo">Markov Chain Monte-Carlo</h2>
+
+<h2 id="parameters-of-agent-and-environment">Parameters of agent and environment</h2>
+<ul>
+  <li>Reward</li>
+  <li>Sate</li>
+  <li>Policy</li>
+  <li>Discounting factor</li>
+  <li>Trajectory</li>
+  <li>State-space</li>
+  <li>Tansition function</li>
+</ul>
+
+<h2 id="bellman-equation">Bellman Equation</h2>
+
+<h2 id="dynamic-programming">Dynamic Programming</h2>
+
+<h2 id="value-function">Value function</h2>
+
+<h2 id="policy-gradient">Policy Gradient</h2>
+
+<h2 id="q-learning">Q-Learning</h2>
+
+<h2 id="model-based-and-model-free-learning">Model-Based and Model-Free Learning</h2>
+
+<h2 id="exploration-and-exploitation">Exploration and Exploitation</h2>
+
+<h2 id="common-rl-types">Common RL types</h2>
+<ul>
+  <li>Inverse RL</li>
+  <li>Imitation RL</li>
+  <li>APprenticeship learning</li>
+  <li>Meta Learning</li>
+</ul>
+
+<h2 id="reward-shaping">Reward Shaping</h2>
+
+<h2 id="actor-critic">Actor-Critic</h2>
+
+<h2 id="monte-carlo-tree-search">Monte-Carlo Tree search</h2>
+
+<h2 id="human-in-the-loop">Human in the loop</h2>
+
+<h2 id="deep-rl">Deep RL</h2>
+
+<h2 id="differentiable-ai">Differentiable AI</h2>
+
+<h2 id="zero-shot-one-shot-few-shot">Zero-Shot, One-Shot, Few-shot</h2>
+
+
+      </section>
+      <footer>
+        
+        <p>This project is maintained by <a href="https://github.com/amsks">amsks</a></p>
+        
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="/assets/js/scale.fix.js"></script>
+    
+  </body>
+</html>

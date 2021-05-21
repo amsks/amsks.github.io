@@ -10,10 +10,10 @@
 
 
 ### About Me
-- I am a Master student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/). I am interested in exploring how systems infer patterns from empirical data and training them to learn a wide variety of skills from low-volume datasets. What excites me the most is the extent to which we can learn about our intelligence through the endeavor of creating one. I have worked on problems at the intersection of Robotics, Reinforcement Learning and Meta-Learning on single-agent and Multi-Agent settings, and I have also dabbled with Evolutionary Algorithms and Optimization Literature. I am currently working on ad-hoc cooperation in the game of [Hanabi](https://arxiv.org/abs/1902.00506)
+- I am a Master's student in the [EIT Digital Master's course in Autonomous systems](https://masterschool.eitdigital.eu/programmes/aus/). I am interested in exploring how learning systems can learn to abstract structure out of tasks and learn to reason about themselves. What excites me the most is the extent to which we can learn about our intelligence through the endeavor of creating one. I have worked on problems at the intersection of Robotics, Reinforcement Learning, and Meta-Learning in single-agent and Multi-Agent settings, and I have also dabbled with Evolutionary Algorithms and Optimization Literature. I am currently working on ad-hoc cooperation in the game of [Hanabi](https://arxiv.org/abs/1902.00506)
 
 
-- **Fun Fact :** I am a musician - multiinstrumentalist and singer - and can sing in around 8 languages so far. Checkout some of my song covers on my [instagram page](https://www.instagram.com/melodic.musings/)
+- **Fun Fact :** I am a musician - Multi-instrumentalist and Singer - and can sing in around 8 languages so far. Checkout some of my song covers on my [instagram page](https://www.instagram.com/melodic.musings/)
 
 #### Education
 - [EURECOM](http://www.eurecom.fr/en)
@@ -37,7 +37,367 @@
 
 
 <!-- --------------------------------- Notes ----------------------------------------- -->
-#### Zettelkasten
+#### Notes
+
+# AutoML: Bayesian Optimization
+
+The general optimization problem can be stated as the task of finding the minimal point of some objective function by adhering to certain constraints. More formally, we can write it as
+
+$$\min_x f(x) \,\,\,\, s.t \,\,\,\, g(x) \leq 0 \,\,\,, \,\,\, h(x) = 0  $$
+
+We usually assume that our functions $f, g, h$ are differentiable, and depending on how we calculate the first and second-order gradients (The Jacobians and Hessians) of our function, we designate the different kinds of methods used to solve this problem. Thus, in a first-order optimization problem, we can evaluate our objective function as well as the Jacobian, while in a second-order problem we can even evaluate the Hessian.  In other cases, we impose some other constraints on either the form of our objective function or do some tricks to approximate the gradients, like approximating the Hessians in Quasi-Newton optimization. However, these do not cover cases where $f(x)$  is a black box. Since we cannot assume that we fully know this function our task can be re-formulated as finding this optimal point $x$ while discovering this function $f$. This can be written in the same form, just without the constraints
+
+$$\min _x f(x) $$
+
+## KWIK
+
+To find the optimal $x$ for an unknown $f$  we need to explicitly reason about what we know about $f$. This is the **Knows What It Knows** framework. I will present an example from the paper that helps understand the need for this explicit reasoning about our function. Consider the task of navigating the following graph:
+
+<img width=700 height=275 src="static/AutoML/KWIK.png">
+
+Each edge in the graph is associated with a binary cost and let's assume that the agent does not know about these costs beforehand, but knows about the topology of the graph. Each time an agent moves from one node to another, it observes and accumulates the cost. An episode is going from the source on the left to the sink on the right. Hence, the learning task is to figure out the optimal path in a few episodes. The simplest solution for the agent is to assume that the costs of edges are uniform and thus, take the shortest path through the middle, which gives it a total cost of 13. We could then use a standard regression algorithm to fit a weight vector to this dataset and estimate the cost of the other paths, simply based on the nodes observed so far, which gives us 14 for the top, 13 for the middle, and 14 for the bottom paths. Hence, the agent would choose to take the middle path, even though it is suboptimal as compared to the top one.
+
+Now, let's consider an agent that does not just fit a weight vector but reasons about whether it can obtain the cost of edges with the available data. Assuming the agent completed the first episode through the middle path and accumulated a reward of 13, the question it needs to answer is which path to go for next. In the bottom path cost of the penultimate node is 2, which can be figured out from the costs of nodes already visited 
+
+$$3 - 1 = 2$$
+
+This gives us more certainty than the uniform assumption that we started with. However, this kind of dependence does not really exist for the upper node since the linear combination does not work on the nodes already visited. If we incorporate a way for our agent to say that it is not sure about the answer to the cost of the upper nodes, we can essentially incentivize it to explore the upper node in the next round, allowing our agent to visit this node and discover the optimal solution. This is similar to how we discuss the exploration-exploitation dilemma in Reinforcement Learning.
+
+## MDP framework
+
+Motivated from the previous section and based on the treatment done [here](https://www.user.tu-berlin.de/mtoussai//teaching/Lecture-Maths.pdf), we can model our solver as an agent and the function as the environment. Our agent can sample the value of the function in a range of possible values and in a limited budget of samples, it needs to find the optimal $x$. The observation that comes after sampling from the environment is the noisy estimate of $f$, which can call $y$. Thus, we can write our function as the expectation over these outputs
+
+$$f( x) = \mathbb{E}\big [ y |f(x) \big ]$$
+
+We can cast this as a Markov Decision Process where the state is defined by the data the agent has collected so far. Let's call this data $S$. Thus, at each iteration $t$, our agent exists in a state $S_t$ and needs to make a decision on where to sample the next $x_t$. Once it collects this sample, it adds this to its existing knowledge
+
+$$S_{t+1} = S_t \cup \{x_t, f_t \} $$
+
+We can create a policy $\pi$  that our agent follows to take an action from a particular state
+
+$$\pi : S_t \rightarrow x_t$$
+
+Hence, the agent operates with a prior over our function $P(f)$  , and based on this prior it calculates a deterministic posterior $P_\pi (S|x_t, f)$  by multiplying it with the expectation over the outputs.
+
+$$\pi ^* = \argmin_\pi  \int P(f) P( S|\pi , f) \mathbb{E}[y|f]$$
+
+Since the agent does not know $f$ apriori, it needs to calculate a posterior belief over this function based on the accumulated data
+
+$$P(f|S) = \frac{P(S|f) P(f)}{P(S)} $$
+
+With the incorporation of this belief, we can define an MDP over the beliefs with stochastic transitions. The states in this MDP are the posterior belief $P(f|S)$ . Thus, the agent needs to simulate the transitions in this MDP and it can theoretically solve the optimal problem through something like Dynamic programming. However, this is difficult to compute.
+
+## Bayesian Methods
+
+This is where Bayesian methods come into the picture. They formulate this belief $P(f|S)$  as a Bayesian representation and compute this using a gaussian process at every step. After this, they use a heuristic to choose the next decision. The Gaussian process used to compute this belief is called **surrogate function** and the heuristic used is called an **Acquisition Function.** We can write the process as follows: 
+
+1. Compute the posterior belief using a surrogate Gaussian process to form an estimate of the mean $\mu(x)$  and variance around this estimate $\sigma^2(x)$  to describe the uncertainty
+2. Compute an acquisition function $\alpha_t(x)$  that is proportional to how beneficial it is to sample the next point from the range of values
+3. Find the maximal point of this acquisition function and sample at that next location 
+
+    $$x_t = \argmax_x \alpha_t(x) $$
+
+This process is repeated a fixed number of iterations called the **optimization budget** to converge to a decently good point. Three poplar acquisition functions are
+
+- **Probability of Improvement (MPI) →** The value of the acquisition function is proportional to the probability of improvement at each point. We can characterize this as the upper-tail CDF of the surrogate posterior
+
+    $$\alpha_t( x) = \int_{-\infty}^{y_{opt}}\mathcal{N} \big (y|\mu(x), \sigma (x) \big ) dy $$
+
+- **Expected Improvement (EI)** → The value is not just proportional to the probability, but also to the magnitude of possible improvement from the point.
+
+    $$\alpha_t(x) = \int_{-\infty}^{y_{opt}}\mathcal{N} \big (y|\mu(x), \sigma (x) \big ) \big [   y_{opt} - y\big ] dy$$
+
+- **Upper Confidence Bound (UCB)** → We control the exploration through the variance and control parameter and exploit the maximum values
+
+    $$\alpha_t(x)  = -\mu(x)  + \beta\sigma(x) $$
+
+The evaluation of this maximization of the acquisition function is another non-linear optimization problem. However, the advantage is that these functions are analytic and so, we can solve for jacobians and Hessians of these, ensuring convergence at least on a local level. To make this process converge globally, we need to optimize from multiple start points from the domain and hope that after all these random starts the maximum found by the algorithm is indeed the global one.
+
+
+## Hyperparameter Tuning
+
+One of the places where Global Bayesian Optimization can show good results is the optimization of hyperparameters for Neural Networks. So, let's implement this approach to tune the learning rate of an Image Classifier! I will use the KMNIST dataset and a small ResNet-9 Model with a Stochastic Gradient Descent optimizer. Our plan of attack is as follows:
+
+1. Create a training pipeline for our Neural Network with the Dataset and customizable learning rate 
+2. Cast the training and inference into a an objective function, which can serve as ou blackbox
+3. Map the inference to an evaluation metric that can be used in the optimization procedure 
+4. Use this function in a global bayesian optimization procedure. 
+
+### Creating the training pipeline and Objective Function
+
+I have used PyTorch and the lightning module to create a boilerplate that can be used to train our network. Since KMNIST and ResNet architectures are already available in PyTorch, all we need to do is customize the ResNet architecture for MNIST, which I have done as follows
+
+```python
+def create_resnet9_model() -> nn.Module:
+    '''
+        Function to customize the RESNET to 9 layers and 10 classes
+
+        Returns
+        --------
+        torch.module
+            Pytorch Module of the Model
+    '''
+    model = ResNet(BasicBlock, [1, 1, 1, 1], num_classes=10)
+    model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
+    return model
+
+# 
+class ResNet9(pl.LightningModule):
+    def __init__(self, learning_rate=0.005):
+        '''
+            Pytorch Lightning Module for training the RESNET with SGD optimizer
+
+            Parameters
+            -----------
+            learning_rate: float 
+                Learning rate to be used for training every time since it is an 
+                optimization parameter
+        '''
+        super().__init__()
+        self.model = create_resnet9_model()
+        self.loss = nn.CrossEntropyLoss()
+        self.learning_rate = learning_rate
+
+    @auto_move_data
+    def forward(self, x):
+        return self.model(x)
+
+    def training_step(self, batch, batch_no):
+        x, y = batch
+        loss = self.loss(self(x), y)
+        return loss
+
+    def configure_optimizers(self):
+        return torch.optim.SGD(self.parameters(), lr=self.learning_rate)
+```
+
+Once this is done, our next step is to use the training pipeline and cast it into an objective function. For this, we need to evaluate our model somehow. I have used the balanced accuracy as an evaluation metric, but any other metric can also be used (like the AUC-ROC score) 
+
+```python
+def objective(  lr=0.1, 
+                epochs=1, 
+                gpu_count=1, 
+                iteration=None, 
+                model_dir='./outputs/models/', 
+                train_dl=None,
+                test_dl = None 
+            ):
+
+    '''
+        The objective function for the optimization procedure 
+
+        Parameters
+        -----------
+        lr: float 
+            learning Rate 
+        epochs: int 
+            Epochs for training
+        gpu_count: int 
+            Number of GPUs to be used (0 for only CPUs)
+        iteration: int 
+            Current iteration
+        model_dir: str
+            directory to save model checkpoints 
+        train_dl: Torch Dataloader 
+            Dataloader for training
+        test_dl: Torch Dataloader 
+            Dataloader for inference
+
+        Returns
+        ---------
+        float
+            balanced Accuracy of the model after inference
+
+    '''
+
+    save = False
+    checkpoint = "current_model.pt"
+    model = ResNet9(learning_rate=lr)
+
+    trainer = pl.Trainer(
+        gpus=gpu_count,
+        max_epochs=epochs,
+        progress_bar_refresh_rate=20
+    )
+
+    trainer.fit(model, train_dl)
+    trainer.save_checkpoint(checkpoint)
+
+    inference_model = ResNet9.load_from_checkpoint(
+        checkpoint, map_location="cuda")
+
+    true_y, pred_y, prob_y = [], [], []
+    for batch in tqdm(iter(test_dl), total=len(test_dl)):
+        x, y = batch
+        true_y.extend(y)
+				model.freeze()
+		    probabilities = torch.softmax(inference_model(x), dim=1)
+		    predicted_class = torch.argmax(probabilities, dim=1)
+        pred_y.extend(predicted_class.cpu())
+        prob_y.extend(probabilities.cpu().numpy())
+
+    if save is False:
+        os.remove(checkpoint)
+
+    return np.mean(balanced_accuracy_score(true_y, pred_y))
+```
+
+### Implementing Bayesian Optimization
+
+As mentioned in the previous sections, we first need a Gaussian Process as a surrogate model. We can either write it from scratch or just use some open-sourced library to do this. Here, I have used sci-kit learn to create a regressor  
+
+```python
+# Create the Model
+    m52 = sklearn.gaussian_process.kernelsConstantKernel(1.0) * Matern( length_scale=2.0, 
+                                        nu=1.5
+                                    )
+    model = sklearn.gaussian_process.GaussianProcessRegressor(
+                                        kernel=m52, 
+                                        alpha=1e-10, 
+                                        n_restarts_optimizer=100
+                                    )
+```
+
+Once th Gaussian process is established, we now need to write the acquisition function. I have used the Expected Improvements acquisition function. The core idea can be re-written as proposed by Mockus 
+
+$$EI(x) = \begin{cases} 
+\big( \mu_t(x) - y_{max} - \epsilon \big ) \Phi(Z)   + \sigma_t (x) \phi(Z) &\sigma_t(x) > 0  \\
+0  & \sigma_t(x) > 0
+
+\end{cases}$$
+
+Where
+
+$$Z = \frac{\mu_t(x) - y_{max} - \epsilon}{\sigma_t(x) }$$
+
+and $\Phi$ and $\phi$  are the PDF and CDF functions. This formulation is an analytical expression that achieves the same result as our earlier formulation and we have added $\epsilon$ as an exploration parameter. This can be implemented as follows
+
+```python
+def _acquisition(self, X, samples):
+        '''
+            Acquisition function using hte Expected Improvement method
+
+            Parameters
+            -----------
+            X : N x 1 
+                Array of parameter points observed so far
+
+            X_samples : N x 1
+                Array of Sampled points between the bounds
+
+            Returns
+            --------
+            float
+                Expected improvement
+
+        '''
+
+        # calculate the max of surrogate values from history
+        mu_x_, _ = self.surrogate(X)
+        max_x_ = max(mu_x_)
+
+        # Get the mean and deviation of the samples 
+        mu_sample_, std_sample_ = self.surrogate(samples)
+        mu_sample_ = mu_sample_[:, 0]
+
+        # Get the improvement
+        with np.errstate(divide='warn'):
+            z = (mu_sample_ - max_x_ - self.eps) / std_sample_
+            EI_ = (mu_sample_ - max_x_ - self.eps) * \
+                scipy.stats.norm.cdf(z) + std_sample_ * scipy.stats.norm.pdf(z)
+            EI_[std_sample_ == 0.0] = 0
+
+        return EI_
+```
+
+the `self.surrogate()` function is just predicting using the Gaussian process earlier written. Once we have our expected improvements, we need to optimize our acquisition by maximizing over these expected improvements
+
+```python
+def optimize_acq(self, X):
+        '''
+            Optimization of the Acquisition function using a maximization check of the outputs
+
+            Parameters
+            -----------
+            X : N x 1 
+                Array of parameter points
+
+            Returns
+            --------
+            float
+                Next location of the sampling point based on the Maximization
+
+        '''
+            
+        # Calculate Acquisition value for each sample
+        EI_ = self._acquisition(X, self.X_samples_)
+
+        # Get the index of the largest Score
+        max_index_ = np.argmax(EI_)
+
+        return self.X_samples_[max_index_, 0]
+```
+
+### Putting it all together
+
+Now that we have our optimization routines, we just need to combine them with our objective function into a loop and we are done. In my code, I have implemented the optimization as a class and I pass the paramters to this class. So, the main loop looks as follows: 
+
+ 
+
+```python
+budget = 10
+
+train_data = KMNIST("kmnist", train=True, download=True, transform=ToTensor())
+test_data = KMNIST("kmnist", train=False, download=True, transform=ToTensor())
+
+train_dl = DataLoader(train_data, batch_size=batch_size, shuffle=True, num_workers=8 )
+test_dl = DataLoader(test_data, batch_size=batch_size, num_workers=8)
+
+# sample the domain
+X = np.array([np.random.uniform(0, 1) for _ in range(init_samples)])
+y = np.array([objective(lr =x, 
+                        epochs=init_epochs, 
+                        gpu_count=gpu_count,
+                        train_dl=train_dl,
+                        test_dl=test_dl
+                        ) for x in X])
+
+X = X.reshape(len(X), 1)
+y = y.reshape(len(y), 1)
+
+for i in range(budget):
+		# fit the model
+		B.model.fit(X, y)
+		
+		# Select the next point to sample
+		X_next = B.optimize_acq(X, y)
+		
+		# Sample the point from Objective
+		Y_next = objective( lr=X_next, 
+		                    epochs=epochs, 
+		                    gpu_count=gpu_count,
+		                    model_dir= output_dir+"/models/", 
+		                    iteration=i+1,
+		                    train_dl= train_dl,
+		                    test_dl = test_dl
+		                    )
+		
+		print(f"LR = {X_next} \t Balanced Accuracy = {Y_next*100} %")
+		
+		# Plots for second iteration onwards 
+		B.plot(X, y, X_next, i+1)
+		
+		# add the data to History
+		X = np.vstack((X, [[X_next]]))
+		y = np.vstack((y, [[Y_next]]))
+```
+
+Here, I have used a budged to 10 function evaluations in the main loop and 2 function evaluations before the first posterior estimate. An exemplary plot of what comes out at the end is shown below
+
+<img width=700 height=400 src="static/AutoML/plot-iter-3.png">
+
+The vertical axis is the Balanced Accuracy and the horizontal axis is the learning rate. As can be seen, this is the third iteration of the main loop, with 2 points sampled as an initial estimate, and the acquisition function is the highest at the region with the balance of uncertainty and value of the mean.
+
 
 # Meta: Non-Parametric Methods
 The optimization-based methods are very useful for model-agnosticism and expression with sufficiently deep networks. However, as we have seen the main bottleneck is the second-order optimization which ends up being compute and memory intensive. Thus, the natural question is whether we can embed a learning procedure without the second-order optimization? one answer to this lies in the regime of data when it comes to the test time → during the meta-test time our paradigm of few-shot learning is a low data regime. Thus, methods that are non-parametric and have been shown to work well in these cases can be applied here! Specifically,
@@ -3839,6 +4199,187 @@ The limitations of this approach are:
 - Vendor lock-in due to control shifted to the providers, but this might change as more providers enter the market.
 
 
+<!-- %%% -->
+# RL: Policy Gradients
+
+The core idea of Reinforcement learning is to learn some kind of behavior through optimizing for rewards. The behavior learned by an agent i.e. the schema it follows while going through this process is the learned policy that it uses to decide which action to take and thus, the transition from one state to another. One way to close the loop for the agent to learn is by evaluating the states and actions through value functions and thus, our way to measure the learned policy is seen through these value functions, approximated by lookup tables, linear combinations, Neural Networks e.t.c. Policy Gradient methods take a different approach where they bypass the need for a value function by parameterizing the policy directly. While the agent can still use a value function to learn, it need not use it for selecting actions. The advantages that policy gradient methods offer are 3 fold: 
+
+1. Approximating the policy might be simpler than approximating action values and a policy-based method might typically learn faster and yield a superior asymptotic policy. One very good example that illustrates this is the work by [Simsek et. al](http://proceedings.mlr.press/v48/simsek16.pdf) on the game of Tetris where they showed that it is possible to choose amongst actions without really evaluating them.
+2. Policy gradient methods can handle stochastic policies. The case of card games with imperfect information, like poker, is a direct example where the optimal play might be to do 2 different things with certain probabilities. If we are maximizing the actions based on value approximations, we don't really have a natural way of finding stochastic policies. Policy Gradient methods can do this.
+3. Policy gradient methods offer stronger convergence guarantees since with continuous policies the action probabilities change smoothly. This is not the case with the fixed $\epsilon$ -greedy evaluation since there is always a probability to do something random.  
+4. The choice of policy parameterization is sometimes a good way of injecting prior knowledge about a desired form of the policy into the system. This is especially helpful when we look at introducing Meta-Learning strategies into Reinforcement Learning.
+
+In the following sections, I first use the theoretical treatment done in Sutton and Barto's book since I was better able to understand policy gradients' essence through this. However, I again do the derivation by looking at the whole thing from the viewpoint of trajectories, since I find it more intuitive.
+
+## Policy Gradient Theorem
+
+The issue with the parameterization of the policy is that the policy affects both the action selections and the distribution of states in which those selections are made. While going from state to action is straightforward, going the other way round involves the environment and thus, the parameterization is typically unknown. Thus, with this unknown effect of policy changes on the state distributions, the issue is evaluating the gradients of the performance. This is where the policy gradient theorem comes into the picture, as it shows that the gradient of the policy w.r.t its parameters does not involve the derivative of the state distribution. For episodic tasks, if we assume that every episode starts in some particular state $s_0$, then we can write a performance measure as the value of the start state of the episode
+
+$$J(\bm{\theta}) = v_{\pi_\theta} (s_0)$$
+
+For simplicity, we remove the $\bm{\theta}$  from the subscript of $\pi$ . Now, to get a derivative of this measure, we start by differentiating this value function w.r.t $\bm{\theta}$:
+
+ 
+
+$$\begin{aligned}
+\nabla_{\bm{\theta}} J(\bm{\theta}) & =  \nabla v_\pi (s) \\
+& = \nabla \bigg [ \sum_{a \in \mathcal{A}}\pi(a|s) q_\pi(s,a)   \bigg ] \\
+& = \sum_a \bigg[ \nabla\pi(a|s) q_\pi (s, a)  + \pi(a|s) \nabla q_\pi(s,a)    \bigg ] \\
+& = \sum_a \bigg[ \nabla\pi(a|s) q_\pi (s, a)  + \pi(a|s) \,\, \nabla \sum _{s' \in \mathcal{S}, r \in \mathcal{R}} p(s', r | s, a) ( r + v_\pi (s') )     \bigg ]
+\end{aligned}$$
+
+we now extend $q_\pi (s,a)$  in the second term on the right to the rollout for the new state $s'$
+
+$$
+\nabla v_\pi (s) = \sum_a \bigg[ \nabla\pi(a|s) q_\pi (s, a)  + \pi(a|s) \,\, \nabla \sum _{s' \in \mathcal{S}, r \in \mathcal{R}} p(s', r | s, a) ( r + v_\pi (s') ) \bigg ] $$
+
+The reward is independent of the parameters $\theta$, so we can set that derivative inside the sum to 0, and so, we get:
+
+$$
+\nabla v_\pi (s) = \sum_a \bigg[ \nabla\pi(a|s) q_\pi (s, a)  + \pi(a|s) \,\, \nabla \sum _{s' \in \mathcal{S} } p(s' | s, a) v_\pi (s') \bigg ] $$
+
+Thus, we now have a recursive formulation of $\nabla v_\pi (s)$  in terms of $\nabla v_\pi (s')$ . To calculate this derivative in the infinite horizon episodic case we just need to unroll this infinitely many times, which can be written as 
+
+$$\sum_{x \in \mathcal{s}} \sum _{k=0}^\infty P(s \rightarrow x, k , \pi )  \sum_{a \in \mathcal{A}} \nabla \pi (a|s)  q_\pi (x, a) $$
+
+Here, $P(s \rightarrow x, k, \pi )$  is the probability of transitioning from state $s$ to state $x$ in $k$  steps under policy $\pi$. To estimate this probability we use something called the stationary distribution of the Markov chains. This term comes from the [Fundamental Theorem of Markov Chains](http://www.math.uchicago.edu/~may/VIGRE/VIGRE2008/REUPapers/Plavnick.pdf) which intuitively says that in very long random walks the probability of ending up at some state is independent of where you started. When we club all these probabilities into a distribution over the states, then we have a stationary distribution, denoted by $\mu(s)$ . In on-policy training, we usually estimate this distribution by the fraction of time spent in a state. In our case of episodic tasks, if we let $\eta(s)$  denote the total time spent in a state in an episode, then we can calculate $\mu(s)$  as 
+
+$$\mu(s) = \frac{\eta(s)}{\sum_s \eta(s)}$$
+
+In our derivation, $P(s \rightarrow x, k, \pi )$  for very long walks can be estimated by the total time spent in the state $s$. Thus, we can inject $\eta(s)$  into our equation as follows:
+
+$$\begin{aligned}
+\nabla_{\bm{\theta}}J(\bm{\theta})  & = \sum_{s \in \mathcal{S}} \eta(s) \sum_{a \in \mathcal{A}} \nabla\pi(a|s)  q_\pi(s,a) \\
+& = \sum_{s \in \mathcal{S}} \eta(s) \sum_{s \in \mathcal{S}} \frac{\eta(s)}{\sum_{s \in \mathcal{S}} \eta(s)} \sum_{a \in \mathcal{A}} \nabla\pi(a|s)  q_\pi(s,a) \\
+& \propto \sum_{s \in \mathcal{S}} \mu(s) \sum_{a \in \mathcal{A}} \nabla\pi(a|s)  q_\pi(s,a) 
+\end{aligned}$$
+
+Thus, we get the form of the theorem as 
+
+$$\nabla_{\bm{\theta}}J(\bm{\theta}) \propto \sum_{s \in \mathcal{S}} \mu(s) \sum_{a \in \mathcal{A}}  q_\pi(s,a) \nabla\pi(a|s) $$
+
+The proportionality is the average length of an episode. In the case of continuous tasks, this is $1$. Thus, now we see that we have a gradient over a parameterized policy, which allows us to move in the direction of maximizing this gradient i.e gradient ascent. We can estimate this gradient through different means.
+
+## REINFORCE: Monte-Carlo Sampling
+
+For Monte-Carlo sampling of the policy, our essential requirement is sampling from a distribution that allows us to get an estimate of the policy. From the equation of the policy gradient theorem, we can write this again as an expectation over a sample of states $S_t \sim s$ in the direction of the policy gradient
+
+$$\nabla_{\bm{\theta}}J(\bm{\theta})  = \mathbb{E}_\pi \bigg [\sum_{a \in \mathcal{A}}  q_\pi(S_t,a) \nabla_{\bm{\theta}} \pi(a|S_t, \bm{\theta}) \bigg ]$$
+
+The expectation above would be an expectation over the actions if we were to include the probability of selecting the actions as the weight. Thus, we can do that to remove the sum over actions too:
+
+$$\begin{aligned}
+\nabla_{\bm{\theta}}J(\bm{\theta})  & = \mathbb{E}_\pi \bigg [\sum_{a \in \mathcal{A}}  q_\pi(S_t,a) \nabla_{\bm{\theta}} \pi(a|S_t, \bm{\theta}) \frac{\pi(a|S_t, \bm{\theta})}{\pi(a|S_t, \bm{\theta})} \bigg ] \\
+& = \mathbb{E}_\pi \bigg [\sum_{a \in \mathcal{A}}   \pi(a|S_t, \bm{\theta}) q_\pi(S_t,a) \frac{\nabla_{\bm{\theta}} \pi(a|S_t, \bm{\theta})}{\pi(a|S_t, \bm{\theta})} \bigg ] \\
+& =\mathbb{E}_\pi \bigg [ q_\pi(S_t,A_t) \frac{\nabla_{\bm{\theta}} \pi(A_t|S_t, \bm{\theta})}{\pi(A_t|S_t, \bm{\theta})} \bigg ] 
+\end{aligned}$$
+
+The expectation over $q_\pi (S_t, A_t)$  is essentially the return $G_t$. Thus, we can replace that in the above equation to get: 
+
+$$\nabla_{\bm{\theta}}J(\bm{\theta})  = \mathbb{E}_\pi \bigg [ G_t\frac{\nabla_{\bm{\theta}} \pi(A_t|S_t, \bm{\theta})}{\pi(A_t|S_t, \bm{\theta})} \bigg ] $$
+
+We now have a full sampling of the states and actions conditioned on our parameters in the gradients. This can be considered a sample from the policy and we can update our parameters using this quantity to get our update rule as: 
+
+$$\begin{aligned}
+\bm{\theta}_{t+1} &= \bm{\theta}_t + \alpha \nabla_{\bm{\theta}}J(\bm{\theta}) \\ & =\bm{\theta}_t + \alpha \bigg ( \, G_t\frac{\nabla_{\bm{\theta}} \pi(A_t|S_t, \bm{\theta})}{\pi(A_t|S_t, \bm{\theta})} \bigg )
+\end{aligned}$$
+
+This is the REINFORCE Algorithm! We have each update which is simply the learning rate $\alpha$ multiplied by a quantity that is proportional to the return and a vector of gradients of the probability of taking a certain action in a state. From the gradient ascent logic, we can see that this vector is the direction of maximizing the probability of taking action $A_t$ again, whenever we visit $S_t$. Moreover, The update is increasing the parameter vector in this direction proportional to the return, and inversely proportional to the action probability. Since the return is evaluated till the end of the episode, this is a Monte-Carlo Algorithm. We can further refine this using the identity of log differentiation and adding the discount factor to get the update as:
+
+$$\bm{\theta}_{t+1} = \bm{\theta} + \alpha \gamma^t G_t \nabla_{\bm{\theta}} \ln \pi(A_t| S_t , \bm{\theta}) $$
+
+## Looking at Trajectories
+
+Another way to look at the above formulation is through sampled trajectories, as done in [Sergey Levine's slides](http://rail.eecs.berkeley.edu/deeprlcourse/static/slides/lec-5.pdf). While theoretically, this treatment is similar to the one done above, I just find the notation more intuitive. Recall, a trajectory is a sequence of states and actions over time, and the rewards accumulated in this sequence qualify this trajectory. Thus, we can say that the utility objective $J(\bm{\theta})$  is the sum of the accumulated rewards of some number of trajectories sampled from a policy $\pi_\theta$ 
+
+$$J(\bm{\theta}) = \mathbb{E}_{\tau \sim \pi_{\bm{\theta}} (\tau)} \bigg [  \sum_t r(s_t, a_t)  \bigg ] \approx \frac{1}{N} \sum_i \sum_t r(s_{i:t}, a_{i:t}) $$
+
+Let this sum of reward be denoted by $G(\tau)$  for a trajectory $\tau$ . Thus, we can re-write the above equation as
+
+$$J(\bm{\theta}) =  \mathbb{E}_{\tau \sim \pi_{\bm{\theta}}(\tau) } \big [ G(\tau)  \big ] $$
+
+This expectation is essentially sampling a trajectory from a policy and weighing it with the accumulated rewards. Thus, we can write it as 
+
+$$J(\bm{\theta}) =  \int \pi_{\bm{\theta}} (\tau) G(\tau) d\tau   $$
+
+Now, we just differentiate this objective, and add a convenient policy term to make it an expectation:
+
+$$\begin{aligned}
+\nabla_{\bm{\theta}} J(\bm{\theta})  & = \nabla_{\bm{\theta}} \int \pi_{\bm{\theta}} (\tau) G(\tau) d\tau   \\
+& = \int \nabla_{\bm{\theta}}  \pi_{\bm{\theta}} (\tau) G(\tau) d\tau \\
+& = \int \pi_{\bm{\theta}}(\tau) \frac{\nabla_{\bm{\theta}}  \pi_{\bm{\theta}}(\tau) }{\pi_{\bm{\theta}}(\tau)} G(\tau) d\tau
+
+\end{aligned}$$
+
+Now, we just use an identity $\frac{dx}{x} = d \log x$ and get
+
+$$\nabla_{\bm{\theta}} J(\bm{\theta})   = \int \pi_{\bm{\theta}} (\tau) \nabla_{\bm{\theta}}  \log \pi_{\bm{\theta}} (\tau ) G(\tau) d\tau   $$
+
+Thus, we can write this as:
+
+$$\nabla_{\bm{\theta}} J(\bm{\theta}) = \mathbb{E}_{\tau \sim \pi_{\bm{\theta}} (\tau)} \big [ \nabla_{\bm{\theta}}  \log \pi_{\bm{\theta}} (\tau ) G(\tau)   \big ] $$
+
+Hence, we get the same final result as before: the gradient depends on the gradient of the log policy weighted by the rewards accumulated over the trajectory. Now, we can translate this to states and actions over the trajectory by simply considering what the policy of the trajectory represents: 
+
+$$\begin{aligned}
+& \pi_{\bm{\theta}} (s_1, a_1, ..., s_T, a_T) = \mu(s) \prod_{t=1}^{T} \pi_{\bm{\theta}}(a_t|s_t)p(s_{t+1}|s_t, a_t) \\
+\implies & \log \pi_{\bm{\theta}} (s_1, a_1, ..., s_T, a_T) = \log \mu(s) + \sum_{t=1}^{T} \log \pi_{\bm{\theta}}(a_t|s_t) + \log p(s_{t+1}|s_t, a_t)
+\end{aligned}$$
+
+When we differentiate this log policy w.r.t $\bm{\theta}$, we realize that $\mu(s)$  and $p(s_{t+1}|s_t, a_t)$ do not depend on this parameter, and would be set to 0. Thus, our utility expression would end up looking like
+
+$$\nabla_{\bm{\theta}} J(\bm{\theta}) = \mathbb{E}_{\tau \sim \pi_{\bm{\theta}} (\tau)} \big [  \sum_{t=1}^{T} \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a_t|s_t) \sum_{t=1}^{T}r(s_t, a_t)   \big ] $$
+
+Then we take average of the samples as the expectation, we get 
+
+$$\nabla_{\bm{\theta}} J(\bm{\theta}) \approx \frac{1}{N} \sum _{i=1}^N \bigg [  \sum_{t=1}^{T} \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a_t|s_t) \sum_{t=1}^{T}r(s_t, a_t)   \bigg ] $$
+
+And this is the key formula behind REINFORCE again and the update can thus, be written as
+
+$$\bm{\theta} \leftarrow \bm{\theta} + \alpha \nabla_{\bm{\theta}} J(\bm{\theta}) $$
+
+This is where I find it more intuitive to just use $\tau$ for trajectories since now we can just write our REINFORCE algorithm as : 
+
+1. Sample a set of trajectories $\{ \tau ^i\}$ from the policy $\pi_{\bm{\theta}}(a_t|s_t)$ 
+2. Estimate $\nabla_{\bm{\theta}} J(\bm{\theta})$ 
+3. Update the parameters $\bm{\theta} \leftarrow \bm{\theta} + \alpha \nabla_{\bm{\theta}} J(\bm{\theta})$
+
+
+## Reducing Variance
+
+The idea of parameterizing the policy and working directly with the sampled trajectories has an intuitive appeal due to its clarity. However, this approach suffers from high variance. This is because when we compute the expectation over trajectories, we are essentially sampling $N$ different trajectories and then taking the average of the accumulated rewards. If we take this sampling to be uniform, we can easily imagine scenarios, where the trajectories sampled, have wildly different accumulated rewards. Thus, the chances of getting a high variance in the values that we are averaging over increase. If we were to scale $N$  to $\infty$  then our average becomes closer to the true expectation. However, this is computationally expensive. There are multiple ways to reduce this variance.
+
+### Rewards to go
+
+In the trajectory formulation, we are accumulating all of the rewards from $t=0$ to $t = N$. However, one way to make this online would be to just consider the rewards from the timestep at which we take the policy log value till the end of the horizon. This can be written as
+
+$$\nabla_{\bm{\theta}} J(\bm{\theta}) \approx \frac{1}{N} \sum _{i=1}^N \bigg [  \sum_{t=1}^{T} \nabla_{\bm{\theta}} \log \pi_{\bm{\theta}}(a_t|s_t) \sum_{t'=t}^{T}r(s_{t'}, a_{t'})   \bigg ] $$
+
+Thus, by reducing the number of  rewards we consider for each policy evaluation, we are essentially better able to control the variance up to a certain extent
+
+### Baselining
+
+Another way to control the variance is to realize that the actions in a state are the quantities that create a variance for each state in trajectory. However, we see that our return $G(\tau)$  is dependent on both states and actions. Thus, if we could compare this value to a baseline value $b(s)$  , we eliminate the variance resulting from fixed state selection. In the policy gradient theorem, this would look like
+
+$$\nabla_{\bm{\theta}}J(\bm{\theta}) \propto \sum_{s \in \mathcal{S}} \mu(s) \sum_{a \in \mathcal{A}}  \big ( q_\pi(s,a) - b(s)  \big )  \nabla\pi(a|s) $$
+
+since $b(s)$  does not vary with actiosn, it would not have an effect on our summation since its sum over all actions would be 0:
+
+$$\begin{aligned}
+\sum_a b(s) \nabla_{\bm{\theta}}\pi(a|s, \bm{\theta}) & = b(s) \nabla_{\bm{\theta}} \sum_a \pi(a|s, \bm{\theta}) \\
+& = b(s) \nabla_{\bm{\theta}} 1 \\
+& = 0
+\end{aligned}$$
+
+Thus, we can effectively update our REINFORCE update with this baseline to get
+
+$$\bm{\theta}_{t+1} =   =\bm{\theta}_t + \alpha \big ( \, G_t - b(s) \big ) \frac{\nabla_{\bm{\theta}} \pi(A_t|S_t, \bm{\theta})}{\pi(A_t|S_t, \bm{\theta})}$$
+
+Or, in the trajectory formulation 
+
+$$\bm{\theta}_{t+1} =   =\bm{\theta}_t + \alpha \nabla_{\bm{\theta}}  \log \pi_{\bm{\theta}} (\tau ) \big (G(\tau)  - b(s) \big ) $$
+
+One good function for $b(s)$ could be the estimate of the state value $\hat{v}(s_t, \bm{w})$ . Doing something like this may seem like going to the realm of actor-critic methods, where we are parameterizing the policy and using the value function, but this is not the case here since we are not using the value function to bootstrap. We are stabilizing the variance by using the estimate of the value function as a baseline. Baselines are not just limited to this. We can inject all kinds of things into the baseline to try scaling up our policy gradient. For example, an [interesting paper](https://arxiv.org/abs/2102.10362) published recently talks about using functions that take into account causal dependency as a Baseline. There are many other extensions like Deterministic Policy Gradients, Deep Deterministic Policy Gradients, Proximal Optimization e.t.c that look deeper into this problem.
 
 
 
