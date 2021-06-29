@@ -5,6 +5,7 @@
 - Reach me: <a href='mailto:adityak735@gmail.com'> `adityak735@gmail.com` </a>
 - [Github](http://github.com/amsks)
 - [Linkedin](https://www.linkedin.com/in/amsks/)
+- [Twitter](https://twitter.com/AlphaMike_96)
 - [Curriculum Vitae](CV/CV_Aditya_Mohan.pdf)
 - [Reading list](reading-list.html)
 
