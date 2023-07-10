@@ -1,34 +1,47 @@
-"Adams":
-  - firstname: ["Edwin", "E.", "E. P.", "Edwin Plimpton"]
-    url: https://en.wikipedia.org/wiki/Edwin_Plimpton_Adams
+"Biedenkapp":
+  - firstname: ["André", "A."]
+    url: https://andrebiedenkapp.github.io/
 
-"Podolsky":
-  - firstname: ["Boris", "B.", "B. Y.", "Boris Yakovlevich"]
-    url: https://en.wikipedia.org/wiki/Boris_Podolsky
+"Hutter":
+  - firstname: ["Frank", "F."]
+    url: https://ml.informatik.uni-freiburg.de/profile/hutter
 
-"Rosen":
-  - firstname: ["Nathan", "N."]
-    url: https://en.wikipedia.org/wiki/Nathan_Rosen
+"Lindauer":
+  - firstname: ["Marius", "M."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/lindauer
 
-"Bach": 
-  - firstname: ["Johann Sebastian", "J. S."]
-    url: https://en.wikipedia.org/wiki/Johann_Sebastian_Bach
+"Benjamins":
+  - firstname: ["Carolin", "C."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/benjamins
 
-  - firstname: ["Carl Philipp Emanuel", "C. P. E."]
-    url: https://en.wikipedia.org/wiki/Carl_Philipp_Emanuel_Bach
+"Schubert":
+  - firstname: ["Frederik", "F."]
+    url: http://www.tnt.uni-hannover.de/en/staff/schubert/
 
-"Przibram":
-  - firstname: ["Karl"]
-    url: https://link.springer.com/article/10.1007/s00016-019-00242-z
+"Eimer":
+  - firstname: ["Theresa", "T."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/eimer
 
-"Schrödinger":
-  - firstname: ["Erwin"]
-    url: https://en.wikipedia.org/wiki/Erwin_Schr%C3%B6dinger
+"Zhang":
+  - firstname: ["Amy", "A."]
+    url: https://amyzhang.github.io/
 
-"Lorentz":
-  - firstname: ["Hendrik Antoon"]
-    url: https://en.wikipedia.org/wiki/Hendrik_Lorentz
+"Rosenhahn":
+  - firstname: ["Bodo", "B."]
+    url: http://www.tnt.uni-hannover.de/en/staff/rosenhahn/
 
-"Planck":
-  - firstname: ["Max"]
-    url: https://en.wikipedia.org/wiki/Max_Planck
+"Ruhkopf":
+  - firstname: ["Tim", "T."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/ruhkopf
+
+"Deng":
+  - firstname: ["Difan", "D."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/deng
+  
+"Tornede":
+  - firstname: ["Alexander", "A."]
+    url: https://www.ai.uni-hannover.de/en/institut/team/tornede-alexander
+
+"Loni":
+  - firstname: ["Mohammad", "M."]
+    url: https://www.es.mdu.se/staff/3662-Mohammad_Loni
