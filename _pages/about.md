@@ -24,9 +24,7 @@ Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hann
 I am interested in exploring how agents can learn to abstract structure out of tasks and use this to adapt better to different classes of tasks. Thus, I am currently working on gaining further insight into generalization and domain adaptation in Reinforcement Learning and Meta-Learning. My greater research ambition is to create Robust and General Learning pipelines that require minimal handcrafting from humans. 
 
 
-I previously completed my Master's in Autonomous Systems from the EIT double-Degree M
-I have previously worked on problems in Robotics, Reinforcement Learning, and Meta-Learning in single-agent and Multi-Agent settings.
+I previously completed my Master's in Autonomous Systems from [Technical University of Berlin](https://www.tu.berlin/en/) and [EURECOM](https://www.eurecom.fr/en)., with my thesis focusing no ad-hoc cooperation in Hanabi. I have previously worked on problems in Robotics, Reinforcement Learning, and Meta-Learning in single-agent and Multi-Agent settings.
 
-Apart from making the world a better place (pun intneded), I also love to sing, play music, dance and cook.
-If you wanna chat, just reach out to me via email.
-
+Apart from all of the Reinforcement Learning in my life, I also love to sing, play piano and guitar, compose music, dance and cook.
+If you want to chat, feel free to reach out to me via email or twitter.
