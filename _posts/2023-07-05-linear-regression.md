@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Linear Regression
-date: 2023-07-05 12:57:00-0400
+date: 2023-07-05 08:57:00-0400
 categories: machine-learning
 giscus_comments: false
 related_posts: false

@@ -265,7 +265,7 @@ jekyll-archives:
     category: '/blog/category/:name/'
 
 # display_tags: ['reinforcement-learning', 'gauge-theory'] # these tags will be displayed on the front page of your blog
-display_categories: ['reinforcement-learning', 'gauge-theory', 'automl'] # these categories will be displayed on the front page of your blog
+display_categories: ['reinforcement-learning', 'meta-learning', 'machine-learning', 'automl', 'evolutionary-computation', 'gauge-theory'] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
