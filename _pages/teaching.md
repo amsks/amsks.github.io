@@ -1,12 +1,18 @@
 ---
 layout: page
 permalink: /teaching/
-title: teaching
-description: Materials for courses you taught. Replace this text with your description.
+title: teaching and theses
+# description: Materials for courses you taught. Replace this text with your description.
 nav: true
 nav_order: 5
 ---
 
-For now, this page is assumed to be a static description of your courses. You can convert it to a collection similar to `_projects/` so that you can have a dedicated page for each course.
+Please refer to the [institute page](https://www.ai.uni-hannover.de/en/studies) for all details 
+regarding teaching and thesis topics that I am offering. 
 
-Organize your courses by years, topics, or universities, however you like!
+Previously, I have been involved with the following courses:
+
+    Reinforcement Learning Seminar: Spring 2022
+    Reinforcement Learning: Fall 2022
+    Reproducibility in Machine Learning: Spring 2023 
+

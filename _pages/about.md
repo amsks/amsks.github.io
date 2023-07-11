@@ -1,6 +1,6 @@
 ---
 layout: about
-title: Bonjour!
+title: bonjour!
 permalink: /
 # subtitle: <a href='#'>Affiliations</a>. 
 

@@ -8,7 +8,7 @@ middle_name:
 last_name: Mohan
 email: adityak735@gmail.com
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
-  A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+  Hello, Hello, Hello! We are gathered here today to get through this thing called life. 
 footer_text: >
   Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio"></a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
@@ -106,7 +106,7 @@ youtube_id: # your youtube channel id (youtube.com/@<youtube_id>)
 discord_id: # your discord id (18-digit unique numerical identifier)
 
 contact_note: >
-  You can contact me via email or on twitter.
+  Please contact me via email or on twitter.
 
 # -----------------------------------------------------------------------------
 # Analytics and search engine verification
@@ -134,7 +134,11 @@ pagination:
 
 related_blog_posts:
   enabled: true
-  max_related: 3
+  max_related: 5
+
+external_sources:
+  - name: automl.org
+    rss_url: https://www.automl.org/author/mohan/
 
 # Giscus comments (RECOMMENDED)
 # Follow instructions on https://giscus.app/ to setup for your repo to fill out
@@ -265,7 +269,8 @@ jekyll-archives:
     category: '/blog/category/:name/'
 
 # display_tags: ['reinforcement-learning', 'gauge-theory'] # these tags will be displayed on the front page of your blog
-display_categories: ['reinforcement-learning', 'meta-learning', 'machine-learning', 'automl', 'evolutionary-computation', 'gauge-theory'] # these categories will be displayed on the front page of your blog
+display_categories: ['reinforcement-learning', 'meta-learning', 'machine-learning', 'automl', 
+                      'evolutionary-computation', 'gauge-theory'] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------
 # Jekyll Scholar
@@ -307,7 +312,7 @@ filtered_bibtex_keywords: [ abbr, abstract, arxiv, bibtex_show, html, pdf, selec
                             code, poster, slides, website, preview, altmetric]
 
 # Maximum number of authors to be shown for each publication (more authors are visible on click)
-max_author_limit: 3  # leave blank to always show all authors
+max_author_limit:   # leave blank to always show all authors
 more_authors_animation_delay: 10  # more authors are revealed on click using animation; smaller delay means faster animation
 
 
@@ -356,7 +361,7 @@ jekyll-diagrams:
 # Optional Features
 # -----------------------------------------------------------------------------
 
-enable_google_analytics:    false  # enables google analytics
+enable_google_analytics:    true  # enables google analytics
 enable_panelbear_analytics: false  # enables panelbear analytics
 enable_google_verification: false  # enables google site verification
 enable_bing_verification:   false  # enables bing site verification
@@ -365,7 +370,7 @@ enable_math:                true   # enables math typesetting (uses MathJax)
 enable_tooltips:            false  # enables automatic tooltip links generated
                                    # for each section titles on pages and posts
 enable_darkmode:            true   # enables switching between light/dark modes
-enable_navbar_social:       false  # enables displaying social links in the
+enable_navbar_social:       true  # enables displaying social links in the
                                    # navbar on the about page
 enable_project_categories:  true   # enables categorization of projects into
                                    # multiple categories
