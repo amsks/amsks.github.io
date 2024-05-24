@@ -1,14 +1,26 @@
-"Biedenkapp":
-  - firstname: ["André", "A."]
-    url: https://andrebiedenkapp.github.io/
-
 "Hutter":
   - firstname: ["Frank", "F."]
     url: https://ml.informatik.uni-freiburg.de/profile/hutter
 
 "Lindauer":
   - firstname: ["Marius", "M."]
-    url: https://www.ai.uni-hannover.de/en/institut/team-luhai/lindauer
+    url: https://www.ai.uni-hannover.de/en/lindauer
+
+"Zhang":
+  - firstname: ["Amy", "A."]
+    url: https://amyzhang.github.io/
+  
+"Wachsmuth":
+  - firstname: ["Henning", "H."]
+    url: https://www.ai.uni-hannover.de/de/wachsmuth
+
+"Rosenhahn":
+  - firstname: ["Bodo", "B."]
+    url: http://www.tnt.uni-hannover.de/en/staff/rosenhahn/
+
+"Dockhorn":
+  - firstname: ["Alexander", "A."]
+    url: https://www.tnt.uni-hannover.de/de/staff/dockhorn/
 
 "Benjamins":
   - firstname: ["Carolin", "C."]
@@ -22,13 +34,9 @@
   - firstname: ["Theresa", "T."]
     url: https://www.ai.uni-hannover.de/en/institut/team-luhai/eimer
 
-"Zhang":
-  - firstname: ["Amy", "A."]
-    url: https://amyzhang.github.io/
-
-"Rosenhahn":
-  - firstname: ["Bodo", "B."]
-    url: http://www.tnt.uni-hannover.de/en/staff/rosenhahn/
+"Biedenkapp":
+  - firstname: ["André", "A."]
+    url: https://andrebiedenkapp.github.io/
 
 "Ruhkopf":
   - firstname: ["Tim", "T."]
