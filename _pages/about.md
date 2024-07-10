@@ -20,7 +20,7 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
-<!-- Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/). -->
+Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/).
 
 Sequential decision-making problems in the real world often come with abundant information that is typically underutilized in Reinforcement Learning (RL). 
 My research focuses on leveraging this information to enhance RL techniques. 
@@ -31,4 +31,5 @@ I completed my Master's in Autonomous Systems from [Technical University of Berl
 where my thesis focused on ad-hoc cooperation in Hanabi. 
 Additionally, I have worked on problems in Robotics, Reinforcement Learning, and Meta-Learning in both single-agent and multi-agent settings.
 
-Beyond my research, I have a passion for singing, playing piano and guitar, composing music, dancing, and cooking. If you’d like to chat about research, music, food, or anything else, don't hesitate to book a [slot in my calender](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2HIgZFJjg6BuXnSMlPTnyqgT7UcBdumLA7ctxYu-524bHNePzFhXCBWXIfCLq91oM9SGGuLL3O)
+Beyond my research, I have a passion for singing, playing piano and guitar, composing music, dancing, and cooking.
+If you’d like to chat about research, music, food, or anything else, don't hesitate to book a [slot in my calender](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2HIgZFJjg6BuXnSMlPTnyqgT7UcBdumLA7ctxYu-524bHNePzFhXCBWXIfCLq91oM9SGGuLL3O)
