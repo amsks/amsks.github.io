@@ -20,7 +20,7 @@ selected_papers: true # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
-Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/).
+<!-- Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/). -->
 
 Sequential decision-making problems in the real world often come with abundant information that is typically underutilized in Reinforcement Learning (RL). 
 My research focuses on leveraging this information to enhance RL techniques. 
