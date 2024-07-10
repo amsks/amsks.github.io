@@ -22,11 +22,13 @@ social: true  # includes social icons at the bottom of the page
 
 <!-- Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/). -->
 
-I believe studying and explicitly utilizing information about problem structure can help us significantly improve squential decision making techniques, such as Reinforcement Learning.
-Thus, I am interested in exploring how agents can learn to abstract structure out of tasks (the discovery problem) and use this to improve performance.
+Sequential decision-making problems in the real world often come with abundant information that is typically underutilized in Reinforcement Learning (RL). 
+My research focuses on leveraging this information to enhance RL techniques. 
+Specifically, I aim to explore how RL agents can utilize task structures to improve sample efficiency and generalization. 
+In doing so, my work intersects various RL domains, including Contextual RL, Automated RL, Meta-RL, and state abstractions.
 
 I completed my Master's in Autonomous Systems from [Technical University of Berlin](https://www.tu.berlin/en/) and [EURECOM](https://www.eurecom.fr/en), 
 where my thesis focused on ad-hoc cooperation in Hanabi. 
-I have previously worked on problems in Robotics, Reinforcement Learning, and Meta-Learning in single-agent and Multi-Agent settings.
+Additionally, I have worked on problems in Robotics, Reinforcement Learning, and Meta-Learning in both single-agent and multi-agent settings.
 
-Apart from all of the research, I love to sing, play piano and guitar, compose music, dance and cook.
+Beyond my research, I have a passion for singing, playing piano and guitar, composing music, dancing, and cooking. If you’d like to chat about research, music, food, or anything else, don't hesitate to book a [slot in my calender](https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ2HIgZFJjg6BuXnSMlPTnyqgT7UcBdumLA7ctxYu-524bHNePzFhXCBWXIfCLq91oM9SGGuLL3O)
