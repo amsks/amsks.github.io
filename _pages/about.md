@@ -23,7 +23,10 @@ social: true  # includes social icons at the bottom of the page
 <!-- Researcher at the [Institute of Artificial Intelligence](https://www.ai.uni-hannover.de/en/). -->
 
 Sequential decision-making problems in the real world often come with structure that is typically underutilized in Reinforcement Learning (RL). 
-My work is dedicated to uncovering and leveraging this inherent structure. I focus on developing methods that enable RL agents to utilize rich contextual cues, temporal dependencies, and modular task structures, ultimately improving learning efficiency, generalization, and adaptability. My research spans areas such as Contextual RL, Meta-RL, AutoRL, and state abstractions, and I am particularly interested in self-supervised techniques that empower agents to learn without explicit labels.
+I develop methods that enable RL agents to utilize information about contextual changes, temporal dependencies, and modular decompositions, in order to 
+help them learn efficiently and adapt to changing but structured environments.
+My research spans areas such as Contextual RL, Meta-RL, AutoRL, and Representation Learning, 
+and I am currently working on self-supervised RL, where the agent learns behavior without explicit labels or human supervision.
 
 **Before my PhD:** I completed my Master's in Autonomous Systems from [Technical University of Berlin](https://www.tu.berlin/en/) and [EURECOM](https://www.eurecom.fr/en), 
 where my thesis focused on ad-hoc cooperation in Hanabi. 
