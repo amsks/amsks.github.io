@@ -11,11 +11,11 @@ Dynamic programming (DP) is a method that solves a problem by breaking it down i
 
 ```cpp
 int fib(int *x*) {
-	
+
 	if (x < 2) {
 		return 1;
 	}
-	return fib(x-1) + fib(x-2);	
+	return fib(x-1) + fib(x-2);
 
 }
 ```
@@ -27,14 +27,14 @@ int fib(int *x*) {
 
 	static vector<int> cache(N, -1);
 	int& result = cache[x];
-	
+
 	if (result == -1) {
-	
+
 		if (x < 2) result = 1;
-	
+
 		else result = fib(x-1) + fib(x-2);
 	}
-	
+
 	return result;
 }
 ```

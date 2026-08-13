@@ -31,7 +31,7 @@ As we repeat more experiments and update the values at the first visit, we get c
 ### Every-Visit MC Evaluation
 This is same as first visit evaluation, except we update at every visit:
 
-1. $$N(s) \gets N(s) + 1$$ 
+1. $$N(s) \gets N(s) + 1$$
 2. $$S(s) \gets S(s) + 1$$
 3. $$V(s) = \frac{S(s)}{N(s)}$$
 
@@ -82,7 +82,7 @@ which allows us to see why certain methods are estimates:
 - The DP method is an estimate because it does not know the future values of states and thus, uses the current state value estimate in its place.
 - The TD method is an estimate because it does both of these things. Hence, it is a combination of both. However, unlike DP, MC and TD do not require a model of the environment. Moreover, the online nature of these algorithms is something that allows them to work with samples of backups, whereas DP requires full backup.
 
-TD and MC can further be differentiated based on the nature of the samples that they work with: 
+TD and MC can further be differentiated based on the nature of the samples that they work with:
 
 - TD requires shallow backups since it is inherently online in nature
 - MC requires deep backups due to the nature of its search.
@@ -93,7 +93,7 @@ Another way to look at the inherent difference is to realize that DP inherently 
     {% include figure.html path="assets/img/Reinforcement-Learning/TD-MC-DP.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-## Extending TD to n-steps 
+## Extending TD to n-steps
 
 The next natural step for something like TD would be to extend it to further steps. For this, we generalize the target and define it as follows:
 
@@ -105,7 +105,7 @@ $$V(S_t) \gets V(S_t) + \alpha (G^{(n)}_t - V(S_t)$$
 
 One interesting thing to note here is that if the value of $$n$$ is increased all the way to the terminal state, then we essentially get the same equation as MC methods!
 
-### Averaging over n returns 
+### Averaging over n returns
 To get the best out of all the $$n$$ steps, one improvement could be to average the returns over a certain number of states. For example, we could combine 2-step and 4-step returns and take the average :
 
 $$G_{avg} = \frac{1}{2} [ G^{(2)} + G^{(4)} ]$$
@@ -120,7 +120,7 @@ $$G^{(\lambda)}_t = (1 - \lambda ) \displaystyle\sum_{n=1}^{\infin} \lambda^{n-1
 
 And this, is also called **Forward-view $$TD(\lambda)$$.**
 
-### Backward View 
+### Backward View
 
 To understand the backward view, we need a way to see how we are going to judge the causal relationships between events and outcomes (Returns). There are two heuristics:
 
@@ -143,4 +143,3 @@ So, all we need to do it scale the TD-error $$\delta_t$$ according to the trace 
 $$V(S) \gets V(S) + \alpha \delta_t E_t(s)$$
 
 Thus, when $$\lambda = 0$$, we get the equation for $$TD(0)$$ , and when $$\lambda =1$$, the credit is deferred to the end of the episode and we get MC equation.
-

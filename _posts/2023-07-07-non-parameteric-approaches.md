@@ -50,15 +50,15 @@ While Matching networks work well for one-shot meta-learning tasks, they do all 
     {% include figure.html path="assets/img/Meta/Meta-3.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-As shown in the figure above, the classes become seperable in this embedding space. 
+As shown in the figure above, the classes become seperable in this embedding space.
 
 $$\mathbf{c}_k = \frac{1}{|\mathcal{D_i^{tr}}|} \sum_{(x,y) \in \mathcal{D_i^{tr}}} f_\theta(x)$$
 
-Now, if we have a metric on this space then all we have to do is find the near class cluster to a new query point and we can classify that point as belonging to this class by taking the softmax over the distances 
+Now, if we have a metric on this space then all we have to do is find the near class cluster to a new query point and we can classify that point as belonging to this class by taking the softmax over the distances
 
 $$p_\theta(y = k|x) = \frac{\exp \big(  -d (f_\theta(x), \mathbf{c}_k) \big)}{ \sum_{k'} \exp \big(  -d (f_\theta(x), \mathbf{c}_{k'}) \big)}$$
 
-If we want to reason more complex stuff about our data then we just need to create a good enough representation in the embedding space. Some approaches to do this are: 
+If we want to reason more complex stuff about our data then we just need to create a good enough representation in the embedding space. Some approaches to do this are:
 
 - [Relation Network](https://arxiv.org/abs/1711.06025) → This is an approach where they learn the relationship between embeddings i.e instead of taking $$d(.)$$  as a pre-determined distance measure, they learn it inherently for the data
 - [Infinite Mixture Prototypes](https://arxiv.org/pdf/1902.04552.pdf) → Instead of defining each class by a single cluster. they represent each class by a set of clusters. Thus, by inferring this number of clusters they are able to interpolate between nearest neighbors and the prototypical representations.
@@ -68,11 +68,11 @@ If we want to reason more complex stuff about our data then we just need to crea
 
 ### Computation Graph Perspective
 
-We can view these meta-learnin algorithms as computation graphs: 
+We can view these meta-learnin algorithms as computation graphs:
 
 - Black-box adaptation is essentially a sequence of inputs and outputs on a computational graph
 - Optimization can be seen as a embedding an optimization routine into a computational graph
-- Non-parameteric methods can be seen as computational graphs working with the embedding spaces
+- Non-parametric methods can be seen as computational graphs working with the embedding spaces
 
 This viewpoint allows us to see how to mix-match these approaches to improve performance:
 
@@ -81,7 +81,7 @@ This viewpoint allows us to see how to mix-match these approaches to improve per
 
 ### Algorithmic Properties Perspective
 
-We consider the following properties of the most importance for most tasks : 
+We consider the following properties of the most importance for most tasks :
 
 - **Expressive Power** → Ability of our learned function $$f$$ to represent a range of learning procedures. This is important for scalability and applicability to a range of domains.
 - **Consistency** → The learned learning procedure will asymptotically solve the task given enough data, regardless of the meta-training procedure. The main idea is to reduce the reliance on the meta-training and generate the ability to perform on Out-Of-Distribution (OOD) tasks
@@ -92,5 +92,3 @@ We can now say the following about the three approaches:
 - **Black-Box Adaptation** → Complete Expressive Power, but not consistent
 - **Optimization Approaches** → Consistent and expressive for sufficiently deep models, but fail in expressiveness for other kinds of tasks, especially in Meta-Reinforcement Learning.
 - **Non-parametric Approaches** → Expressive for most architectures and consistent under certain conditions
-
-

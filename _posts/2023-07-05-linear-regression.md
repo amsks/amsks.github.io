@@ -18,17 +18,17 @@ related_posts: false
 - Let the Line be $$y(x) = w_0 + w_1x$$
 - Now, our optimization goal is to find the values of $$w_0, w_1$$ so that the variation around this line is minimal → We do this by minimizing the squared Errors
 
-To know if taking into the samples actually improves anything or not, all we have to do is calculate the variance around the fit and compare it with variance around the mean of the y values of the point, and give an answer in percentages! This is called the $$R^2$$ value: 
+To know if taking into the samples actually improves anything or not, all we have to do is calculate the variance around the fit and compare it with variance around the mean of the y values of the point, and give an answer in percentages! This is called the $$R^2$$ value:
 
 $$
 R^2  = \frac {\text{Var}(mean) - \text{Var}(fit)}{\text{Var}(\text{mean})}
 $$
 
-Thus, if this value is 0.6 , we get a 60% improvement in the variance by taking the x features into account. 
+Thus, if this value is 0.6 , we get a 60% improvement in the variance by taking the x features into account.
 
-Let's go to the interesting stuff → The Math of this all 
+Let's go to the interesting stuff → The Math of this all
 
-## Math of Regression 
+## Math of Regression
 
 Let's take the  case of a set of multidimensional features $$\mathbf{X} \in \mathbb{R}^D \,\,\,$$ where, $$i= 1,...,N$$. For each of these set of D dimensional inputs, we have one output $$\mathbf{y} \in \mathbb{R}$$. Thus, we have our data as $\{(X_i,y_i)\}$ to which we have to fit a D dimensional hyperplane so that the variance around this hyperplane is minimal. Let's start by defining our model:
 
@@ -51,7 +51,7 @@ $$
 Here, I have used bold to represent vector notation. since our model is linear, we can define it as:
 
 $$
-\hat{f}(\mathbf{X}) = \mathbf{X}\mathbf{w} 
+\hat{f}(\mathbf{X}) = \mathbf{X}\mathbf{w}
 $$
 
 - **Note:** to make this work by taking bias into account we let $$\mathbf{w} \in \mathbb{R}^{D+1}$$ where the D weights are corresponding to D features and the extra weight is the bias. Thus, $$\mathbf{X} \in \mathbb{R}^{NX(D+1)}$$ which basically means that our N observations are stacked vertically and each observation is of D dimensions, but to make the notation work, we add a 1 at the start, which will be the multiplier for our bias term, and thus, have D+1 as the dimension of the row.

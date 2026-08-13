@@ -7,12 +7,12 @@ giscus_comments: false
 related_posts: false
 ---
 
-**Main Idea:** 
+**Main Idea:**
 
-1. Make an explicit assumption about what distribution the data was modeled from 
+1. Make an explicit assumption about what distribution the data was modeled from
 2. Set the parameters of this distribution so that the data we observe is most likely i.e **maximize the likelihood of our data**
 
-For  a simple example of a coin toss, we can see this as maximizing the probability of observing heads from a binomial distribution: 
+For  a simple example of a coin toss, we can see this as maximizing the probability of observing heads from a binomial distribution:
 
 $$p(z_1, ..., z_n) = p(z_1 ...., z_n|\theta)$$
 
@@ -35,7 +35,7 @@ $$\hat{\theta}_{MLE} = \underset{\theta}{\text{argmax}} \sum_{i=1}^N Log(p(z_i|\
 Let us use this idea for the regression problem. We assume that our outputs are distributed in a Gaussian manner around the line w  have to find out. This basically means that our $$\epsilon$$  is a Gaussian Noise that is messing up our outputs from the fundamental distribution
 
 <div class="col-sm">
-    {% include figure.html path="assets/img//MALIS/MLE.png" class="img-centered rounded z-depth-0" %}
+    {% include figure.html path="assets/img/MALIS/MLE.png" class="img-centered rounded z-depth-0" %}
 </div>
 
 Thus, our equation for getting this probability of our output would be :
@@ -65,7 +65,7 @@ Which is the same as minimizing :
 
 $$\hat{w} = \underset{w}{\text{argmin}} \sum_{i=1}^N (y_i - x_iw)^2$$
 
-and the solution is: 
+and the solution is:
 
 $$\mathbf{w} = (\mathbf{X}^T\mathbf{X})^{-1} \mathbf{X}^T\mathbf{y}$$
 

@@ -7,12 +7,12 @@ giscus_comments: false
 related_posts: false
 ---
 
-While prediction is all about estimating the value function in an environment for which the underlying MDP is not known, Model-Free control deals with optimizing the value function. While many problems can be modelled as MDPs, in a lot of problems we don't really have that liberty in some sense. The reasons why using an MDP to model the problem might not make sense are: 
+While prediction is all about estimating the value function in an environment for which the underlying MDP is not known, Model-Free control deals with optimizing the value function. While many problems can be modelled as MDPs, in a lot of problems we don't really have that liberty in some sense. The reasons why using an MDP to model the problem might not make sense are:
 
 - MDP is unknown → In this case we have to sample experiences and somehow work with samples.
 - MDP is known, but too complicated in terms of space and so, we again have to rely on experience
 
-We can classify the policy learning process into two kinds based on the policy we learn and the policy we evaluate upon: 
+We can classify the policy learning process into two kinds based on the policy we learn and the policy we evaluate upon:
 
 - **On-Policy Learning** → If we learn about policy $$\pi$$ from the experiences sampled from $$\pi$$ , then we are essentially learning on the job.
 - **Off-Policy Learning** → If we use a policy $$\mu$$  to sample the experiences, but our target is to learn about policy $$\pi$$ , then we are essentially seeing someone else do something and learning how to do something else through that
@@ -20,12 +20,12 @@ We can classify the policy learning process into two kinds based on the policy w
 
 ## Generalized Policy Iteration
 
-As explained before our process of learning can also be broken down into 2 stages: 
+As explained before our process of learning can also be broken down into 2 stages:
 
-1. **Policy Evaluation** → Iteratively estimating $$v_\pi$$ throught the samled experiences a.k.a iterative policy evaluation 
-2. **Policy Improvement →**  Generating a policy $$\pi' \geq \pi$$ 
+1. **Policy Evaluation** → Iteratively estimating $$v_\pi$$ throught the samled experiences a.k.a iterative policy evaluation
+2. **Policy Improvement →**  Generating a policy $$\pi' \geq \pi$$
 
-The process of learning oscillates between these two states in sense → We evaluate a policy, then improve it, then evaluate it again and so on until we get the optimal policy $\pi^*$ and the corresponding optimal value $$v^*$$. Thus, we could see this as state transitions, as shown below: 
+The process of learning oscillates between these two states in sense → We evaluate a policy, then improve it, then evaluate it again and so on until we get the optimal policy $\pi^*$ and the corresponding optimal value $$v^*$$. Thus, we could see this as state transitions, as shown below:
 
 <div class="col-sm">
     {% include figure.html path="assets/img/Reinforcement-Learning/Model-Free-Control/mfc-1.png" class="img-centered rounded z-depth-0" %}
@@ -41,7 +41,7 @@ Each process drives the value function or policy toward one of the lines represe
 
 ## On-Policy Monte-Carlo Control
 
-Our iteration and evaluation steps are: 
+Our iteration and evaluation steps are:
 
 - We use Monte-Carlo to estimate the value
 - We use greedy policy improvement to get a better policy
@@ -50,11 +50,11 @@ Ideally, we can easily use the value function $$v_\pi$$ for evaluation and then 
 
 $$\pi'(s) = \argmax_{a \in \mathcal{A}} R^a_s + P_{ss'}^a V(s')$$
 
-Here, to get the $$P_{ss'}^a$$ we need to have a transition model, which goes against our target of staying model-free. The action-value $$q_\pi$$, on the other hand, does not require this transition probability: 
+Here, to get the $$P_{ss'}^a$$ we need to have a transition model, which goes against our target of staying model-free. The action-value $$q_\pi$$, on the other hand, does not require this transition probability:
 
 $$\pi'(s) = \argmax_{a \in A} Q(s,a)$$
 
-Thus, using $$q_\pi$$ allows us to close the loop in a model-free way. Hence, we now have our 2-step process that needs to be repeated until convergence as: 
+Thus, using $$q_\pi$$ allows us to close the loop in a model-free way. Hence, we now have our 2-step process that needs to be repeated until convergence as:
 
 - Iteratively Evaluate $$q_\pi$$  using Monte-Carlo methods
 - Improve to $$\pi' \geq \pi$$  greedily
@@ -65,7 +65,7 @@ Greedy improvement is essentially asking us to select the policy that leads to t
 
 ### $$\epsilon$$-greedy Strategy
 
-One way to make deterministic greedy policies stochastic is to follow an $$\epsilon$$-**greedy strategy**  → We try all $$m$$ actions with non-zero probability, and choose random actions with a probability $$\epsilon$$, while maintaining a probability of $$1- \epsilon$$  for choosing actions based on the greedy evaluation. Thus, by controlling $$\epsilon$$ as a hyperparameter, we tune how much randomness our agent is willing to accept in its decision: 
+One way to make deterministic greedy policies stochastic is to follow an $$\epsilon$$-**greedy strategy**  → We try all $$m$$ actions with non-zero probability, and choose random actions with a probability $$\epsilon$$, while maintaining a probability of $$1- \epsilon$$  for choosing actions based on the greedy evaluation. Thus, by controlling $$\epsilon$$ as a hyperparameter, we tune how much randomness our agent is willing to accept in its decision:
 
 $$
 \pi(a|s)  = \begin{cases}
@@ -74,9 +74,9 @@ $$
 
 \end{cases}$$
 
-The good thing is that we can prove that the new policy that we get with the $$\epsilon$$-greedy strategy actually does lead to a better policy: 
+The good thing is that we can prove that the new policy that we get with the $$\epsilon$$-greedy strategy actually does lead to a better policy:
 
- 
+
 
 $$
 \begin{aligned}
@@ -84,25 +84,25 @@ q_\pi(s, \pi'(s)) & = \sum_{a \in \mathcal{A}} \pi'(a|s) q_\pi(s,a) \\
 & = \frac{\epsilon}{m} \sum_{a \in \mathcal{A}} \pi'(a|s) q_\pi(s,a) +  ( 1- \epsilon) \max_{a \in \mathcal{A} } q_\pi(s,a) \\
 & \geq \frac{\epsilon}{m} \sum_{a \in \mathcal{A}} \pi'(a|s) q_\pi(s,a) +  ( 1- \epsilon) \sum_{a \in \mathcal{A}} \frac{\pi(a|s) - \frac{\epsilon}{m}}{1 - \epsilon} q_\pi(s,a) \\
 & = v_\pi (s) \\
-\therefore v_\pi(s') & \geq v_\pi (s) 
+\therefore v_\pi(s') & \geq v_\pi (s)
 \end{aligned} $$
 
 ### GLIE
 
-Greedy in the Limit with Infinite Exploration, as the name suggests, is a strategy in which we are essentially trying to explore infinitely, but reducing the magnitude of exploration over time so that in the limit the strategy remains greedy. Thus, a GLIE strategy has to satisfy 2 conditions: 
+Greedy in the Limit with Infinite Exploration, as the name suggests, is a strategy in which we are essentially trying to explore infinitely, but reducing the magnitude of exploration over time so that in the limit the strategy remains greedy. Thus, a GLIE strategy has to satisfy 2 conditions:
 
-- If a state is visited infinitely often, then each action in that state is chosen infinitely often 
+- If a state is visited infinitely often, then each action in that state is chosen infinitely often
 
     $$\lim_{k \rightarrow \infty } N_k(s,a) = \infty $$
 
-- In the limit, the learning policy is greedy with respect to the learned Q-function 
+- In the limit, the learning policy is greedy with respect to the learned Q-function
 
     $$\lim_{k \rightarrow  \infty} \pi_k(a|s) = \bm{1} (a = \argmax_{a \in \mathcal{A}} Q_k(s, a'))$$
 
-So, to convert our $$\epsilon$$-greedy strategy to a GLIE strategy, for example, we need to ensure that the magnitude of $$\epsilon$$  decays overtime to 0. Two variants of exploration strategies that have been shown to be GLIE are: 
+So, to convert our $$\epsilon$$-greedy strategy to a GLIE strategy, for example, we need to ensure that the magnitude of $$\epsilon$$  decays overtime to 0. Two variants of exploration strategies that have been shown to be GLIE are:
 
 - $$\epsilon$$-greedy with exploration with $$\epsilon_t = c/ N(t)$$ where $$N(t)$$ → number of visits to state $$s_t=s$$
-- Boltzmann Exploration with 
+- Boltzmann Exploration with
 
     $$
     \begin{aligned}
@@ -114,32 +114,32 @@ So, to convert our $$\epsilon$$-greedy strategy to a GLIE strategy, for example,
 
 ### GLIE Monte-Carlo Control
 
-We use Monte-Carlo estimation to get an estimate of the policy and then improve it in a GLIE manner as follows: 
+We use Monte-Carlo estimation to get an estimate of the policy and then improve it in a GLIE manner as follows:
 
 - Sample k$$^{th}$$ episode using policy $\pi$ so that $$\{S_1, A_1, R_1, ....., S_T \} \sim \pi$$
 - For each state and action, update the Number of visitation
 
     $$\begin{aligned}
     & N(S_t, A_t) \leftarrow N(S_t, A_t) + 1 \\
-    & Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \frac{1}{N(S_t, A_t)}  (G_t - Q(S_t, A_t) )  
+    & Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \frac{1}{N(S_t, A_t)}  (G_t - Q(S_t, A_t) )
     \end{aligned}$$
 
 - Improve the policy based on action value as
 
     $$\begin{aligned}
-    & \epsilon \leftarrow \frac{\epsilon}{k} \\ 
+    & \epsilon \leftarrow \frac{\epsilon}{k} \\
     & \pi \leftarrow \epsilon-greedy(Q)
     \end{aligned}$$
 
-Thus, now we update the quality of each state-action pair by running an episode and update all the states that were encountered. Then we lip a coin with $$1- \epsilon$$ probability of selecting the state-action pair with the highest $$Q(s,a)$$  from all the possible choices and $$\epsilon$$  probability of taking a random pair. Hence, we are able to ensure exploration happens with an $\epsilon$  probability, and this probability changes proportional to $$\frac{1}{k}$$ which essentially allows us to get more greedy as $$k$$ increases, with the hope that we converge to the optimal policy. In fact, it has 
+Thus, now we update the quality of each state-action pair by running an episode and update all the states that were encountered. Then we lip a coin with $$1- \epsilon$$ probability of selecting the state-action pair with the highest $$Q(s,a)$$  from all the possible choices and $$\epsilon$$  probability of taking a random pair. Hence, we are able to ensure exploration happens with an $\epsilon$  probability, and this probability changes proportional to $$\frac{1}{k}$$ which essentially allows us to get more greedy as $$k$$ increases, with the hope that we converge to the optimal policy. In fact, it has
 
 ## Off-Policy Monte-Carlo Control
 
-To be able to use experiences sampled from a policy $$\pi'$$ to estimate $$v_\pi$$ or $$q_\pi$$, we need to understand how the policies might relate to each other. To be even able to make a comparison, we first need to ensure that every action taken under $$\pi$$ is also taken, at least occasionally, under $$\pi'$$ → This allows us to guarantee representation of actions being common between the policies and thus, we need to ensure 
+To be able to use experiences sampled from a policy $$\pi'$$ to estimate $$v_\pi$$ or $$q_\pi$$, we need to understand how the policies might relate to each other. To be even able to make a comparison, we first need to ensure that every action taken under $$\pi$$ is also taken, at least occasionally, under $$\pi'$$ → This allows us to guarantee representation of actions being common between the policies and thus, we need to ensure
 
 $$\pi(s,a) > 0  \implies \pi'(s,a) > 0$$
 
-Now, let's consider we have the $i^{th}$ visit to a state $s$ in the episodes generated from $$\pi'$$ and the sequence of states and actions following this visit and let $$P_i(s), P_i'(s)$$ denote the probabilities of that complete sequence happening given policies $$\pi, \pi'$$ and let $$R_i(s)$$ be the return of this state. Thus to estimate $$v_\pi(s)$$ we only need to weigh the relative probabilities of $$s$$ happening in both policies. Thus, the desired MC estimate after $$n_s$$ returns from $$s$$ is: 
+Now, let's consider we have the $i^{th}$ visit to a state $s$ in the episodes generated from $$\pi'$$ and the sequence of states and actions following this visit and let $$P_i(s), P_i'(s)$$ denote the probabilities of that complete sequence happening given policies $$\pi, \pi'$$ and let $$R_i(s)$$ be the return of this state. Thus to estimate $$v_\pi(s)$$ we only need to weigh the relative probabilities of $$s$$ happening in both policies. Thus, the desired MC estimate after $$n_s$$ returns from $$s$$ is:
 
 $$V(s) = \frac{\sum_{i=1}^{n_s} \frac{P_i(s)}{P_i(s')} R_i(s)}{\sum_{i=1}^{n_s} \frac{P_i(s)}{P_i(s')}}$$
 
@@ -155,7 +155,7 @@ Thus, we see that the weights needed to estimate $$V(s)$$  only depend on polici
 
 ### Importance Sampling
 
-In MC off-policy control, we can use the returns generated from policy $$\mu$$ to estimate policy $$\pi$$ by weighing the target $$G_t$$ based on the similarity between the policies. This is the essence of importance sampling, where we estimate the expectation of a different distribution based on a given distribution: 
+In MC off-policy control, we can use the returns generated from policy $$\mu$$ to estimate policy $$\pi$$ by weighing the target $$G_t$$ based on the similarity between the policies. This is the essence of importance sampling, where we estimate the expectation of a different distribution based on a given distribution:
 
 $$\begin{aligned}
 \mathbb{E}_{X \sim P}[f(X)] & = \sum P(X) f(X)  \\
@@ -167,46 +167,46 @@ Thus, we just multiple te importance sampling correlations along the episodes an
 
 $$G^{\pi/\mu}_t = \frac{\pi(a_t|s_t)}{\mu(a_t|s_t)} \frac{\pi(a_{t+1}|s_{t+1})}{\mu(a_{t+1}|s_{t+1})} ... \frac{\pi(a_T|s_T)}{\mu(a_T|s_T)} G_t$$
 
-And now, we can use $$G^{\pi/\mu}_t$$ to compute our value update for MC-control. 
+And now, we can use $$G^{\pi/\mu}_t$$ to compute our value update for MC-control.
 
 ## TD-Policy Control
 
-The advantages of TD-Learning over MC methods are clear: 
+The advantages of TD-Learning over MC methods are clear:
 
 1. Lower variance
 2. Online
-3. Incomplete sequences 
+3. Incomplete sequences
 
-We again follow the pattern of GPI strategy, but this time using the TD estimate of the target and then again encounter the same issue of maintaining exploration, which leads us to on-policy ad off-policy control. As was the case with MC control, we need to remain model-free and so we shift the TD from estimating state-values to action-values. We know that formally, they both are equivalent and essentially Markov chains. 
+We again follow the pattern of GPI strategy, but this time using the TD estimate of the target and then again encounter the same issue of maintaining exploration, which leads us to on-policy ad off-policy control. As was the case with MC control, we need to remain model-free and so we shift the TD from estimating state-values to action-values. We know that formally, they both are equivalent and essentially Markov chains.
 
 ### On-Policy Control : SARSA
 
-We can use the same TD-target as state values to get the update for state-action pairs: 
+We can use the same TD-target as state values to get the update for state-action pairs:
 
 $$Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \big[ R_{t+1} + \gamma Q(s_{t+1}, a_{t+1}) - Q(s_t, a_t) \big]$$
 
-This is essentially operating over the set of current states and action, one step look-ahead of the same values and the reward of the next pair → $$(s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1})$$ - and the order in which this is written is **S**tate → **A**ction → **R**ewards → **S**tate → **A**ction. Thus, this algorithm is called SARSA.  We can use SARSA for evaluating our policies and then improve the policies, again, in an $\epsilon$-greedy manner. SARSA converges to $$q^*(s,a)$$ under the following conditions: 
+This is essentially operating over the set of current states and action, one step look-ahead of the same values and the reward of the next pair → $$(s_t, a_t, r_{t+1}, s_{t+1}, a_{t+1})$$ - and the order in which this is written is **S**tate → **A**ction → **R**ewards → **S**tate → **A**ction. Thus, this algorithm is called SARSA.  We can use SARSA for evaluating our policies and then improve the policies, again, in an $\epsilon$-greedy manner. SARSA converges to $$q^*(s,a)$$ under the following conditions:
 
 - GLIE sequences of policies $$\pi_t(a|s)$$
 - Robbins-Monro sequence of step-sizes $$\alpha_t$$
 
     $$\begin{aligned}
     & \sum_{t=1}^\infty \alpha_t = 0 \\
-    & \sum_{t=1}^\infty \alpha^2_t < \infty 
+    & \sum_{t=1}^\infty \alpha^2_t < \infty
     \end{aligned}$$
 
-We can perform a similar modification on SARSA to to extend it to n-steps by defining a target based on n-step returns: 
+We can perform a similar modification on SARSA to to extend it to n-steps by defining a target based on n-step returns:
 
 $$\begin{aligned}
 & q_t^{(n)} = r_{t+1} + \gamma r_{t+2} + \gamma^2 r_{t+3} + ... +  \gamma^{n-1} r_{t+n} + \gamma^n Q(s_{t+n}) \\
 \therefore \,\,\,& Q(s_t, a_t) \leftarrow Q(s_t, a_t) + \alpha \big[ q_t^{(n)} - Q(s_t, a_t) \big]
 \end{aligned}$$
 
-Additionally, we can also formulate a forward-view SARSA($$\lambda$$)  by combining n-step returns: 
+Additionally, we can also formulate a forward-view SARSA($$\lambda$$)  by combining n-step returns:
 
 $$q_t^\lambda  = (1 - \lambda) \sum _{n=1}^\infty \lambda ^{n-1} q_t^{(n)}$$
 
-and just like TD($$\lambda$$), we can implement Eligibility traces in online algorithms, in which case there will be one eligibility trace for each state-action pair: 
+and just like TD($$\lambda$$), we can implement Eligibility traces in online algorithms, in which case there will be one eligibility trace for each state-action pair:
 
 $$\begin{aligned}
 & E_0(s,a) = 0 \\

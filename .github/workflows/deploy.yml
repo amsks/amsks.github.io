@@ -20,12 +20,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout 🛎️
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
     - name: Setup Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2.2'
+        ruby-version-file: '.ruby-version'
         bundler-cache: true
+    # jekyll-imagemagick shells out to `convert`; without it every responsive
+    # .webp silently fails to generate and the srcset tags 404.
+    - name: Install ImageMagick
+      run: sudo apt-get update && sudo apt-get install -y imagemagick
     - name: Install and Build 🔧
       run: |
         pip3 install --upgrade jupyter
@@ -37,4 +41,3 @@ jobs:
       uses: JamesIves/github-pages-deploy-action@v4
       with:
         folder: _site
-

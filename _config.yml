@@ -10,7 +10,7 @@ email: adityak735@gmail.com
 description: > # the ">" symbol means to ignore newlines until "footer_text:"
   Personal Website of Aditya Mohan
 footer_text: >
-  Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio"></a> theme.
+  Powered by <a href="https://jekyllrb.com/" target="_blank">Jekyll</a> with the <a href="https://github.com/alshedivat/al-folio" target="_blank">al-folio</a> theme.
   Hosted by <a href="https://pages.github.com/" target="_blank">GitHub Pages</a>.
   Photos from <a href="https://unsplash.com" target="_blank">Unsplash</a>.
 keywords: Reinforcement Learning, Meta-Learning, AutoML, AutoRL  # add your own keywords or leave empty
@@ -45,7 +45,7 @@ repo_trophies:
 # will use title and url fields
 # Take a look to https://github.com/jekyll/jekyll-feed for more customization
 
-rss_icon: flase
+rss_icon: true
 
 # -----------------------------------------------------------------------------
 # Layout
@@ -135,9 +135,12 @@ related_blog_posts:
   enabled: true
   max_related: 5
 
+# External sources.
+# If you have blog posts published on medium.com or other external sources,
+# you can display them in your blog by adding a link to the RSS feed.
 external_sources:
   - name: automl.org
-    rss_url: https://www.automl.org/author/mohan/
+    rss_url: https://www.automl.org/author/mohan/feed/
 
 # Giscus comments (RECOMMENDED)
 # Follow instructions on https://giscus.app/ to setup for your repo to fill out
@@ -159,13 +162,6 @@ external_sources:
 disqus_shortname: # put your disqus shortname
 # https://help.disqus.com/en/articles/1717111-what-s-a-shortname
 
-# External sources.
-# If you have blog posts published on medium.com or other external sources,
-# you can display them in your blog by adding a link to the RSS feed.
-external_sources:
-  - name: medium.com
-    rss_url: https://medium.com/@al-folio/feed
-
 # -----------------------------------------------------------------------------
 # Collections
 # -----------------------------------------------------------------------------
@@ -176,12 +172,6 @@ collections:
       layout: post
     output: true
     permalink: /news/:path/
-  projects:
-    output: true
-    permalink: /projects/:path/
-
-# news_scrollable: true # adds a vertical scroll bar if there are more than 3 news items
-# news_limit: 5 # leave blank to include all the news in the `_news` folder
 
 announcements:
   enabled: true
@@ -271,7 +261,7 @@ jekyll-archives:
     category: '/blog/category/:name/'
 
 # display_tags: ['reinforcement-learning', 'gauge-theory'] # these tags will be displayed on the front page of your blog
-display_categories: ['reinforcement-learning', 'meta-learning', 'machine-learning', 'automl', 
+display_categories: ['reinforcement-learning', 'meta-learning', 'machine-learning', 'automl',
                       'evolutionary-computation', 'gauge-theory'] # these categories will be displayed on the front page of your blog
 
 # -----------------------------------------------------------------------------
@@ -310,7 +300,7 @@ badges: # Display different badges for your publications
   dimensions_badge: true # Dimensions badge (https://badge.dimensions.ai/)
 
 # Filter out certain bibtex entry keywords used internally from the bib output
-filtered_bibtex_keywords: [ abbr, abstract, arxiv, bibtex_show, html, pdf, selected, supp, blog, 
+filtered_bibtex_keywords: [ abbr, abstract, arxiv, bibtex_show, html, pdf, selected, supp, blog,
                             code, poster, slides, website, preview, altmetric]
 
 # Maximum number of authors to be shown for each publication (more authors are visible on click)

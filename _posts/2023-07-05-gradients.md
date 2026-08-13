@@ -9,12 +9,12 @@ related_posts: false
 
 ## Gradient Descent
 
-- **predicted value** $$= \text{intercept} + \text{slope}$$ 
+- **predicted value** $$= \text{intercept} + \text{slope}$$
 - **metric** → $$y = C + \frac{dy}{dx} x$$
 
 let $$y'$$ be the expected value:
-- residual $$= y' - y $$ 
-- sos = $$(y' - y)^2$$. 
+- residual $$= y' - y $$
+- sos = $$(y' - y)^2$$.
 - Thus, our optimization target becomes : $$\frac{1}{2} \sum (y' - (C + Mx))^2$$
 
 How gradient Descent works is by taking steps towards the optimal target. This is different from least-squares since in the latter we numerically compute the optimal solution by differentiating the target w.r.t C and setting it to 0 to find the inflection, which will be the minimal point. Gradient descent, on the other hand, works by first selecting a random value of intercept, say  $$C_1$$ , and then moving a step in the direction of decrease in value. This step is determined by the learning rate $$\alpha$$ which is a hyperparameter. So, at $$C_1$$, we differentiate the SOS target w.r.t C and calculate the value by putting $$C = C_1$$ and then multiply this value by alpha to get the next intercept point → Thus, when we are far away from the inflection, we take larger steps and when we are closer to the inflection, we take smaller steps since the slope is saturating. evident in N-dimensional metrics → the same thing is happening on hyperplanes
@@ -24,5 +24,5 @@ How gradient Descent works is by taking steps towards the optimal target. This i
 
 ## Stochastic Gradient Descent
 
-The computations in the Gradient Descent step scale up pretty fast and thus, convergence becomes an issue. SGD resolves this by sampling points for the intercept residual calculation!  → Instead of using all points, we can randomly sample n points - **Mini-batch** - and use them → This is especially helpful when points are clustered in different clusters, since the points in one cluster wil more-or-less have similar residuals! 
+The computations in the Gradient Descent step scale up pretty fast and thus, convergence becomes an issue. SGD resolves this by sampling points for the intercept residual calculation!  → Instead of using all points, we can randomly sample n points - **Mini-batch** - and use them → This is especially helpful when points are clustered in different clusters, since the points in one cluster wil more-or-less have similar residuals!
 - Again the sensitivity to $$\alpha$$ comes into picture and again we can adapt scheduling  to overcome this!

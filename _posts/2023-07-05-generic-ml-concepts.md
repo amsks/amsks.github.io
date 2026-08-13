@@ -9,43 +9,43 @@ related_posts: false
 
 ## Cross-Validation
 
-Allows us to compare different ML methods! When working with a dataset for training a learner: 
-- Naive Idea → Use all data 
+Allows us to compare different ML methods! When working with a dataset for training a learner:
+- Naive Idea → Use all data
 - Better Idea →  Use x percent for training and y percent for testing
 
 the issue is how do we know that the selection is good ? The lord answers through **K-Fold Cross Validation** → split data into K blocks → For each K-block train the data on the rest of the K-1 blocks and test it on K block and log the metric → Average out the performance and use this for comparison
-- **Leave one out cv** → us each sample as a block 
+- **Leave one out cv** → us each sample as a block
 
 ## Confusion Matrix
-Plot the Predicted Positives and Negatives vs, Ground truths : 
+Plot the Predicted Positives and Negatives vs, Ground truths :
 
 <div class="col-sm">
     {% include figure.html path="assets/img/MALIS/Confusion.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-**NOTE:** 
+**NOTE:**
 - The diagonal always shows the True values
 - The non-diagonal elements ar  always false
 
-The major Metrics are: 
+The major Metrics are:
 - **Sensitivity →** Positive Labels correctly predicted : $$\frac{TP}{TP + TN }$$
 - **Specificity →** Negative Labels Correctly predicted : $$\frac{TN}{TN + FN}$$
 
 Let's say we test out logistic regression against Random Forests to classify patients with and without heart disease. Then the algorithm with the higher sensitivity should be chosen if our target is to classify patients with heart disease, while the algorithm with higher specificity should be chosen if we want to classify patients without heart disease
 
-### What about Non-binary classification 
+### What about Non-binary classification
 Calculate these values for each label by treating the values as Label and !label. For if we have three labels, we take the true positives as all the classifications done for label i and the TN as all the misclassifications done for label i → This means that if the data actually belonged to the other classes and was still classified as belonging to i, then it is a False Positive. Similarly, we take True Negative as all the classifications done on all other classes except out current label and the false negatives as the classifications. Let's take the following example:
 
 <div class="col-sm">
     {% include figure.html path="assets/img/MALIS/Confusion-2.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-Here, for The class Cat, we get : 
+Here, for The class Cat, we get :
 
 - Sensitivity $$= 5/(5 + 3 + 0) = 5/8 = 0.625$$
 - Specificity $$= (3 + 2 + 1 + 11)/(3 + 2 + 1 + 11 + 2 ) = 17/19 = 0.894$$
 
-Other major metrics are: 
+Other major metrics are:
 - **Accuracy** → $$(TP+TN)/total = (100+50)/165 = 0.91$$
 - **Misclassification Rate** → $$(FP+FN)/total = (10+5)/165 = 0.09$$ = 1 - accuracy
 - **Precision → $$TP/predicted yes = 100/110 = 0.91$$**
@@ -77,7 +77,7 @@ And this variation can be plotted as follows:
 
 ## ROC and AUC
 
-The whole idea of ROC curve is adjusting our classification threshold for example in the case of logistic regression - to mess-around with the rates of TP and FP. We plot these values for each threshold against each other on a graph, as shown: 
+The whole idea of ROC curve is adjusting our classification threshold for example in the case of logistic regression - to mess-around with the rates of TP and FP. We plot these values for each threshold against each other on a graph, as shown:
 
 <div class="col-sm">
     {% include figure.html path="assets/img/MALIS/ROC.png" class="img-centered rounded z-depth-0" %}

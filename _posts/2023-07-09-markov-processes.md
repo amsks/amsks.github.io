@@ -34,10 +34,10 @@ Another way to visualize this would be in the form of a graph, as shown below, c
     {% include figure.html path="assets/img/Reinforcement-Learning/MP.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-This is a basic chain that represents the actions a student can take in the class, with associated probabilities of taking those actions. Thus, in the state - Class 1 - the student has an equal chance of going to the next class or browsing Facebook. Once they start browsing Facebook, then they have a 90% chance of continuing to browse since it is addictive. Similarly, other states can be seen too. 
+This is a basic chain that represents the actions a student can take in the class, with associated probabilities of taking those actions. Thus, in the state - Class 1 - the student has an equal chance of going to the next class or browsing Facebook. Once they start browsing Facebook, then they have a 90% chance of continuing to browse since it is addictive. Similarly, other states can be seen too.
 
 ## Markov Reward Process
-Now if we add another parameter of rewards to the Markov processes, then the scenario changes to the one in which entering each state has an associated expected immediate reward. This, now, becomes a Markov Reward Process. 
+Now if we add another parameter of rewards to the Markov processes, then the scenario changes to the one in which entering each state has an associated expected immediate reward. This, now, becomes a Markov Reward Process.
 
 <div class="col-sm">
     {% include figure.html path="assets/img/Reinforcement-Learning/MRP.png" class="img-centered rounded z-depth-0" %}
@@ -160,7 +160,7 @@ The expectation for the value of the states is the sum of the values of the acti
     {% include figure.html path="assets/img/Reinforcement-Learning/sve.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-Thus, under the policy $$\pi$$ this value is the sum of the q-values of the actions: 
+Thus, under the policy $$\pi$$ this value is the sum of the q-values of the actions:
 
 $$
 v_{\pi}(s) = \sum_{a \in A} \pi (a|s) q_{\pi} (s,a)

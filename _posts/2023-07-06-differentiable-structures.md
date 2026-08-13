@@ -7,20 +7,20 @@ giscus_comments: false
 related_posts: false
 ---
 
-To get differentiable manifolds, we need to refine the notion of Compatibility. We do this by saying that an atlas $$\mathcal{A}$$ is $$K$$-compatible if $$\forall (U,x), (V,y) \in \mathcal{A}$$ we have either of the two following conditions: 
+To get differentiable manifolds, we need to refine the notion of Compatibility. We do this by saying that an atlas $$\mathcal{A}$$ is $$K$$-compatible if $$\forall (U,x), (V,y) \in \mathcal{A}$$ we have either of the two following conditions:
 
 - $$U \cap V = \Phi$$
 - $$U \cap V \neq \Phi$$  →  $$U,V$$ satisfy some condition $$K$$
 
-Now, we can define $$K$$ to be usually: 
+Now, we can define $$K$$ to be usually:
 
-1. $$C^0$$ 
+1. $$C^0$$
 2. $$C^k$$ → Transition maps are $$k$$-times differentiable
-3. $$C^{\infty}$$ → Smooth transitions 
-4. $$C^{\omega}$$→ Analytic i.e can be expanded through a taylor expansion 
+3. $$C^{\infty}$$ → Smooth transitions
+4. $$C^{\omega}$$→ Analytic i.e can be expanded through a taylor expansion
 5. Complex → Transition functions satisfy the Cauchy-Riemann Equations
 
-**Whitney Theorem** → The theorem says: 
+**Whitney Theorem** → The theorem says:
 
 - Any maximal $$C^k$$ Atlas, contains a $$C^{\infty}$$ Atlas
 - Any two $$C^k$$ atlas that cotain the same $$C^{\infty}$$ atlas are identical
@@ -42,13 +42,13 @@ If we have two manifolds $$(M, O_M, \mathcal{A}_M)$$  and $$(N, O_N, \mathcal{A}
 
 $$\phi: M \rightarrow N $$
 
-is diffferentiable if for some points in some charts in the two atlases: 
+is diffferentiable if for some points in some charts in the two atlases:
 
 $$p \in U : (U,x) \in \mathcal {A}_M \\
 q \in V : (V,y) \in \mathcal {A}_N \\
 q = \phi(p) $$
 
-The transformation map that comes: 
+The transformation map that comes:
 
 $$y \,\, \circ \,\,\phi \,\, \circ \,\,  x^{-1}$$
 
@@ -73,18 +73,18 @@ And because this transformation exists, we can say that the second chart is also
     {% include figure.html path="assets/img/GT/DS.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-This relation would, by extension, be true for any chart for which this relation holds → $$C^k$$-compatible chart. If the map $$\phi : M \rightarrow N$$ is $$C^{\infty}$$-compatible then this is called a **diffeomorphism,** and the two manifolds $$(M, O_M, \mathcal{A}_M)$$  and $$(N, O_N, \mathcal{A}_N)$$  are called diffeomorphic if there exists a diffeomorphism between them. 
+This relation would, by extension, be true for any chart for which this relation holds → $$C^k$$-compatible chart. If the map $$\phi : M \rightarrow N$$ is $$C^{\infty}$$-compatible then this is called a **diffeomorphism,** and the two manifolds $$(M, O_M, \mathcal{A}_M)$$  and $$(N, O_N, \mathcal{A}_N)$$  are called diffeomorphic if there exists a diffeomorphism between them.
 
 $$M \cong_{diff} N $$
 
-Usually, we consider diffeomorphic manifolds the same as smooth manifolds. 
+Usually, we consider diffeomorphic manifolds the same as smooth manifolds.
 
 ### How many different Differentiable structures can we put on a manifold up to diffeomorphism ?
 
 The answer depends on the dimension:
 
-1. $$dim = 1,2,3$$  → **Radon-Moise Theorems** → For we can make a unique differential Manifold from topological manifolds since all the different ones are diffeomorphic, which allows us to work easily with differentiability 
+1. $$dim = 1,2,3$$  → **Radon-Moise Theorems** → For we can make a unique differential Manifold from topological manifolds since all the different ones are diffeomorphic, which allows us to work easily with differentiability
 2. $$dim > 4$$ → **Surgery Theory →** We can essentially understand a higher dimensional torus by using familiar structures like a sphere and cylinder, which can be 'intelligently' combined: If we take a sphere, make a hole, and insert a cylinder i.e. perform surgery, while controlling invariance, like fundamental group, homotopy group, homologies, etc., then we can essentially understand the torus since we understand the sphere and Cylinder. The assertion is that we can, similarly, understand all structures in higher dimensions by performing intelligent surgery. In the 1960s, it was shown that there are finitely many smooth manifolds one can make from a topological manifold in dimensions greater than 4. One practical application of this to physics, in principle, could be that if we are to assume that spacetime is a differential manifold of higher dimensions, then pure math tells us that there exist finitely many ways in which this higher dimensional structure could be projected to our 3D understanding, and we could conduct experiments to determine which one of these nature has chosen!
-3. $$dim = 4$$  → For the case of compact spaces, there are non-countably many different smooth manifolds that can be created! For the case of compact spaces, we look at partial results based on Betti Numbers. Thus, when we look at Einstein's description of spacetime being $$\mathbb{R}^4$$, we can see that there are non-countably many smooth manifolds as far as we know from the analysis. Thus, if our theories fail, they could very well fail because of our choice of the structure. 
+3. $$dim = 4$$  → For the case of compact spaces, there are non-countably many different smooth manifolds that can be created! For the case of compact spaces, we look at partial results based on Betti Numbers. Thus, when we look at Einstein's description of spacetime being $$\mathbb{R}^4$$, we can see that there are non-countably many smooth manifolds as far as we know from the analysis. Thus, if our theories fail, they could very well fail because of our choice of the structure.
 
 One of the key features of Differential Manifolds is tangent spaces. Since we are speaking of geometry intrinsically, we need to develop an intuition that is separate from the embedded space in which an object exists.

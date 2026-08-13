@@ -11,11 +11,11 @@ We can define a Topological Manifold as a Paracompact and Hausdorff topological 
 
 $$x : U \rightarrow x(u) \in \mathbb{R}^d$$
 
-In other words, we can say that a topological space is a Manifold if it behaves like $$\mathbb{R}^d$$ locally. This manifold, as obvious, is $$d$$-dimensional. For example, a circle and a square are homeomorphic and represent the $$S^2$$ manifold. 
+In other words, we can say that a topological space is a Manifold if it behaves like $$\mathbb{R}^d$$ locally. This manifold, as obvious, is $$d$$-dimensional. For example, a circle and a square are homeomorphic and represent the $$S^2$$ manifold.
 
 ### Sub-Manifold
 
-We can also extend this notion to the subsets of our topological space → So, if we have a space $$N \subseteq M$$, then we call it a sub-manifold of $$M$$  if it is a manifold in its own right. All we need to check, thus, is the induced topology $$(N, O \mid_N)$$ and see if it is a manifold or not. So, a circle can be considered a sub-manifold of the $$\mathbb{R}^2$$ , but two circles touching each other at exactly one point might not satisfy this since the point at which they touch is locally behaving like $$\mathbb{R}, \mathbb{R}$$  which is not the same as $$\mathbb{R}^2$$. 
+We can also extend this notion to the subsets of our topological space → So, if we have a space $$N \subseteq M$$, then we call it a sub-manifold of $$M$$  if it is a manifold in its own right. All we need to check, thus, is the induced topology $$(N, O \mid_N)$$ and see if it is a manifold or not. So, a circle can be considered a sub-manifold of the $$\mathbb{R}^2$$ , but two circles touching each other at exactly one point might not satisfy this since the point at which they touch is locally behaving like $$\mathbb{R}, \mathbb{R}$$  which is not the same as $$\mathbb{R}^2$$.
 
 ### Product Manifolds
 
@@ -41,12 +41,12 @@ For a point $$p \in M$$ , the pre-image of the set only containing $$p$$ under t
 
 $$F := preim_\pi (\{ p\}) \,\,\,\,\, \exists  p \in M  $$
 
-For example, let's take a product Manifold. For a Fibre Bundle $$F$$ and a base space $$M$$ , we can define the total space as: 
+For example, let's take a product Manifold. For a Fibre Bundle $$F$$ and a base space $$M$$ , we can define the total space as:
 
 $$
 \begin{aligned}
 E = M \times F \\
-\pi : M \times F \rightarrow M 
+\pi : M \times F \rightarrow M
 \end{aligned}
 $$
 
@@ -56,23 +56,23 @@ So, a Mobius strip can be through of a Bundle constructed by taking a rectangle 
     {% include figure.html path="assets/img/GT/TopMan/TopMan-2.png" class="img-centered rounded z-depth-0" %}
 </div>
 
-We find that even though it is not a product Manifold, we can say that the pre-image of every point maps to the interval $$[-1, 1]$$ and this makes it a bundle of $$\mathbb{S}^1$$. We can see that bundles are essentially a generalization of the idea of taking a product, by intuitively understanding that to make a bundle we basically take a base space and attach fibers in a certain way. However, the definition does not really mention any notion of the total space being built out of the base space, and this is the generalization bit. 
+We find that even though it is not a product Manifold, we can say that the pre-image of every point maps to the interval $$[-1, 1]$$ and this makes it a bundle of $$\mathbb{S}^1$$. We can see that bundles are essentially a generalization of the idea of taking a product, by intuitively understanding that to make a bundle we basically take a base space and attach fibers in a certain way. However, the definition does not really mention any notion of the total space being built out of the base space, and this is the generalization bit.
 
 ### Fiber Bundle
 
-We can be a bit more restricted in our notion of a bundle and yet be more general than a simple product space, To better elucidate this, we can say that in a bundle the fiber for multiple points need not be the same for all points → We are only interested in the existence of some fiber as per its definition. So, if we restrict the points to having the same fiber 
+We can be a bit more restricted in our notion of a bundle and yet be more general than a simple product space, To better elucidate this, we can say that in a bundle the fiber for multiple points need not be the same for all points → We are only interested in the existence of some fiber as per its definition. So, if we restrict the points to having the same fiber
 
 $$
-F := preim_\pi (\{ p\}) \,\,\,\,\, \forall  p \in M  
+F := preim_\pi (\{ p\}) \,\,\,\,\, \forall  p \in M
 $$
 
-Then we call $$E \rightarrow^\pi M$$ a Fiber Bundle with the Typical Fiber $$F$$. We  often write the map as 
+Then we call $$E \rightarrow^\pi M$$ a Fiber Bundle with the Typical Fiber $$F$$. We  often write the map as
 
 $$
-F \rightarrow E \rightarrow^{\pi} M 
+F \rightarrow E \rightarrow^{\pi} M
 $$
 
-Thus, fiber bundles are between Product Manifolds and General Bundles.  
+Thus, fiber bundles are between Product Manifolds and General Bundles.
 
 ### Section
 
@@ -88,7 +88,7 @@ A very good example of this is in quantum Mechanics → The wave function $$\Psi
 
 ### Sub-Bundles
 
-We can use the same logic of Sub-manifolds to create sub-bundles. We take a bundle $$E \rightarrow ^\pi M$$  and then define another bundle  $$E' \rightarrow^{\pi '} M'$$ . Now, this new bundle will be a sub-bundle if it meets the following three conditions: 
+We can use the same logic of Sub-manifolds to create sub-bundles. We take a bundle $$E \rightarrow ^\pi M$$  and then define another bundle  $$E' \rightarrow^{\pi '} M'$$ . Now, this new bundle will be a sub-bundle if it meets the following three conditions:
 
 1. $$E' \subset E$$
 2. $$M' \subset M$$
@@ -96,7 +96,7 @@ We can use the same logic of Sub-manifolds to create sub-bundles. We take a bund
 
 ### Isomorphism in Bundles
 
-If we have two  bundles: 
+If we have two  bundles:
 
 $$E \rightarrow^{\pi_E} M \\
 F \rightarrow^{\pi_F} N $$
@@ -104,7 +104,7 @@ F \rightarrow^{\pi_F} N $$
 And we have two maps:
 
 $$\varphi:   E \rightarrow F \\
-f : M \rightarrow N 
+f : M \rightarrow N
 $$
 
 Then, we call this a bundle morphism. This can essentially be seen as true if the map below commutes.
@@ -130,20 +130,20 @@ Then, the above two bundles are called isomorphic, since they clearly have the s
 
 ## Viewing Manifolds from Atlases
 
-Let $$(M,O)$$  be a topological Manifold of dimension $$d$$. Then a pair $$(U, x)$$  where 
+Let $$(M,O)$$  be a topological Manifold of dimension $$d$$. Then a pair $$(U, x)$$  where
 
 $$U  \in O \\
 x: U \rightarrow \mathbb{R}^d$$
 
- is called a chart of the manifold. This is just a terminology formalizing the notion that the neighborhood of a point in a manifold that maps to some subset of $$\mathbb{R}^d$$ be called a chart. However, since $$x$$ maps to $$\mathbb{R}^d = \mathbb{R} \times \mathbb{R} \times ...$$ , we can now say that the components of $$x$$  are essentially coordinates of a point $$p \in U$$  w.r.t the chart  $$(U,x)$$. This is crucial to understand, since now we are realizing that on any topological manifold, we can only define coordinates based on a chart, and we can have different such charts.  Thus, there has to  exist a set of charts such that every point is covered i.e 
+ is called a chart of the manifold. This is just a terminology formalizing the notion that the neighborhood of a point in a manifold that maps to some subset of $$\mathbb{R}^d$$ be called a chart. However, since $$x$$ maps to $$\mathbb{R}^d = \mathbb{R} \times \mathbb{R} \times ...$$ , we can now say that the components of $$x$$  are essentially coordinates of a point $$p \in U$$  w.r.t the chart  $$(U,x)$$. This is crucial to understand, since now we are realizing that on any topological manifold, we can only define coordinates based on a chart, and we can have different such charts.  Thus, there has to  exist a set of charts such that every point is covered i.e
 
 $$\cup_{(U,x) \in A} U = M $$
 
-Thus, there will be many-empty charts that overlap, and the collection of such charts is called an **Atlas.** 
+Thus, there will be many-empty charts that overlap, and the collection of such charts is called an **Atlas.**
 
 ### Compatibility in Charts
 
-Two chard $$(U,x)$$  and $$(V,x)$$  are called $$C^0$$-compatible if either fo the following conditions are met: 
+Two chard $$(U,x)$$  and $$(V,x)$$  are called $$C^0$$-compatible if either fo the following conditions are met:
 
 1. $$U \cap V = \Phi$$
 2. $$U\cap V \neq \Phi$$, but $$y \circ x^{-1}$$ exists

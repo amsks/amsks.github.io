@@ -23,7 +23,7 @@ To find the optimal $$x$$ for an unknown $$f$$  we need to explicitly reason abo
 
 Each edge in the graph is associated with a binary cost and let's assume that the agent does not know about these costs beforehand, but knows about the topology of the graph. Each time an agent moves from one node to another, it observes and accumulates the cost. An episode is going from the source on the left to the sink on the right. Hence, the learning task is to figure out the optimal path in a few episodes. The simplest solution for the agent is to assume that the costs of edges are uniform and thus, take the shortest path through the middle, which gives it a total cost of 13. We could then use a standard regression algorithm to fit a weight vector to this dataset and estimate the cost of the other paths, simply based on the nodes observed so far, which gives us 14 for the top, 13 for the middle, and 14 for the bottom paths. Hence, the agent would choose to take the middle path, even though it is suboptimal as compared to the top one.
 
-Now, let's consider an agent that does not just fit a weight vector but reasons about whether it can obtain the cost of edges with the available data. Assuming the agent completed the first episode through the middle path and accumulated a reward of 13, the question it needs to answer is which path to go for next. In the bottom path cost of the penultimate node is 2, which can be figured out from the costs of nodes already visited 
+Now, let's consider an agent that does not just fit a weight vector but reasons about whether it can obtain the cost of edges with the available data. Assuming the agent completed the first episode through the middle path and accumulated a reward of 13, the question it needs to answer is which path to go for next. In the bottom path cost of the penultimate node is 2, which can be figured out from the costs of nodes already visited
 
 $$3 - 1 = 2$$
 
@@ -55,11 +55,11 @@ With the incorporation of this belief, we can define an MDP over the beliefs wit
 
 ## Bayesian Methods
 
-This is where Bayesian methods come into the picture. They formulate this belief $$P(f|S)$$  as a Bayesian representation and compute this using a gaussian process at every step. After this, they use a heuristic to choose the next decision. The Gaussian process used to compute this belief is called **surrogate function** and the heuristic used is called an **Acquisition Function.** We can write the process as follows: 
+This is where Bayesian methods come into the picture. They formulate this belief $$P(f|S)$$  as a Bayesian representation and compute this using a gaussian process at every step. After this, they use a heuristic to choose the next decision. The Gaussian process used to compute this belief is called **surrogate function** and the heuristic used is called an **Acquisition Function.** We can write the process as follows:
 
 1. Compute the posterior belief using a surrogate Gaussian process to form an estimate of the mean $$\mu(x)$$  and variance around this estimate $$\sigma^2(x)$$  to describe the uncertainty
 2. Compute an acquisition function $$\alpha_t(x)$$  that is proportional to how beneficial it is to sample the next point from the range of values
-3. Find the maximal point of this acquisition function and sample at that next location 
+3. Find the maximal point of this acquisition function and sample at that next location
 
     $$x_t = \argmax_x \alpha_t(x) $$
 
@@ -84,10 +84,10 @@ The evaluation of this maximization of the acquisition function is another non-l
 
 One of the places where Global Bayesian Optimization can show good results is the optimization of hyperparameters for Neural Networks. So, let's implement this approach to tune the learning rate of an Image Classifier! I will use the KMNIST dataset and a small ResNet-9 Model with a Stochastic Gradient Descent optimizer. Our plan of attack is as follows:
 
-1. Create a training pipeline for our Neural Network with the Dataset and customizable learning rate 
+1. Create a training pipeline for our Neural Network with the Dataset and customizable learning rate
 2. Cast the training and inference into a an objective function, which can serve as ou blackbox
-3. Map the inference to an evaluation metric that can be used in the optimization procedure 
-4. Use this function in a global bayesian optimization procedure. 
+3. Map the inference to an evaluation metric that can be used in the optimization procedure
+4. Use this function in a global bayesian optimization procedure.
 
 ### Creating the training pipeline and Objective Function
 
@@ -107,7 +107,7 @@ def create_resnet9_model() -> nn.Module:
     model.conv1 = torch.nn.Conv2d(1, 64, kernel_size=(7, 7), stride=(2, 2), padding=(3, 3), bias=False)
     return model
 
-# 
+#
 class ResNet9(pl.LightningModule):
     def __init__(self, learning_rate=0.005):
         '''
@@ -115,8 +115,8 @@ class ResNet9(pl.LightningModule):
 
             Parameters
             -----------
-            learning_rate: float 
-                Learning rate to be used for training every time since it is an 
+            learning_rate: float
+                Learning rate to be used for training every time since it is an
                 optimization parameter
         '''
         super().__init__()
@@ -137,36 +137,36 @@ class ResNet9(pl.LightningModule):
         return torch.optim.SGD(self.parameters(), lr=self.learning_rate)
 ```
 
-Once this is done, our next step is to use the training pipeline and cast it into an objective function. For this, we need to evaluate our model somehow. I have used the balanced accuracy as an evaluation metric, but any other metric can also be used (like the AUC-ROC score) 
+Once this is done, our next step is to use the training pipeline and cast it into an objective function. For this, we need to evaluate our model somehow. I have used the balanced accuracy as an evaluation metric, but any other metric can also be used (like the AUC-ROC score)
 
 ```python
-def objective(  lr=0.1, 
-                epochs=1, 
-                gpu_count=1, 
-                iteration=None, 
-                model_dir='./outputs/models/', 
+def objective(  lr=0.1,
+                epochs=1,
+                gpu_count=1,
+                iteration=None,
+                model_dir='./outputs/models/',
                 train_dl=None,
-                test_dl = None 
+                test_dl = None
             ):
 
     '''
-        The objective function for the optimization procedure 
+        The objective function for the optimization procedure
 
         Parameters
         -----------
-        lr: float 
-            learning Rate 
-        epochs: int 
+        lr: float
+            learning Rate
+        epochs: int
             Epochs for training
-        gpu_count: int 
+        gpu_count: int
             Number of GPUs to be used (0 for only CPUs)
-        iteration: int 
+        iteration: int
             Current iteration
         model_dir: str
-            directory to save model checkpoints 
-        train_dl: Torch Dataloader 
+            directory to save model checkpoints
+        train_dl: Torch Dataloader
             Dataloader for training
-        test_dl: Torch Dataloader 
+        test_dl: Torch Dataloader
             Dataloader for inference
 
         Returns
@@ -210,23 +210,23 @@ def objective(  lr=0.1,
 
 ### Implementing Bayesian Optimization
 
-As mentioned in the previous sections, we first need a Gaussian Process as a surrogate model. We can either write it from scratch or just use some open-sourced library to do this. Here, I have used sci-kit learn to create a regressor  
+As mentioned in the previous sections, we first need a Gaussian Process as a surrogate model. We can either write it from scratch or just use some open-sourced library to do this. Here, I have used sci-kit learn to create a regressor
 
 ```python
 # Create the Model
-    m52 = sklearn.gaussian_process.kernelsConstantKernel(1.0) * Matern( length_scale=2.0, 
+    m52 = sklearn.gaussian_process.kernelsConstantKernel(1.0) * Matern( length_scale=2.0,
                                         nu=1.5
                                     )
     model = sklearn.gaussian_process.GaussianProcessRegressor(
-                                        kernel=m52, 
-                                        alpha=1e-10, 
+                                        kernel=m52,
+                                        alpha=1e-10,
                                         n_restarts_optimizer=100
                                     )
 ```
 
-Once th Gaussian process is established, we now need to write the acquisition function. I have used the Expected Improvements acquisition function. The core idea can be re-written as proposed by Mockus 
+Once th Gaussian process is established, we now need to write the acquisition function. I have used the Expected Improvements acquisition function. The core idea can be re-written as proposed by Mockus
 
-$$EI(x) = \begin{cases} 
+$$EI(x) = \begin{cases}
 \big( \mu_t(x) - y_{max} - \epsilon \big ) \Phi(Z)   + \sigma_t (x) \phi(Z) &\sigma_t(x) > 0  \\
 0  & \sigma_t(x) > 0
 
@@ -245,7 +245,7 @@ def _acquisition(self, X, samples):
 
             Parameters
             -----------
-            X : N x 1 
+            X : N x 1
                 Array of parameter points observed so far
 
             X_samples : N x 1
@@ -262,7 +262,7 @@ def _acquisition(self, X, samples):
         mu_x_, _ = self.surrogate(X)
         max_x_ = max(mu_x_)
 
-        # Get the mean and deviation of the samples 
+        # Get the mean and deviation of the samples
         mu_sample_, std_sample_ = self.surrogate(samples)
         mu_sample_ = mu_sample_[:, 0]
 
@@ -285,7 +285,7 @@ def optimize_acq(self, X):
 
             Parameters
             -----------
-            X : N x 1 
+            X : N x 1
                 Array of parameter points
 
             Returns
@@ -294,7 +294,7 @@ def optimize_acq(self, X):
                 Next location of the sampling point based on the Maximization
 
         '''
-            
+
         # Calculate Acquisition value for each sample
         EI_ = self._acquisition(X, self.X_samples_)
 
@@ -306,9 +306,9 @@ def optimize_acq(self, X):
 
 ### Putting it all together
 
-Now that we have our optimization routines, we just need to combine them with our objective function into a loop and we are done. In my code, I have implemented the optimization as a class and I pass the paramters to this class. So, the main loop looks as follows: 
+Now that we have our optimization routines, we just need to combine them with our objective function into a loop and we are done. In my code, I have implemented the optimization as a class and I pass the paramters to this class. So, the main loop looks as follows:
 
- 
+
 
 ```python
 budget = 10
@@ -321,8 +321,8 @@ test_dl = DataLoader(test_data, batch_size=batch_size, num_workers=8)
 
 # sample the domain
 X = np.array([np.random.uniform(0, 1) for _ in range(init_samples)])
-y = np.array([objective(lr =x, 
-                        epochs=init_epochs, 
+y = np.array([objective(lr =x,
+                        epochs=init_epochs,
                         gpu_count=gpu_count,
                         train_dl=train_dl,
                         test_dl=test_dl
@@ -334,25 +334,25 @@ y = y.reshape(len(y), 1)
 for i in range(budget):
 		# fit the model
 		B.model.fit(X, y)
-		
+
 		# Select the next point to sample
 		X_next = B.optimize_acq(X, y)
-		
+
 		# Sample the point from Objective
-		Y_next = objective( lr=X_next, 
-		                    epochs=epochs, 
+		Y_next = objective( lr=X_next,
+		                    epochs=epochs,
 		                    gpu_count=gpu_count,
-		                    model_dir= output_dir+"/models/", 
+		                    model_dir= output_dir+"/models/",
 		                    iteration=i+1,
 		                    train_dl= train_dl,
 		                    test_dl = test_dl
 		                    )
-		
+
 		print(f"LR = {X_next} \t Balanced Accuracy = {Y_next*100} %")
-		
-		# Plots for second iteration onwards 
+
+		# Plots for second iteration onwards
 		B.plot(X, y, X_next, i+1)
-		
+
 		# add the data to History
 		X = np.vstack((X, [[X_next]]))
 		y = np.vstack((y, [[Y_next]]))
