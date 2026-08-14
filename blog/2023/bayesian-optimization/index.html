@@ -11,7 +11,7 @@
     <span class="n">model</span><span class="p">.</span><span class="n">conv1</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="nc">Conv2d</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">),</span> <span class="n">stride</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">padding</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">bias</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">model</span>
 
-<span class="c1"># 
+<span class="c1">#
 </span><span class="k">class</span> <span class="nc">ResNet9</span><span class="p">(</span><span class="n">pl</span><span class="p">.</span><span class="n">LightningModule</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.005</span><span class="p">):</span>
         <span class="sh">'''</span><span class="s">
@@ -19,8 +19,8 @@
 
             Parameters
             -----------
-            learning_rate: float 
-                Learning rate to be used for training every time since it is an 
+            learning_rate: float
+                Learning rate to be used for training every time since it is an
                 optimization parameter
         </span><span class="sh">'''</span>
         <span class="nf">super</span><span class="p">().</span><span class="nf">__init__</span><span class="p">()</span>
@@ -39,33 +39,33 @@
 
     <span class="k">def</span> <span class="nf">configure_optimizers</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">torch</span><span class="p">.</span><span class="n">optim</span><span class="p">.</span><span class="nc">SGD</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="nf">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="n">self</span><span class="p">.</span><span class="n">learning_rate</span><span class="p">)</span>
-</code></pre></div></div> <p>Once this is done, our next step is to use the training pipeline and cast it into an objective function. For this, we need to evaluate our model somehow. I have used the balanced accuracy as an evaluation metric, but any other metric can also be used (like the AUC-ROC score)</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">objective</span><span class="p">(</span>  <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> 
-                <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-                <span class="n">gpu_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> 
-                <span class="n">iteration</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
-                <span class="n">model_dir</span><span class="o">=</span><span class="sh">'</span><span class="s">./outputs/models/</span><span class="sh">'</span><span class="p">,</span> 
+</code></pre></div></div> <p>Once this is done, our next step is to use the training pipeline and cast it into an objective function. For this, we need to evaluate our model somehow. I have used the balanced accuracy as an evaluation metric, but any other metric can also be used (like the AUC-ROC score)</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">objective</span><span class="p">(</span>  <span class="n">lr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">gpu_count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">iteration</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                <span class="n">model_dir</span><span class="o">=</span><span class="sh">'</span><span class="s">./outputs/models/</span><span class="sh">'</span><span class="p">,</span>
                 <span class="n">train_dl</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
-                <span class="n">test_dl</span> <span class="o">=</span> <span class="bp">None</span> 
+                <span class="n">test_dl</span> <span class="o">=</span> <span class="bp">None</span>
             <span class="p">):</span>
 
     <span class="sh">'''</span><span class="s">
-        The objective function for the optimization procedure 
+        The objective function for the optimization procedure
 
         Parameters
         -----------
-        lr: float 
-            learning Rate 
-        epochs: int 
+        lr: float
+            learning Rate
+        epochs: int
             Epochs for training
-        gpu_count: int 
+        gpu_count: int
             Number of GPUs to be used (0 for only CPUs)
-        iteration: int 
+        iteration: int
             Current iteration
         model_dir: str
-            directory to save model checkpoints 
-        train_dl: Torch Dataloader 
+            directory to save model checkpoints
+        train_dl: Torch Dataloader
             Dataloader for training
-        test_dl: Torch Dataloader 
+        test_dl: Torch Dataloader
             Dataloader for inference
 
         Returns
@@ -106,12 +106,12 @@
 
     <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="nf">mean</span><span class="p">(</span><span class="nf">balanced_accuracy_score</span><span class="p">(</span><span class="n">true_y</span><span class="p">,</span> <span class="n">pred_y</span><span class="p">))</span>
 </code></pre></div></div> <h3 id="implementing-bayesian-optimization">Implementing Bayesian Optimization</h3> <p>As mentioned in the previous sections, we first need a Gaussian Process as a surrogate model. We can either write it from scratch or just use some open-sourced library to do this. Here, I have used sci-kit learn to create a regressor</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create the Model
-</span>    <span class="n">m52</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">gaussian_process</span><span class="p">.</span><span class="nf">kernelsConstantKernel</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="nc">Matern</span><span class="p">(</span> <span class="n">length_scale</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> 
+</span>    <span class="n">m52</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">gaussian_process</span><span class="p">.</span><span class="nf">kernelsConstantKernel</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span> <span class="o">*</span> <span class="nc">Matern</span><span class="p">(</span> <span class="n">length_scale</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
                                         <span class="n">nu</span><span class="o">=</span><span class="mf">1.5</span>
                                     <span class="p">)</span>
     <span class="n">model</span> <span class="o">=</span> <span class="n">sklearn</span><span class="p">.</span><span class="n">gaussian_process</span><span class="p">.</span><span class="nc">GaussianProcessRegressor</span><span class="p">(</span>
-                                        <span class="n">kernel</span><span class="o">=</span><span class="n">m52</span><span class="p">,</span> 
-                                        <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> 
+                                        <span class="n">kernel</span><span class="o">=</span><span class="n">m52</span><span class="p">,</span>
+                                        <span class="n">alpha</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
                                         <span class="n">n_restarts_optimizer</span><span class="o">=</span><span class="mi">100</span>
                                     <span class="p">)</span>
 </code></pre></div></div> <p>Once th Gaussian process is established, we now need to write the acquisition function. I have used the Expected Improvements acquisition function. The core idea can be re-written as proposed by Mockus</p> \[EI(x) = \begin{cases} \big( \mu_t(x) - y_{max} - \epsilon \big ) \Phi(Z) + \sigma_t (x) \phi(Z) &amp;\sigma_t(x) &gt; 0 \\ 0 &amp; \sigma_t(x) &gt; 0 \end{cases}\] <p>Where</p> \[Z = \frac{\mu_t(x) - y_{max} - \epsilon}{\sigma_t(x) }\] <p>and \(\Phi\) and \(\phi\) are the PDF and CDF functions. This formulation is an analytical expression that achieves the same result as our earlier formulation and we have added \(\epsilon\) as an exploration parameter. This can be implemented as follows</p> <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">_acquisition</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">samples</span><span class="p">):</span>
@@ -120,7 +120,7 @@
 
             Parameters
             -----------
-            X : N x 1 
+            X : N x 1
                 Array of parameter points observed so far
 
             X_samples : N x 1
@@ -137,7 +137,7 @@
 </span>        <span class="n">mu_x_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">surrogate</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
         <span class="n">max_x_</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="n">mu_x_</span><span class="p">)</span>
 
-        <span class="c1"># Get the mean and deviation of the samples 
+        <span class="c1"># Get the mean and deviation of the samples
 </span>        <span class="n">mu_sample_</span><span class="p">,</span> <span class="n">std_sample_</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">surrogate</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
         <span class="n">mu_sample_</span> <span class="o">=</span> <span class="n">mu_sample_</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
 
@@ -155,7 +155,7 @@
 
             Parameters
             -----------
-            X : N x 1 
+            X : N x 1
                 Array of parameter points
 
             Returns
@@ -164,7 +164,7 @@
                 Next location of the sampling point based on the Maximization
 
         </span><span class="sh">'''</span>
-            
+
         <span class="c1"># Calculate Acquisition value for each sample
 </span>        <span class="n">EI_</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="nf">_acquisition</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">X_samples_</span><span class="p">)</span>
 
@@ -182,8 +182,8 @@
 
 <span class="c1"># sample the domain
 </span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="nf">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">init_samples</span><span class="p">)])</span>
-<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="nf">objective</span><span class="p">(</span><span class="n">lr</span> <span class="o">=</span><span class="n">x</span><span class="p">,</span> 
-                        <span class="n">epochs</span><span class="o">=</span><span class="n">init_epochs</span><span class="p">,</span> 
+<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">([</span><span class="nf">objective</span><span class="p">(</span><span class="n">lr</span> <span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                        <span class="n">epochs</span><span class="o">=</span><span class="n">init_epochs</span><span class="p">,</span>
                         <span class="n">gpu_count</span><span class="o">=</span><span class="n">gpu_count</span><span class="p">,</span>
                         <span class="n">train_dl</span><span class="o">=</span><span class="n">train_dl</span><span class="p">,</span>
                         <span class="n">test_dl</span><span class="o">=</span><span class="n">test_dl</span>
@@ -195,26 +195,26 @@
 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">budget</span><span class="p">):</span>
 		<span class="c1"># fit the model
 </span>		<span class="n">B</span><span class="p">.</span><span class="n">model</span><span class="p">.</span><span class="nf">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-		
+
 		<span class="c1"># Select the next point to sample
 </span>		<span class="n">X_next</span> <span class="o">=</span> <span class="n">B</span><span class="p">.</span><span class="nf">optimize_acq</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
-		
+
 		<span class="c1"># Sample the point from Objective
-</span>		<span class="n">Y_next</span> <span class="o">=</span> <span class="nf">objective</span><span class="p">(</span> <span class="n">lr</span><span class="o">=</span><span class="n">X_next</span><span class="p">,</span> 
-		                    <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span> 
+</span>		<span class="n">Y_next</span> <span class="o">=</span> <span class="nf">objective</span><span class="p">(</span> <span class="n">lr</span><span class="o">=</span><span class="n">X_next</span><span class="p">,</span>
+		                    <span class="n">epochs</span><span class="o">=</span><span class="n">epochs</span><span class="p">,</span>
 		                    <span class="n">gpu_count</span><span class="o">=</span><span class="n">gpu_count</span><span class="p">,</span>
-		                    <span class="n">model_dir</span><span class="o">=</span> <span class="n">output_dir</span><span class="o">+</span><span class="sh">"</span><span class="s">/models/</span><span class="sh">"</span><span class="p">,</span> 
+		                    <span class="n">model_dir</span><span class="o">=</span> <span class="n">output_dir</span><span class="o">+</span><span class="sh">"</span><span class="s">/models/</span><span class="sh">"</span><span class="p">,</span>
 		                    <span class="n">iteration</span><span class="o">=</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span>
 		                    <span class="n">train_dl</span><span class="o">=</span> <span class="n">train_dl</span><span class="p">,</span>
 		                    <span class="n">test_dl</span> <span class="o">=</span> <span class="n">test_dl</span>
 		                    <span class="p">)</span>
-		
+
 		<span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">LR = </span><span class="si">{</span><span class="n">X_next</span><span class="si">}</span><span class="s"> </span><span class="se">\t</span><span class="s"> Balanced Accuracy = </span><span class="si">{</span><span class="n">Y_next</span><span class="o">*</span><span class="mi">100</span><span class="si">}</span><span class="s"> %</span><span class="sh">"</span><span class="p">)</span>
-		
-		<span class="c1"># Plots for second iteration onwards 
+
+		<span class="c1"># Plots for second iteration onwards
 </span>		<span class="n">B</span><span class="p">.</span><span class="nf">plot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">X_next</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-		
+
 		<span class="c1"># add the data to History
 </span>		<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">vstack</span><span class="p">((</span><span class="n">X</span><span class="p">,</span> <span class="p">[[</span><span class="n">X_next</span><span class="p">]]))</span>
 		<span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">vstack</span><span class="p">((</span><span class="n">y</span><span class="p">,</span> <span class="p">[[</span><span class="n">Y_next</span><span class="p">]]))</span>
-</code></pre></div></div> <p>Here, I have used a budged to 10 function evaluations in the main loop and 2 function evaluations before the first posterior estimate. An exemplary plot of what comes out at the end is shown below</p> <div class="col-sm"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/AutoML/plot-iter-3-480.webp"></source> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/AutoML/plot-iter-3-800.webp"></source> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/AutoML/plot-iter-3-1400.webp"></source> <img src="/assets/img/AutoML/plot-iter-3.png" class="img-centered rounded z-depth-0" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> <p>The vertical axis is the Balanced Accuracy and the horizontal axis is the learning rate. As can be seen, this is the third iteration of the main loop, with 2 points sampled as an initial estimate, and the acquisition function is the highest at the region with the balance of uncertainty and value of the mean.</p> </div> </article> <br> <hr> <br> <ul class="list-disc pl-8"></ul> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2022/displaying-external-posts-on-your-al-folio-blog/">Displaying External Posts on Your al-folio Blog</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/policy-gradients/">Policy Gradients</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/model-free-control/">Model-Free Control</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/model-free-prediction/">Model-Free Prediction</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/planning-and-dynamic-programming/">Planning and Dynamic Programming</a> </li> </div> </div> <footer class="sticky-bottom mt-5"> <div class="container"> © Copyright 2026 Aditya Mohan. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with <a href="https://github.com/alshedivat/al-folio" rel="external nofollow noopener" target="_blank"></a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. Last updated: May 26, 2026. </div> </footer> <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha256-fgLAgv7fyCGopR/gBNq2iW3ZKIdqIcyshnUULC4vex8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@4/imagesloaded.pkgd.min.js"></script> <script defer src="/assets/js/masonry.js" type="text/javascript"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.8/dist/medium-zoom.min.js" integrity="sha256-7PhEpEWEW0XXQ0k6kQrPKwuoIomz8R8IYyuU1Qew4P8=" crossorigin="anonymous"></script> <script defer src="/assets/js/zoom.js"></script> <script defer src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script> <script src="/assets/js/no_defer.js"></script> <script defer src="/assets/js/common.js"></script> <script defer src="/assets/js/copy_code.js" type="text/javascript"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script type="text/javascript">window.MathJax={tex:{tags:"ams"}};</script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script> <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> <script async src="https://www.googletagmanager.com/gtag/js?id="></script> <script>function gtag(){window.dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","");</script> <script type="text/javascript">function progressBarSetup(){"max"in document.createElement("progress")?(initializeProgressElement(),$(document).on("scroll",function(){progressBar.attr({value:getCurrentScrollPosition()})}),$(window).on("resize",initializeProgressElement)):(resizeProgressBar(),$(document).on("scroll",resizeProgressBar),$(window).on("resize",resizeProgressBar))}function getCurrentScrollPosition(){return $(window).scrollTop()}function initializeProgressElement(){let e=$("#navbar").outerHeight(!0);$("body").css({"padding-top":e}),$("progress-container").css({"padding-top":e}),progressBar.css({top:e}),progressBar.attr({max:getDistanceToScroll(),value:getCurrentScrollPosition()})}function getDistanceToScroll(){return $(document).height()-$(window).height()}function resizeProgressBar(){progressBar.css({width:getWidthPercentage()+"%"})}function getWidthPercentage(){return getCurrentScrollPosition()/getDistanceToScroll()*100}const progressBar=$("#progress");window.onload=function(){setTimeout(progressBarSetup,50)};</script> </body> </html>
+</code></pre></div></div> <p>Here, I have used a budged to 10 function evaluations in the main loop and 2 function evaluations before the first posterior estimate. An exemplary plot of what comes out at the end is shown below</p> <div class="col-sm"> <figure> <picture> <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/AutoML/plot-iter-3-480.webp"></source> <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/AutoML/plot-iter-3-800.webp"></source> <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/AutoML/plot-iter-3-1400.webp"></source> <img src="/assets/img/AutoML/plot-iter-3.png" class="img-centered rounded z-depth-0" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();"> </picture> </figure> </div> <p>The vertical axis is the Balanced Accuracy and the horizontal axis is the learning rate. As can be seen, this is the third iteration of the main loop, with 2 points sampled as an initial estimate, and the acquisition function is the highest at the region with the balance of uncertainty and value of the mean.</p> </div> </article> <br> <hr> <br> <ul class="list-disc pl-8"></ul> <h2 class="text-3xl font-semibold mb-4 mt-12">Enjoy Reading This Article?</h2> <p class="mb-2">Here are some more articles you might like to read next:</p> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2021/carl-a-benchmark-to-study-generalization-in-reinforcement-learning/">CARL: A benchmark to study generalization in Reinforcement Learning</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/understanding-autorl-hyperparameter-landscapes/">Understanding AutoRL Hyperparameter Landscapes</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/learning-activation-functions-for-sparse-neural-networks-improving-accuracy-in-sparse-models/">Learning Activation Functions for Sparse Neural Networks: Improving Accuracy in Sparse Models</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2023/experience-driven-algorithm-selection-making-better-and-cheaper-selection-decisions/">Experience-Driven Algorithm Selection: Making better and cheaper selection decisions</a> </li> <li class="my-2"> <a class="text-pink-700 underline font-semibold hover:text-pink-800" href="//blog/2024/incorporating-structure-in-deep-reinforcement-learning/">Incorporating Structure in Deep Reinforcement Learning</a> </li> </div> </div> <footer class="sticky-bottom mt-5"> <div class="container"> © Copyright 2026 Aditya Mohan. Powered by <a href="https://jekyllrb.com/" target="_blank" rel="external nofollow noopener">Jekyll</a> with the <a href="https://github.com/alshedivat/al-folio" target="_blank" rel="external nofollow noopener">al-folio</a> theme. Hosted by <a href="https://pages.github.com/" target="_blank" rel="external nofollow noopener">GitHub Pages</a>. Photos from <a href="https://unsplash.com" target="_blank" rel="external nofollow noopener">Unsplash</a>. Last updated: August 14, 2026. </div> </footer> <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha256-fgLAgv7fyCGopR/gBNq2iW3ZKIdqIcyshnUULC4vex8=" crossorigin="anonymous"></script> <script src="https://cdn.jsdelivr.net/npm/mdbootstrap@4.20.0/js/mdb.min.js" integrity="sha256-NdbiivsvWt7VYCt6hYNT3h/th9vSTL4EDWeGs5SN3DA=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js" integrity="sha256-Nn1q/fx0H7SNLZMQ5Hw5JLaTRZp0yILA/FRexe19VdI=" crossorigin="anonymous"></script> <script defer src="https://cdn.jsdelivr.net/npm/imagesloaded@4/imagesloaded.pkgd.min.js"></script> <script defer src="/assets/js/masonry.js" type="text/javascript"></script> <script defer src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.8/dist/medium-zoom.min.js" integrity="sha256-7PhEpEWEW0XXQ0k6kQrPKwuoIomz8R8IYyuU1Qew4P8=" crossorigin="anonymous"></script> <script defer src="/assets/js/zoom.js"></script> <script defer src="https://unpkg.com/bootstrap-table@1.21.4/dist/bootstrap-table.min.js"></script> <script src="/assets/js/no_defer.js"></script> <script defer src="/assets/js/common.js"></script> <script defer src="/assets/js/copy_code.js" type="text/javascript"></script> <script async src="https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js"></script> <script async src="https://badge.dimensions.ai/badge.js"></script> <script type="text/javascript">window.MathJax={tex:{tags:"ams"}};</script> <script defer type="text/javascript" id="MathJax-script" src="https://cdn.jsdelivr.net/npm/mathjax@3.2.0/es5/tex-mml-chtml.js"></script> <script defer src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> <script async src="https://www.googletagmanager.com/gtag/js?id="></script> <script>function gtag(){window.dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","");</script> <script type="text/javascript">function progressBarSetup(){"max"in document.createElement("progress")?(initializeProgressElement(),$(document).on("scroll",function(){progressBar.attr({value:getCurrentScrollPosition()})}),$(window).on("resize",initializeProgressElement)):(resizeProgressBar(),$(document).on("scroll",resizeProgressBar),$(window).on("resize",resizeProgressBar))}function getCurrentScrollPosition(){return $(window).scrollTop()}function initializeProgressElement(){let e=$("#navbar").outerHeight(!0);$("body").css({"padding-top":e}),$("progress-container").css({"padding-top":e}),progressBar.css({top:e}),progressBar.attr({max:getDistanceToScroll(),value:getCurrentScrollPosition()})}function getDistanceToScroll(){return $(document).height()-$(window).height()}function resizeProgressBar(){progressBar.css({width:getWidthPercentage()+"%"})}function getWidthPercentage(){return getCurrentScrollPosition()/getDistanceToScroll()*100}const progressBar=$("#progress");window.onload=function(){setTimeout(progressBarSetup,50)};</script> </body> </html>
