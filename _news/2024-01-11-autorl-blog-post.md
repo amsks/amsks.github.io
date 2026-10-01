@@ -5,5 +5,4 @@ date: 2024-01-11 10:00:00+0200
 inline: true
 ---
 
-Raghu Rajan, Theresa Eimer, Andre Bidenkapp and I have written a blog post on the AutoRL blog about the year 2023 in AutoRL
-research. You can read it [here](http://autorl.org/blog/retrospective/).
+Raghu Rajan, Theresa Eimer, Andre Biedenkapp and I wrote a [retrospective on AutoRL research in 2023](http://autorl.org/blog/retrospective/).

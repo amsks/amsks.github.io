@@ -11,28 +11,46 @@
 - title: Experience
   type: time_table
   contents:
-    - title: Scientific Researcher and PhD Candidate
-      institution: Institute for Artificial Intelligence, Leibniz University Hannover
-      year: Oct 2021 - Present
+    - title: PhD Candidate
+      institution: Institute of Artificial Intelligence, Leibniz University Hannover
+      year: Apr 2022 - Present
       description:
-        - Generalization and Deployability in Reinforcement Learning through Meta-Learning and
-          Algorithm Configuration.
-        - Incorporating Domain knowledge and Structure as inductive biases in Reinforcement Learning.
-        - Supervised by Prof. Dr. Marius Lindauer
+        - Generalization in Reinforcement Learning, Meta-Learning and Algorithm Configuration
+        - Supervised by Prof. Marius Lindauer
+    - title: Research Scientist Intern
+      institution: Amazon Web Services, Berlin
+      year: Aug 2025 - Feb 2026
+      description:
+        - Offline RL with adaptable objectives and utilities
+        - Managed by Dr. Huibin Shen
     - title: Research Intern
       institution: Learning and Intelligent Systems Group, Technical University of Berlin
-      year: Sep 2020 - Dec 2020
+      year: Oct 2020 - Dec 2020
       description:
-        - Exploration in Reinforcement Learning through reward-shaping using trajectories
-          generated from a planner.
-        - Worked under Ingmar Schubert and Prof. Dr. Marc Toussaint.
-
+        - Plan-conditioned policies for sample-efficient RL
+        - Supervised by Ingmar Schubert and Prof. Marc Toussaint
     - title: Risk Consultant
       institution: KPMG India, Bangalore
       year: Jul 2018 - Sep 2019
+
+- title: Research Visits
+  type: time_table
+  contents:
+    - title: University of Texas at Austin
+      institution: Prof. Amy Zhang
+      year: May - Aug 2026
       description:
-        - Analysis and re-engineering of core business processes and competency pipelines for clients
-          across a broad spectrum of industries
+        - Structured representations for Behavior Foundation Models
+    - title: University of Tübingen
+      institution: Prof. Georg Martius
+      year: Feb - Apr 2025
+      description:
+        - Action-free representations for zero-shot RL
+    - title: Jožef Stefan Institute, Ljubljana
+      institution: Dr. Tome Eftimov
+      year: Jul 2023, Jul 2024
+      description:
+        - Dynamic algorithm configuration using RL
 
 - title: Education
   type: time_table
@@ -41,47 +59,31 @@
       institution: Technical University of Berlin and EURECOM
       year: Oct 2019 - Oct 2021
       description:
-        - Thesis "AI agents that quickly adapt to a partner for Ad-Hoc cooperation in the game of
-          Hanabi"
-        - Supervised by Prof. Dr. Klaus Obermayer
-
-    - title: B.Tech in Electronics and Communication Engineering
+        - Thesis "RL agents that quickly adapt to a partner for Ad-Hoc cooperation in the game of
+          Hanabi" (grade 1.0)
+        - Supervised by Prof. Klaus Obermayer
+    - title: B.Tech. in Electronics and Communication Engineering
       institution: Manipal Institute of Technology
-      year: Aug 2014 – July 2018
+      year: Aug 2014 - Jul 2018
       description:
-        - Thesis "Development of Software for Autonomous Driving Support"
+        - Thesis "Development of Software for Autonomous Driving Support" (grade 1.0)
         - Supervised by Dr. Shankarnarayana Bhat
-# - title: Open Source Projects
-#   type: time_table
-#   contents:
-#     - title: <a href="https://github.com/alshedivat/al-folio">al-folio</a>
-#       year: 2015-now
-#       description: A beautiful, simple, clean, and responsive Jekyll theme for academics.
 
-# - title: Honors and Awards
-#   type: time_table
-#   contents:
-#     - year: 1921
-#       items:
-#         - Nobel Prize in Physics
-#         - Matteucci Medal
-#     - year: 2029
-#       items:
-#         - Max Planck Medal
-
-# - title: Academic Interests
-#   type: nested_list
-#   contents:
-#     - title: Topic 1.
-#       items:
-#         - Description 1.
-#         - Description 2.
-#     - title: Topic 2.
-#       items:
-#         - Description 1.
-#         - Description 2.
-
-# - title: Other Interests
-#   type: list
-#   contents:
-#     - <u>Hobbies:</u> Hobby 1, Hobby 2, etc.
+- title: Honors and Awards
+  type: time_table
+  contents:
+    - year: 2025
+      items:
+        - DAAD IFI fellowship for international research stays (€10,000)
+    - year: Dec 2024
+      items:
+        - Featured in the <a href="https://www.l3s.de/magazine/">Binaire Magazine</a> for excellent AI research
+    - year: Oct 2024
+      items:
+        - L3S Best Publication Award for "Structure in Deep Reinforcement Learning&#58; A Survey and Open Problems"
+    - year: Oct 2024
+      items:
+        - Winner, Haus der Wissenschaft Science Slam
+    - year: 2020
+      items:
+        - EIT Digital Merit Scholarship (€4,500)
